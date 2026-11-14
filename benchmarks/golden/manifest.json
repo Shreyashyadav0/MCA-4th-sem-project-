@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "note": "The example_* samples are FORMAT EXAMPLES ONLY. They are not evaluation data and must be excluded from any reported metric.",
+  "evaluation_samples": [],
+  "format_examples": ["example_01", "example_02"]
+}

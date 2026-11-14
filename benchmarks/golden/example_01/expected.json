@@ -1,0 +1,19 @@
+{
+  "note": "FORMAT EXAMPLE — not part of the evaluation set. Labels below are illustrative.",
+  "findings": [
+    {
+      "file": "app/users.py",
+      "line_start": 4,
+      "line_end": 4,
+      "category": "injection",
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "app/users.py",
+      "line_start": 3,
+      "line_end": 3,
+      "category": "quality",
+      "severity": "MEDIUM"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+diff --git a/app/config.py b/app/config.py
+--- a/app/config.py
++++ b/app/config.py
+@@ -1,2 +1,4 @@
+ import os
+ 
++API_KEY = "ghp_exampleTokenValue1234567890"
++DEBUG = True
