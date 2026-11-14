@@ -118,7 +118,12 @@ EXERCISE_KEYS = {"prompt", "hint", "solution", "explanation"}
 LINK_KEYS = {"label", "path", "lines"}
 LEARN_KEYS = {"label", "href"}
 
-RAW_HTML = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?/?>")
+RAW_HTML = re.compile(
+    r"</?(?:b|i|em|strong|code|pre|a|div|span|script|style|img|br|p|ul|ol|li|h[1-6]|table|tr|td|th"
+    r"|section|article|figure|figcaption|button|input|label|form|iframe|svg)(?:\s[^<>]*)?/?>",
+    re.IGNORECASE,
+)
+INLINE_CODE = re.compile(r"`[^`\n]*`")
 FENCED_CODE = re.compile(r"^```[^\n]*\n[\s\S]*?^```[^\n]*$", re.MULTILINE)
 PART_ENTRY = re.compile(
     r"\{\s*n:\s*(\d+)\s*,\s*title:\s*\"([^\"]+)\"\s*,\s*lessons:\s*(\d+)\s*\}"
@@ -568,6 +573,12 @@ def check_example_sources(lesson: dict, where: str, available: set[str], report:
                 )
 
 
+def raw_html_in(text: str) -> list[str]:
+    """Tags in prose. Fenced and inline code are not markup and are ignored."""
+    stripped = INLINE_CODE.sub(" ", FENCED_CODE.sub(" ", text))
+    return [match.group(0) for match in RAW_HTML.finditer(stripped)]
+
+
 def authored_strings(lesson: dict):
     """Every string a lesson author writes that the reader sees as text."""
     for index, item in enumerate(lesson.get("quiz") or []):
@@ -651,7 +662,10 @@ def check_pages(paths: list[str], report: Report) -> None:
         # are not ids.
         markup = re.sub(r"<script\b[^>]*>.*?</script>", " ", text, flags=re.S)
         markup = re.sub(r"<!--.*?-->", " ", markup, flags=re.S)
-        found_ids = [m[0] or m[1] for m in re.findall(r"""\bid\s*=\s*(?:"([^"]*)"|'([^']*)')""", markup)]
+        found_ids = [
+            m[0] or m[1]
+            for m in re.findall(r"""(?<![\w-])id\s*=\s*(?:"([^"]*)"|'([^']*)')""", markup)
+        ]
         seen = set()
         for name in found_ids:
             if name in seen:
@@ -662,7 +676,12 @@ def check_pages(paths: list[str], report: Report) -> None:
             report.fail(page, f"missing contract id '#{missing}'")
         for extra in [name for name in found_ids if name not in wanted]:
             report.fail(page, f"unexpected id '#{extra}' — the DOM contract names exactly {len(wanted)}")
-        tags = re.findall(r'<script\b[^>]*\bsrc\s*=\s*"([^"]+)"[^>]*>', text)
+        tags = [
+            (m[0] or m[1])
+            for m in re.findall(
+                r"""<script\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)')""", text, re.IGNORECASE
+            )
+        ]
         listed = [src for src in tags if src.startswith("content/") and src not in NON_LESSON]
         sources_tags = [index for index, src in enumerate(tags) if src == "content/repo-sources.js"]
         if not sources_tags:
@@ -673,22 +692,21 @@ def check_pages(paths: list[str], report: Report) -> None:
             first_lesson = next((i for i, src in enumerate(tags) if src in listed), None)
             if first_lesson is not None and sources_tags[0] > first_lesson:
                 report.fail(page, "loads content/repo-sources.js after the first lesson")
+
         if listed != expected:
             report.fail(
                 page,
                 f"lesson script tags do not match the manifest "
                 f"(page: {listed or 'none'}; manifest: {expected or 'none'})",
             )
-        if 'src="assets/manifest.js"' not in text:
+        if "assets/manifest.js" not in tags:
             report.fail(page, "does not load assets/manifest.js")
-        else:
-            order = [
-                re.search(r'src="assets/([a-z-]+\.js)"', tag).group(1)
-                for tag in re.findall(r'<script\s+src="assets/[a-z-]+\.js"\s*>\s*</script>', text)
-            ]
-            wanted = PAGE_SCRIPTS.get(page, [])
-            if order != wanted:
-                report.fail(page, f"script order is {order}, expected {wanted}")
+        order = [
+            src[len("assets/"):] for src in tags if src.startswith("assets/")
+        ]
+        wanted = PAGE_SCRIPTS.get(page, [])
+        if order != wanted:
+            report.fail(page, f"script order is {order}, expected {wanted}")
 
 
 def main() -> int:
@@ -729,14 +747,14 @@ def main() -> int:
 
         concept = lesson.get("concept_md")
         if isinstance(concept, str):
-            hits = RAW_HTML.findall(FENCED_CODE.sub(" ", concept))
+            hits = raw_html_in(concept)
             if hits:
                 report.fail(relative, f"concept_md contains raw HTML: {', '.join(sorted(set(hits))[:4])}")
         # Quiz text and captions are rendered as text, but they are also the
         # place an author is most likely to paste markup by accident.
         for where_text, value in authored_strings(lesson):
             if isinstance(value, str):
-                hits = RAW_HTML.findall(FENCED_CODE.sub(" ", value))
+                hits = raw_html_in(value)
                 if hits:
                     report.fail(relative, f"{where_text} contains raw HTML: {', '.join(sorted(set(hits))[:3])}")
 

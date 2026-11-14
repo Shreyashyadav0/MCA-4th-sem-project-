@@ -174,10 +174,17 @@
       terminal.appendChild(why);
     }
 
+    /* Bring Run back — but never for a terminal-tier example, which has no Run
+     * by design, and never while a terminal panel is the honest answer. */
     function restoreRun() {
       var button = $("tryit-run");
       var terminal = $("tryit-terminal");
-      if (!button || !window.PyRun.isAvailable()) {
+      if (!button) {
+        return;
+      }
+      var tier = example ? example.run_tier || (example.runnable === true ? "browser" : "terminal") : "terminal";
+      if (tier === "terminal") {
+        showTerminal(example);
         return;
       }
       button.hidden = false;
@@ -239,6 +246,12 @@
       var button = $("tryit-copy");
       var text = $("tryit-code").value;
       var done = function (ok) {
+        if (!ok) {
+          /* Select the code so the instruction is true. */
+          var field = $("tryit-code");
+          field.focus();
+          field.select();
+        }
         button.textContent = ok ? "Copied" : "Press Ctrl+C";
         window.setTimeout(function () {
           button.textContent = "Copy";
@@ -296,10 +309,11 @@
         return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
       };
 
+      var vertical = false; /* captured at pointerdown: the axis must not flip mid-drag */
+
       var fromPointer = function (event) {
         var box = split.getBoundingClientRect();
-        /* Stacked, the split is horizontal: the divider moves with clientY. */
-        var ratio = stacked()
+        var ratio = vertical
           ? (event.clientY - box.top) / box.height
           : (event.clientX - box.left) / box.width;
         setSplit(ratio * 100);
@@ -307,8 +321,16 @@
 
       divider.addEventListener("pointerdown", function (event) {
         dragging = true;
+        vertical = stacked();
         divider.setPointerCapture(event.pointerId);
         event.preventDefault();
+      });
+
+      divider.addEventListener("pointercancel", function () {
+        dragging = false;
+      });
+      divider.addEventListener("lostpointercapture", function () {
+        dragging = false;
       });
       divider.addEventListener("pointermove", function (event) {
         if (dragging) {
@@ -353,6 +375,7 @@
         var dark = document.documentElement.getAttribute("data-theme") === "dark";
         button.textContent = dark ? "Light mode" : "Dark mode";
         button.setAttribute("aria-pressed", dark ? "true" : "false");
+        button.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
       };
       button.addEventListener("click", function () {
         var dark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -371,6 +394,18 @@
     function boot() {
       bindTheme();
       bindSplit();
+
+      if (!window.PyRun) {
+        /* The runner script did not load: say so instead of leaving a dead button. */
+        var deadRun = $("tryit-run");
+        if (deadRun) {
+          deadRun.hidden = true;
+        }
+        $("tryit-code").value = "";
+        $("tryit-code").disabled = true;
+        setStatus("The Python runner could not be loaded, so this page cannot run code.");
+        return;
+      }
 
       lesson = lessonById(param("id"));
       if (lesson) {
@@ -412,7 +447,14 @@
       $("tryit-reset").addEventListener("click", function () {
         $("tryit-code").value = original;
         $("tryit-output").textContent = "";
-        restoreRun();
+        var tier = example.run_tier || (example.runnable === true ? "browser" : "terminal");
+        if (tier === "terminal") {
+          showTerminal(example);
+        } else {
+          /* The runtime may still be down; Run is offered anyway, and pressing it
+           * re-shows the fallback if the download is still blocked. */
+          restoreRun();
+        }
         setStatus("Reset to the original snippet.");
         window.setTimeout(function () {
           setStatus("");
@@ -422,6 +464,12 @@
 
       /* Tab indents two spaces rather than leaving the editor; Ctrl-Enter runs. */
       $("tryit-code").addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          /* Tab indents here, so Escape is the documented way out. */
+          event.preventDefault();
+          $("tryit-output").focus();
+          return;
+        }
         if (event.key === "Tab" && event.shiftKey) {
           return; /* Shift-Tab leaves the field, as it should */
         }

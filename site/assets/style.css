@@ -52,7 +52,7 @@
   --sev-high: #ffb27a;
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
-  --scrim: #000000;
+  --scrim: #6b7688;
   --divider: #8892a4;
 }
 
@@ -66,6 +66,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -792,12 +793,6 @@ details.solution[open] summary {
   justify-content: space-between;
 }
 
-.pager a[aria-disabled="true"] {
-  color: var(--muted);
-  text-decoration: none;
-  cursor: default;
-}
-
 .progress-total {
   font-size: 0.875rem;
   color: var(--muted);
@@ -836,8 +831,8 @@ details.solution[open] summary {
   overscroll-behavior: contain;
   border-right: 1px solid var(--border);
   background: var(--surface);
-  /* Inline padding keeps the 3px focus ring + halo inside the scroll box. */
-  padding: var(--space-3) var(--space-1) var(--space-6);
+  /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
+  padding: var(--space-3) var(--space-2) var(--space-6);
 }
 
 .sidebar-toggle {
@@ -1113,7 +1108,7 @@ details.solution[open] summary {
 .split {
   --split: 50%;
   display: grid;
-  grid-template-columns: var(--split) 8px minmax(0, 1fr);
+  grid-template-columns: var(--split) 24px minmax(0, 1fr);
   gap: 0;
   height: calc(100vh - 12rem);
   min-height: 20rem;
@@ -1126,10 +1121,6 @@ details.solution[open] summary {
   min-width: 0;
   overflow: auto;
   background: var(--bg);
-}
-
-.pane-left {
-  border-right: 0;
 }
 
 .split textarea {
@@ -1159,26 +1150,24 @@ details.solution[open] summary {
 .divider {
   position: relative;
   cursor: col-resize;
-  background: var(--divider);
+  background: transparent;
   border: 0;
   padding: 0;
 }
 
-/* An 8px track is a hard target; the hit area is 24px without changing the
- * visual width (WCAG 2.5.8). */
+/* The track is 24px so it is a real target (WCAG 2.5.8); the bar painted inside
+ * is 8px, so the divider never overlays the textarea or the output. */
 .divider::before {
   content: "";
   position: absolute;
-  inset: 0 -8px;
+  inset: 0 8px;
+  background: var(--divider);
+  border-radius: 2px;
 }
 
-.divider:hover,
-.divider:focus-visible {
+.divider:hover::before,
+.divider:focus-visible::before {
   background: var(--accent);
-}
-
-.pane-right {
-  padding: 0;
 }
 
 .pane-right .example-output {
@@ -1245,10 +1234,6 @@ details.solution[open] summary {
     display: inline-block;
   }
 
-  .sidebar-scrim {
-    display: none;
-  }
-
   body.sidebar-open .sidebar-scrim {
     display: block;
     position: fixed;
@@ -1260,7 +1245,7 @@ details.solution[open] summary {
 
   .split {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 8px 1fr;
+    grid-template-rows: var(--split) 24px minmax(0, 1fr);
     height: auto;
   }
 
@@ -1273,7 +1258,7 @@ details.solution[open] summary {
   }
 
   .divider::before {
-    inset: -8px 0;
+    inset: 8px 0;
   }
 }
 
@@ -1296,6 +1281,8 @@ details.solution[open] summary {
     --sev-high: #a63f00;
     --sev-medium: #6f5200;
     --sev-low: #1c5d86;
+    --scrim: #0b1220;
+    --divider: #6b7688;
   }
 
   /* Chrome and controls go; the terminal panel stays, because it holds the
@@ -1309,16 +1296,14 @@ details.solution[open] summary {
   .sidebar,
   .sidebar-scrim,
   .sidebar-toggle,
-  .tryit,
-  .split,
-  .pane,
+  .tryit-bar,
+  .tryit-status,
+  .pane-left,
   .split textarea,
   .pager,
   .quiz-actions,
   .btn-tryit,
-  .divider,
-  .tryit-bar,
-  .tryit-status {
+  .divider {
     display: none;
   }
 
@@ -1337,8 +1322,22 @@ details.solution[open] summary {
     display: none;
   }
 
-  .sidebar {
-    visibility: hidden;
+  /* The editor prints as a plain page: output on paper, no textarea. */
+  .split {
+    display: block;
+    height: auto;
+    border: 0;
+  }
+
+  .pane-right {
+    overflow: visible;
+  }
+
+  .pane-right .example-output {
+    height: auto;
+    max-height: none;
+    padding: 0;
+    background: transparent;
   }
 
   body {

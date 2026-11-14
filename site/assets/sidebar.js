@@ -49,7 +49,7 @@
         done += 1;
       }
     });
-    return { done: done, total: lessons.length, planned: part.lessons };
+    return { done: done, total: lessons.length };
   }
 
   /* ---------------------------------------------------------------- drawer */
@@ -58,11 +58,15 @@
     return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
   }
 
-  function setDrawer(rootNode, open) {
+  var drawerOpen = false; /* what this module last applied, not what CSS thinks */
+
+  function setDrawer(rootNode, open, fromRender) {
     var toggle = document.getElementById("sidebar-toggle");
     if (!rootNode) {
       return;
     }
+    var changed = open !== drawerOpen;
+    drawerOpen = open;
     document.body.classList.toggle("sidebar-open", open);
     if (toggle) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
@@ -70,20 +74,31 @@
     var narrow = isNarrow();
     /* A drawer that is off-screen must not be reachable by Tab or by a screen
      * reader, and `inert` is what actually enforces that. */
-    rootNode.setAttribute("aria-hidden", narrow && !open ? "true" : "false");
+    if (narrow) {
+      rootNode.setAttribute("aria-hidden", open ? "false" : "true");
+    } else {
+      rootNode.removeAttribute("aria-hidden");
+    }
     if ("inert" in rootNode) {
       rootNode.inert = narrow && !open;
     }
-    var page = document.querySelector(".page");
-    if (page && "inert" in page) {
-      page.inert = narrow && open;
-    }
-    if (open) {
+    /* Everything behind the drawer goes inert, not just the lesson body: the
+     * header's own buttons must not be reachable through the scrim. The drawer's
+     * close button and Escape are the ways out. */
+    [".page", ".site-header", ".site-footer"].forEach(function (selector) {
+      var node = document.querySelector(selector);
+      if (node && "inert" in node) {
+        node.inert = narrow && open;
+      }
+    });
+    if (open && changed) {
       var first = rootNode.querySelector("a, button");
       if (first) {
         first.focus();
       }
-    } else if (toggle) {
+    } else if (!open && changed && !fromRender && toggle) {
+      /* Only when the drawer was actually open: a re-render must not steal focus
+       * from whatever the reader was doing. */
       toggle.focus();
     }
   }
@@ -103,7 +118,7 @@
     /* The close button is re-created on every render, so it is delegated from the
      * container instead of bound per instance. */
     rootNode.addEventListener("click", function (event) {
-      if (event.target && event.target.className === "sidebar-close") {
+      if (event.target && event.target.closest && event.target.closest(".sidebar-close")) {
         setDrawer(root, false);
       }
     });
@@ -122,7 +137,14 @@
       }
       /* Focus trap: while the drawer is open, Tab stays inside it. */
       if (event.key === "Tab" && open && isNarrow()) {
-        var focusable = root.querySelectorAll("a[href], button:not([disabled])");
+        var all = root.querySelectorAll("a[href], button:not([disabled])");
+        var focusable = [];
+        for (var index = 0; index < all.length; index += 1) {
+          /* A link inside a collapsed part is in the DOM but not on screen. */
+          if (all[index].offsetParent !== null) {
+            focusable.push(all[index]);
+          }
+        }
         if (!focusable.length) {
           return;
         }
@@ -138,11 +160,11 @@
       }
     });
 
-    setDrawer(root, false);
+    setDrawer(root, false, true);
     /* Recompute on every resize: the wide->narrow direction used to leave the
      * off-screen drawer exposed to the accessibility tree. */
     window.addEventListener("resize", function () {
-      setDrawer(root, isNarrow() && document.body.classList.contains("sidebar-open"));
+      setDrawer(root, isNarrow() && drawerOpen, true);
     });
   }
 
@@ -253,7 +275,7 @@
     root = container;
     bindDrawer(container);
     if (bound) {
-      setDrawer(container, document.body.classList.contains("sidebar-open"));
+      setDrawer(container, drawerOpen, true);
     }
   }
 

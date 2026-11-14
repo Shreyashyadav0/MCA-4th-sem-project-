@@ -541,6 +541,9 @@
     container.appendChild(list);
   }
 
+  var themeBound = false;
+  var themeSync = null;
+
   function bindThemeToggle() {
     var button = document.getElementById("theme-toggle");
     if (!button) {
@@ -555,10 +558,18 @@
         current === "dark" ? "Switch to light theme" : "Switch to dark theme"
       );
     };
+    themeSync = sync;
+    if (themeBound) {
+      sync();
+      return;
+    }
+    themeBound = true;
     button.addEventListener("click", function () {
       var current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
       applyTheme(current === "dark" ? "light" : "dark");
-      sync();
+      if (themeSync) {
+        themeSync();
+      }
     });
     sync();
   }
@@ -832,7 +843,10 @@
     });
 
     var rendered = [];
-    questions.forEach(function (item, qi) {
+    questions.forEach(function (item) {
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        return;  /* a broken entry is a content bug: skip it, never throw */
+      }
       var options = Array.isArray(item.options) ? item.options : [];
       if (!options.length) {
         /* An unanswerable question is a content bug: skip it rather than render a
@@ -873,6 +887,10 @@
       rendered.push(item);
     });
     questions = rendered;
+
+    if (!rendered.length) {
+      return false; /* every question was unusable */
+    }
 
     var actions = el("div", "quiz-actions");
     var check = el("button", "btn btn-check", "Check answers");
@@ -977,8 +995,8 @@
       nav.appendChild(current);
     }
 
-    /* "Part 1 · Lesson 3 of 12" — the count is the part's planned total, which
-     * is what a reader needs to know how long the part is. */
+    /* "Part 0 · Lesson 1 of 2" when the part is complete, and
+     * "Part 1 · Lesson 1 of 10 planned" while it is still being written. */
     var positionLine = document.getElementById("lesson-position");
     if (positionLine) {
       /* "of 10 planned" when the part is only partly written, so the count never
@@ -1027,7 +1045,16 @@
     });
     showSection("lesson-exercise", hasExercise);
 
-    showSection("lesson-quiz", renderQuiz("lesson-quiz", lesson.quiz));
+    var hasQuiz = false;
+    try {
+      hasQuiz = renderQuiz("lesson-quiz", lesson.quiz);
+    } catch (error) {
+      hasQuiz = false;
+      if (window.console && window.console.warn) {
+        window.console.warn("The quiz could not be rendered:", error);
+      }
+    }
+    showSection("lesson-quiz", hasQuiz);
 
     var hasMistakes = fillList("lesson-mistakes", lesson.common_mistakes, function (text) {
       return el("li", null, text);
@@ -1077,6 +1104,9 @@
     bindThemeToggle();
   }
 
+  var markDoneBound = false;
+  var markDoneSync = null;
+
   function bindMarkDone(lesson) {
     var button = document.getElementById("mark-done");
     if (!button) {
@@ -1089,9 +1119,17 @@
       button.setAttribute("aria-pressed", done ? "true" : "false");
       button.className = done ? "btn btn-done is-done" : "btn btn-done";
     };
+    markDoneSync = sync;
+    if (markDoneBound) {
+      sync();
+      return;
+    }
+    markDoneBound = true;
     button.addEventListener("click", function () {
       window.Progress.toggle(lesson.id);
-      sync();
+      if (markDoneSync) {
+        markDoneSync();
+      }
       /* The tick and the part count live in the sidebar, so it has to be told. */
       if (window.Sidebar) {
         try {
@@ -1210,12 +1248,16 @@
     return { id: "", broken: false };
   }
 
-  function renderMissing(id) {
+  function renderMissing(id, broken) {
     document.title = "Lesson not found — AI Code Reviewer, learned from the code";
 
     var title = document.getElementById("lesson-title");
     if (title) {
-      title.textContent = id ? "No lesson with id " + id : "No lesson selected";
+      title.textContent = broken
+        ? "That lesson link is not readable"
+        : id
+          ? "No lesson with id " + id
+          : "No lesson selected";
     }
     var meta = document.getElementById("lesson-meta");
     if (meta) {
@@ -1244,6 +1286,10 @@
     ["lesson-examples", "lesson-tryit", "lesson-exercise", "lesson-quiz", "lesson-mistakes", "lesson-links", "lesson-glossary"].forEach(
       function (key) {
         showSection(key, false);
+        var node = document.getElementById(key);
+        if (node) {
+          node.innerHTML = ""; /* a hidden section must not keep the last lesson's quiz */
+        }
       }
     );
     var position = document.getElementById("lesson-position");
@@ -1268,7 +1314,8 @@
     applyStoredTheme();
     var request = requestedLessonId();
     if (request.broken) {
-      renderMissing("");
+      bindThemeToggle();
+      renderMissing("", true);
       if (window.Sidebar) {
         try {
           window.Sidebar.render(document.getElementById("site-sidebar"), "");
@@ -1281,6 +1328,7 @@
     var id = request.id;
     var lesson = id ? getLessonById(id) : allLessons().sort(byOrder)[0] || null;
     if (!lesson) {
+      bindThemeToggle();
       renderMissing(id);
       if (window.Sidebar) {
         try {

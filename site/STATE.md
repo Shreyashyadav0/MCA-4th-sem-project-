@@ -420,3 +420,69 @@ tryit:  0.1 ex 1 (terminal tier) -> no Run button, command
   for lesson 0.1 (the only written lesson of Part 0) means 0.1 already shows it.
 - The quiz is optional in the validator, as the brief specifies, but both shipped
   lessons carry three questions each so the shape has a reference implementation.
+
+## Wave 1.6b — two audit rounds
+
+Two rounds of independent audit, each followed by fixes: six auditors over the
+Wave 1.6 tree (67 findings: 4 blockers, 20 major), then six more over the fixed
+tree (51 findings: 3 blockers, 8 major). Both rounds were fixed in place; this
+section records what the two rounds changed and what was deliberately left.
+
+**Round one — the blockers.**
+
+1. `sidebar.js` re-added the drawer's click listener on every render, so the
+   handlers stacked and two clicks cancelled out. Every drawer listener is now
+   bound once behind a module flag, and the close button is delegated.
+2. The closed drawer carried `aria-hidden="true"` while staying in the tab
+   order; it now also gets `inert` and `visibility: hidden`, and the page behind
+   an open drawer goes inert.
+3. `tryit.html` crashed on a malformed percent-escape before binding anything,
+   leaving an empty editor and a dead Run button.
+4. The drawer's scrim painted `--bg`, so it was invisible in both themes; it has
+   its own `--scrim` token now.
+
+**Round one — the rest.** Sidebar counts no longer mix written and planned
+numbers; the tick and the part count refresh after "Mark done"; the resize
+handler no longer leaves an off-screen drawer exposed; the quiz skips
+unanswerable questions, guards an out-of-range answer index, clears stale marks
+and announces verdicts; the position line says "of 10 planned" while a part is
+half written; the lesson page gained the theme toggle the other pages had; the
+split editor's Tab no longer traps focus, its divider follows the stacked axis,
+its offline fallback prints the code the reader actually typed, and Run comes
+back after a load failure; print hides the editor; the gate learned per-page
+script order, quiz-shaped raw HTML, duplicate JSON keys and the new page ids.
+
+**Round two — the blockers.**
+
+1. The print fix over-reached: hiding `.tryit`, `.split` and `.pane` hid the
+   output pane too, so printing the editor produced a blank sheet. Only
+   `.tryit-bar`, `.tryit-status`, `.pane-left`, the textarea and the divider are
+   hidden now, and the output prints as a plain page — proven by rendering a PDF.
+2. `restoreRun()` bailed out whenever the runtime was unavailable, so Reset after
+   a blocked CDN never brought Run back; and it also unhid Run for a
+   terminal-tier example, deleting its command panel. It now checks the tier and
+   restores unconditionally for browser tiers.
+3. A `null` entry in `quiz` threw out of `renderLesson`, taking the sidebar, the
+   pager and the theme toggle with it. Broken entries are skipped.
+
+**Round two — the rest.** The sidebar no longer steals focus when it re-renders;
+its Tab trap skips links inside collapsed groups; the header and footer go inert
+with the page. `bindMarkDone` and `bindThemeToggle` bind once and re-sync, so a
+third render no longer makes them no-ops. The not-found page binds the theme
+button, empties the sections it hides, and says when a link is unreadable. The
+divider is a 24px track with an 8px bar, so it never overlays a pane. The dark
+scrim is visible. Print re-declares `--scrim` and `--divider`. The gate now
+parses every `<script>` tag regardless of attributes or quoting, ignores
+`data-id`, reports the actual tag it found, and checks order even when
+`manifest.js` is missing.
+
+**Accepted, not fixed.**
+
+- The collapsed state of a sidebar part is remembered for the session, not
+  across page loads: every navigation re-expands the parts that have lessons.
+  Persisting it would be a new storage key, and the wave did not ask for one.
+- `inert` is not supported everywhere. Where it is missing, the drawer still
+  works (visibility and focus trapping carry it) but the page behind it stays in
+  the accessibility tree.
+- Printing the editor before pressing Run prints an empty output pane, because
+  the pane is empty. That is the page, not the stylesheet.

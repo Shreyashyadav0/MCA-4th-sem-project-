@@ -5,7 +5,7 @@
  * If a later wave needs a new constant, the wave that needs it edits this file
  * deliberately and records the change in site/STATE.md.
  *
- * Globals defined by the site (exactly seven, no others):
+ * Globals defined by the site (exactly eight, no others):
  *   window.CONTRACTS  this file
  *   window.App        assets/app.js      router, renderer, helpers
  *   window.Search     assets/search.js   client-side index
@@ -13,6 +13,8 @@
  *   window.Sidebar    assets/sidebar.js  the lesson tree
  *   window.PyRun      assets/pyodide-loader.js  in-browser Python
  *   window.LESSONS    the content files, an array built by push()
+ *   window.REPO_SOURCES  content/repo-sources.js (generated) — the embedded
+ *                     repository files the runner writes into Pyodide
  */
 (function () {
   "use strict";
@@ -56,7 +58,11 @@
    *                 The gate enforces: 3 to 5 questions; at least two non-empty
    *                 options each; `answer` an integer inside options; `why` a
    *                 non-empty string, shown whether the answer was right or
-   *                 wrong. No HTML in q/options/why.
+   *                 wrong.
+   *
+   * No raw HTML anywhere an author writes prose: concept_md, quiz q/options/why,
+   * code_examples[].caption and code_examples[].why_not. The gate checks all of
+   * them; markup fails the wave rather than rendering as text.
    *   common_mistakes, project_links, learn_more, glossary_terms
    */
   window.CONTRACTS = {
