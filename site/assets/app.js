@@ -570,6 +570,9 @@
     if (partsList) {
       renderParts(partsList);
     }
+    if (window.Sidebar) {
+      window.Sidebar.render(document.getElementById("site-sidebar"), "");
+    }
     updateTotal();
     bindThemeToggle();
 
@@ -654,11 +657,14 @@
 
   /* One example figure. pyodide-loader.js wires the buttons from the data
    * attributes; this function only renders, so the runner owns behaviour. */
-  function renderExample(container, example) {
+  function renderExample(container, example, lessonId, index) {
     var tier = example.run_tier || (example.runnable === true ? "browser" : "terminal");
 
     var figure = el("figure", "code-figure example");
     figure.setAttribute("data-tier", tier);
+    if (example.id) {
+      figure.setAttribute("data-example", example.id);
+    }
     if (example.lang) {
       figure.setAttribute("data-lang", example.lang);
     }
@@ -685,6 +691,12 @@
     var copyBtn = el("button", "btn btn-copy", "Copy code");
     copyBtn.type = "button";
     actions.appendChild(copyBtn);
+
+    /* Every example opens the split editor, terminal-tier ones included: there
+     * the editor shows the command and what it prints instead of a Run button. */
+    var tryLink = el("a", "btn btn-tryit", "Try it yourself »");
+    tryLink.href = "tryit.html?id=" + encodeURIComponent(lessonId) + "&ex=" + index;
+    actions.appendChild(tryLink);
     figure.appendChild(actions);
 
     /* One live region per figure, on the result: the status line repeats what
@@ -793,6 +805,98 @@
     return hasAny;
   }
 
+  /* A quiz is three to five questions with instant feedback. Nothing is stored
+   * and nothing is scored beyond this session: the `why` is the teaching, the
+   * mark is only a signpost. */
+  function renderQuiz(id, quiz) {
+    var node = document.getElementById(id);
+    if (!node) {
+      return false;
+    }
+    node.innerHTML = "";
+    var questions = Array.isArray(quiz) ? quiz : [];
+    if (!questions.length) {
+      return false;
+    }
+
+    var form = el("form", "quiz");
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+    });
+
+    questions.forEach(function (item, qi) {
+      var field = el("fieldset", "quiz-question");
+      field.appendChild(el("legend", "quiz-legend", qi + 1 + ". " + item.q));
+
+      (item.options || []).forEach(function (option, oi) {
+        var label = el("label", "quiz-option");
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.name = "quiz-" + id + "-" + qi;
+        input.value = String(oi);
+        label.appendChild(input);
+        label.appendChild(el("span", "quiz-option-text", option));
+        field.appendChild(label);
+      });
+
+      var verdict = el("p", "quiz-verdict");
+      verdict.hidden = true;
+      field.appendChild(verdict);
+      form.appendChild(field);
+    });
+
+    var actions = el("div", "quiz-actions");
+    var check = el("button", "btn btn-check", "Check answers");
+    check.type = "button";
+    var clear = el("button", "btn", "Clear");
+    clear.type = "button";
+    actions.appendChild(check);
+    actions.appendChild(clear);
+    form.appendChild(actions);
+    node.appendChild(form);
+
+    check.addEventListener("click", function () {
+      var fields = form.querySelectorAll(".quiz-question");
+      for (var index = 0; index < fields.length; index += 1) {
+        var item = questions[index];
+        var field = fields[index];
+        var verdict = field.querySelector(".quiz-verdict");
+        var picked = field.querySelector("input:checked");
+        field.classList.remove("is-right", "is-wrong");
+
+        if (!picked) {
+          verdict.hidden = false;
+          verdict.textContent = "Pick an answer first.";
+          verdict.className = "quiz-verdict is-unanswered";
+          continue;
+        }
+        var correct = Number(picked.value) === Number(item.answer);
+        field.classList.add(correct ? "is-right" : "is-wrong");
+        verdict.hidden = false;
+        verdict.className = "quiz-verdict " + (correct ? "is-right" : "is-wrong");
+        verdict.textContent = correct
+          ? "Correct. " + (item.why || "")
+          : "Not quite — the answer is “" + item.options[item.answer] + "”. " + (item.why || "");
+      }
+    });
+
+    clear.addEventListener("click", function () {
+      var picked = form.querySelectorAll("input:checked");
+      for (var index = 0; index < picked.length; index += 1) {
+        picked[index].checked = false;
+      }
+      var fields = form.querySelectorAll(".quiz-question");
+      for (var index = 0; index < fields.length; index += 1) {
+        fields[index].classList.remove("is-right", "is-wrong");
+        var verdict = fields[index].querySelector(".quiz-verdict");
+        verdict.hidden = true;
+        verdict.textContent = "";
+      }
+    });
+
+    return true;
+  }
+
   function renderLesson(lesson) {
     document.title = lesson.id + " " + lesson.title + " — AI Code Reviewer, learned from the code";
 
@@ -813,6 +917,16 @@
       }
     }
 
+    var part = partByNumber(lesson.part);
+    var siblings = getLessonsByPart(lesson.part);
+    var position = 1;
+    for (var i = 0; i < siblings.length; i += 1) {
+      if (String(siblings[i].id) === String(lesson.id)) {
+        position = i + 1;
+      }
+    }
+    var planned = part ? part.lessons : siblings.length;
+
     var nav = document.getElementById("lesson-nav");
     if (nav) {
       nav.innerHTML = "";
@@ -820,17 +934,21 @@
       home.href = "index.html";
       nav.appendChild(home);
       nav.appendChild(el("span", "crumb-sep", " / "));
-      var part = partByNumber(lesson.part);
-      var partLabel = el(
-        "span",
-        "crumb-part",
-        "Part " + lesson.part + " — " + (part ? part.title : lesson.part_title || "")
+      nav.appendChild(
+        el("span", "crumb-part", "Part " + lesson.part + " — " + (part ? part.title : lesson.part_title || ""))
       );
-      nav.appendChild(partLabel);
       nav.appendChild(el("span", "crumb-sep", " / "));
       var current = el("span", "crumb-current", lesson.id);
       current.setAttribute("aria-current", "page");
       nav.appendChild(current);
+    }
+
+    /* "Part 1 · Lesson 3 of 12" — the count is the part's planned total, which
+     * is what a reader needs to know how long the part is. */
+    var positionLine = document.getElementById("lesson-position");
+    if (positionLine) {
+      positionLine.textContent =
+        "Part " + lesson.part + " · Lesson " + position + " of " + planned;
     }
 
     var concept = document.getElementById("lesson-concept");
@@ -843,8 +961,8 @@
     var hasExamples = Array.isArray(lesson.code_examples) && lesson.code_examples.length > 0;
     if (examples && hasExamples) {
       examples.innerHTML = "";
-      lesson.code_examples.forEach(function (example) {
-        renderExample(examples, example);
+      lesson.code_examples.forEach(function (example, index) {
+        renderExample(examples, example, lesson.id, index);
       });
       /* One pass over the rendered figures; the runner owns the buttons. A
        * broken runner must degrade to "no Run button", never to a half-rendered
@@ -872,6 +990,8 @@
       solution: "Show solution"
     });
     showSection("lesson-exercise", hasExercise);
+
+    showSection("lesson-quiz", renderQuiz("lesson-quiz", lesson.quiz));
 
     var hasMistakes = fillList("lesson-mistakes", lesson.common_mistakes, function (text) {
       return el("li", null, text);
@@ -917,6 +1037,7 @@
 
     bindMarkDone(lesson);
     bindPrevNext(lesson);
+    bindArrowKeys();
   }
 
   function bindMarkDone(lesson) {
@@ -959,23 +1080,50 @@
     if (prevLink) {
       if (prev) {
         prevLink.href = lessonHref(prev.id);
-        prevLink.textContent = "← " + prev.id + " " + prev.title;
+        prevLink.textContent = "❮ Previous · " + prev.title;
+        prevLink.setAttribute("title", prev.id + " " + prev.title);
         prevLink.removeAttribute("aria-disabled");
       } else {
-        disablePager(prevLink, "← Start of the path");
+        disablePager(prevLink, "❮ Start of the path");
       }
     }
 
     var nextLink = document.getElementById("next-link");
     if (nextLink) {
       if (next) {
+        /* The last lesson of a part leads to the next part, and says so. */
+        var crossesPart = Number(next.part) !== Number(lesson.part);
         nextLink.href = lessonHref(next.id);
-        nextLink.textContent = next.id + " " + next.title + " →";
+        nextLink.textContent = (crossesPart ? "Next part ❯ · " : "Next ❯ · ") + next.title;
+        nextLink.setAttribute("title", next.id + " " + next.title);
         nextLink.removeAttribute("aria-disabled");
       } else {
-        disablePager(nextLink, "End of the written path →");
+        disablePager(nextLink, "End of the written path ❯");
       }
     }
+  }
+
+  /* Left/Right follow the pager, unless the reader is typing. */
+  function bindArrowKeys() {
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) {
+        return;
+      }
+      var node = event.target;
+      var tag = node && node.tagName ? node.tagName.toLowerCase() : "";
+      if (tag === "input" || tag === "textarea" || tag === "select" || (node && node.isContentEditable)) {
+        return;
+      }
+      var link = document.getElementById(event.key === "ArrowLeft" ? "prev-link" : "next-link");
+      if (!link || !link.getAttribute("href")) {
+        return;
+      }
+      event.preventDefault();
+      window.location.href = link.getAttribute("href");
+    });
   }
 
   function decode(value) {
@@ -1072,9 +1220,15 @@
     var lesson = id ? getLessonById(id) : allLessons().sort(byOrder)[0] || null;
     if (!lesson) {
       renderMissing(id);
+      if (window.Sidebar) {
+        window.Sidebar.render(document.getElementById("site-sidebar"), "");
+      }
       return;
     }
     renderLesson(lesson);
+    if (window.Sidebar) {
+      window.Sidebar.render(document.getElementById("site-sidebar"), lesson.id);
+    }
   }
 
   window.App = {

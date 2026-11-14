@@ -9,6 +9,7 @@ is the bug.
 | 1 | 2026-11-14 | `ca96890` (frozen reference) | 14 | 2 (`0.1`, `1.1`) | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 1a | 2026-11-14 | `dd561fe` | 0 added, 14 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 1.5 | 2026-11-14 | `4c70195` | 2 added, 10 changed | 0 new; `0.1` and `1.1` rewritten with live examples | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1.6 | 2026-11-14 | `f24c9de` | 2 added, 9 changed | 0 new; `0.1` and `1.1` gained example ids and quizzes | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -344,3 +345,78 @@ rest minor and nit. Every one was triaged; the real defects were fixed here.
 - `HANDOFF.md` in the frozen repo still quotes 638 and 637 tests in two places.
   That file is outside `site/` and frozen; the site must not repeat those numbers,
   and does not.
+
+## Wave 1.6 — the W3Schools layout
+
+The site worked but did not feel like a reference: no permanent topic list, no
+full-page editor behind "Try it yourself", no quiz, and prev/next were text
+links. This wave changed presentation only — no lesson prose or code was
+rewritten, only example ids and quizzes were added.
+
+**Added.** `assets/sidebar.js` (`window.Sidebar = { render }` — the sixth and
+only new global), `tryit.html` (the split editor).
+
+**Changed.** `assets/app.js` (sidebar call, quiz, position line, ❮/❯ pager,
+arrow keys, "Try it yourself »" links), `assets/style.css` (sidebar, drawer,
+quiz, pager, split panes, print overrides), `assets/contracts.js` (schema
+version 2, with the lesson object documented), `tools/validate_lessons.py`
+(example ids, quiz shape, the new pages), both lessons, `index.html`,
+`lesson.html`, `README.md`.
+
+**Two schema fields later waves must now supply.**
+
+1. `code_examples[].id` — stable, `<lesson id>-ex-<n>`, e.g. `1.3-ex-0`. It is
+   what `tryit.html?id=1.3&ex=0` addresses, so it must never change once written.
+2. `quiz` — an array of 3 to 5 `{q, options, answer, why}`. `answer` is the index
+   of the correct option; `why` is one sentence, shown whether the answer was
+   right or wrong. Optional in this wave, **required from Wave 2 onward**.
+
+**Gate results, verbatim.**
+
+```
+$ python site/tools/validate_lessons.py
+OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1
+
+$ python site/tools/embed_sources.py --check
+OK repo-sources.js matches 7 embedded files
+
+$ python -m pytest -q tests
+640 passed, 1 skipped
+
+$ git status --porcelain
+(only site/ paths)
+```
+
+Browser checks, headless Chromium over `file://` at 1400×900 and 600×900:
+
+```
+index:  sidebar parts 13 | part 0 expanded (1 lesson) | part 2 collapsed |
+        aria-current 0 | toggle display none | sidebar width 260px
+lesson: aria-current on 0.1 | part 0 expanded | ticks 0 -> 1 after marking done |
+        "Part 0 · Lesson 1 of 2" | prev "❮ Start of the path" |
+        next "Next part ❯ · Variables, types, and f-strings" |
+        quiz 3 questions, q1 wrong -> why text, q2 right, q3 "Pick an answer first." |
+        2 try-it links, first href tryit.html?id=0.1&ex=0 |
+        ArrowRight inside a textarea does not navigate
+drawer: at 600px toggle display block | closed -> aria-hidden true |
+        open -> body.sidebar-open, aria-expanded true, focus inside the sidebar |
+        Escape -> closed, aria-expanded false
+tryit:  1.1 ex 0 preloaded | edited code ran -> "edited in the browser" |
+        Reset restored the original snippet | back link lesson.html?id=1.1
+tryit:  0.1 ex 1 (terminal tier) -> no Run button, command
+        "python -m pytest -q tests", expected output, and the why line
+```
+
+**Deviations from the brief.**
+
+- `index.html`, `lesson.html` and `tryit.html` were not assigned to any agent but
+  had to change: the sidebar needs a container and a toggle on both pages, and
+  `tryit.html` is new. All three are in the tree above.
+- The brief says every part is a collapsible group *and* that one click reaches
+  any lesson. Both cannot hold for a collapsed group, so parts that have lessons
+  start expanded and parts that do not start collapsed; the current part is
+  always forced open.
+- "Next part" appears when the next lesson belongs to a different part, which
+  for lesson 0.1 (the only written lesson of Part 0) means 0.1 already shows it.
+- The quiz is optional in the validator, as the brief specifies, but both shipped
+  lessons carry three questions each so the shape has a reference implementation.

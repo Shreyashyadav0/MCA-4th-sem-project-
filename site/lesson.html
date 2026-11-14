@@ -11,6 +11,7 @@
 
 <header class="site-header">
   <div class="site-header-inner">
+    <button type="button" class="btn sidebar-toggle" id="sidebar-toggle" aria-controls="site-sidebar" aria-expanded="false">☰ Lessons</button>
     <a class="brand" href="index.html">AI Code Reviewer <span>— learning site</span></a>
     <div class="header-actions">
       <a class="btn" href="index.html">All lessons</a>
@@ -18,76 +19,88 @@
   </div>
 </header>
 
-<main class="page">
-  <nav class="breadcrumb" id="lesson-nav" aria-label="Breadcrumb"></nav>
+<div class="layout">
+  <nav class="sidebar" id="site-sidebar" aria-label="All lessons"></nav>
+  <div class="sidebar-scrim" hidden></div>
 
-  <article>
-    <h1 id="lesson-title" tabindex="-1">Lesson</h1>
-    <div class="lesson-meta-bar" id="lesson-meta"></div>
+  <main class="page">
+    <nav class="breadcrumb" id="lesson-nav" aria-label="Breadcrumb"></nav>
 
-    <section class="lesson-section" hidden aria-label="Concept">
-      <h2>Concept</h2>
-      <div id="lesson-concept"></div>
-    </section>
+    <article>
+      <p class="lesson-position" id="lesson-position"></p>
+      <h1 id="lesson-title" tabindex="-1">Lesson</h1>
+      <div class="lesson-meta-bar" id="lesson-meta"></div>
 
-    <section class="lesson-section" hidden aria-label="Code">
-      <h2>Code</h2>
-      <div id="lesson-examples"></div>
-    </section>
+      <section class="lesson-section" hidden aria-label="Concept">
+        <h2>Concept</h2>
+        <div id="lesson-concept"></div>
+      </section>
 
-    <section class="lesson-section" hidden aria-label="Try it">
-      <h2>Try it</h2>
-      <div id="lesson-tryit"></div>
-    </section>
+      <section class="lesson-section" hidden aria-label="Code">
+        <h2>Code</h2>
+        <div id="lesson-examples"></div>
+      </section>
 
-    <section class="lesson-section" hidden aria-label="Exercise">
-      <h2>Exercise</h2>
-      <div id="lesson-exercise"></div>
-    </section>
+      <section class="lesson-section" hidden aria-label="Try it">
+        <h2>Try it</h2>
+        <div id="lesson-tryit"></div>
+      </section>
 
-    <section class="lesson-section" hidden aria-label="Common mistakes">
-      <h2>Common mistakes</h2>
-      <ul class="mistake-list" id="lesson-mistakes"></ul>
-    </section>
+      <section class="lesson-section" hidden aria-label="Exercise">
+        <h2>Exercise</h2>
+        <div id="lesson-exercise"></div>
+      </section>
 
-    <section class="lesson-section" hidden aria-label="In the repository">
-      <h2>In the repository</h2>
-      <ul class="link-list" id="lesson-links"></ul>
-    </section>
+      <section class="lesson-section" hidden aria-label="Quiz">
+        <h2>Check yourself</h2>
+        <div id="lesson-quiz"></div>
+      </section>
 
-    <section class="lesson-section" hidden aria-label="Glossary">
-      <h2>Glossary</h2>
-      <ul class="glossary-list" id="lesson-glossary"></ul>
-    </section>
-  </article>
+      <section class="lesson-section" hidden aria-label="Common mistakes">
+        <h2>Common mistakes</h2>
+        <ul class="mistake-list" id="lesson-mistakes"></ul>
+      </section>
 
-  <div class="lesson-footer">
-    <button type="button" class="btn btn-done" id="mark-done" aria-pressed="false" hidden>Mark done</button>
-    <div class="pager">
-      <a id="prev-link" aria-disabled="true">← Start of the path</a>
-      <a id="next-link" aria-disabled="true">End of the written path →</a>
+      <section class="lesson-section" hidden aria-label="In the repository">
+        <h2>In the repository</h2>
+        <ul class="link-list" id="lesson-links"></ul>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Glossary">
+        <h2>Glossary</h2>
+        <ul class="glossary-list" id="lesson-glossary"></ul>
+      </section>
+    </article>
+
+    <div class="lesson-footer">
+      <button type="button" class="btn btn-done" id="mark-done" aria-pressed="false" hidden>Mark done</button>
+      <nav class="pager" aria-label="Lesson navigation">
+        <a class="pager-btn pager-prev" id="prev-link" aria-disabled="true">❮ Previous</a>
+        <a class="pager-btn pager-next" id="next-link" aria-disabled="true">Next ❯</a>
+      </nav>
     </div>
-  </div>
 
-  <noscript>
-    <p class="noscript-note">
-      This page renders a lesson with JavaScript, and JavaScript is off in this browser.
-      The lessons are plain text in the repository: start at
-      <code>docs/learning/README.md</code>.
-    </p>
-  </noscript>
-</main>
+    <noscript>
+      <p class="noscript-note">
+        This page renders a lesson with JavaScript, and JavaScript is off in this browser.
+        The lessons are plain text in the repository: start at
+        <code>docs/learning/README.md</code>.
+      </p>
+    </noscript>
+  </main>
+</div>
 
 <footer class="site-footer">
   <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Wave log in
      <code>site/STATE.md</code>.</p>
 </footer>
 
-<!-- Script order is a contract: contracts, progress, app, search, pyodide, manifest, lessons. -->
+<!-- Script order is a contract: contracts, progress, app, search, sidebar, pyodide, manifest, sources, lessons. -->
 <script src="assets/contracts.js"></script>
 <script src="assets/progress.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/search.js"></script>
+<script src="assets/sidebar.js"></script>
 <script src="assets/pyodide-loader.js"></script>
 <script src="assets/manifest.js"></script>
 <script src="content/repo-sources.js"></script>

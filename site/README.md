@@ -21,8 +21,10 @@ site/
   README.md                      this file
   index.html                     the parts list, search, progress, theme toggle
   lesson.html                    one lesson, addressed as lesson.html?id=1.1
+  tryit.html                     the split editor, tryit.html?id=1.1&ex=0
   assets/contracts.js            PARTS, storage keys, the markdown subset
   assets/app.js                  router, renderer, page chrome
+  assets/sidebar.js              the permanent lesson tree (window.Sidebar)
   assets/search.js               client-side search over titles and concepts
   assets/progress.js             "Mark done" state in localStorage
   assets/pyodide-loader.js       the runner: Pyodide, tiers, output panes
@@ -34,6 +36,29 @@ site/
   tools/embed_sources.py         generates content/repo-sources.js
   STATE.md                       the wave log
 ```
+
+## How the site is laid out
+
+Every page carries the same permanent left sidebar: 13 parts, collapsible, with
+the current lesson marked `aria-current="page"`, a tick on anything done, and
+every written lesson one click away. Under 900px it becomes a drawer opened by
+the ☰ button, closed by Escape, the close button or the scrim, with focus trapped
+inside while it is open.
+
+Each lesson shows its position (`Part 1 · Lesson 3 of 12`), a **Check yourself**
+quiz of three to five questions with instant feedback — the explanation is shown
+whether the answer was right or wrong — and ❮ Previous / Next ❯ buttons at the
+foot, where the last lesson of a part offers "Next part". Left and Right arrows
+follow the pager unless the reader is typing in a field.
+
+### Try it yourself
+
+Every code example carries a **Try it yourself »** link to `tryit.html?id=…&ex=…`:
+an editable pane on the left, the output on the right, a draggable divider, and
+Run / Reset / Copy in the toolbar. Reset restores the original snippet exactly.
+It reads the snippet from `window.LESSONS`, so it needs no server, and it uses
+the same runner, so a `terminal`-tier example shows its command and expected
+output instead of a Run button.
 
 ## The runner: three tiers, and the project's own code
 
@@ -113,7 +138,9 @@ against `CONTRACTS.PARTS`, that every `project_links` path exists (and its line
 range fits), that no `concept_md` contains raw HTML, that `content/` and the
 manifest list the same files, that both pages load the manifest's lessons in
 manifest order, and that each page carries exactly the ids the DOM contract
-names — no missing id, no extra one. It also checks that every example declares
+names — no missing id, no extra one. It also checks that every example carries a
+unique, well-formed `id` and that any `quiz` has 3 to 5 questions with a valid
+answer index and a non-empty `why`. It also checks that every example declares
 a valid `run_tier`, that `runnable` agrees with it, that a `terminal` example
 carries `expected_output` and a `why_not`, and that any file it asks the runner to
 materialise is actually embedded. It exits non-zero with one line per problem.
@@ -129,6 +156,9 @@ materialise is actually embedded. It exits non-zero with one line per problem.
 
    The object must be **JSON-compatible** (double-quoted keys and strings, no
    template literals, no trailing commas) because the validator parses it as JSON.
+   Every example needs a stable `id` (`<lesson id>-ex-<n>`, e.g. `1.3-ex-0`) —
+   `tryit.html` addresses examples by it — and every lesson from Wave 2 onward
+   needs a `quiz` of 3 to 5 `{q, options, answer, why}` entries.
    `concept_md` is markdown only, and only the subset in `CONTRACTS.MARKDOWN_SUBSET`:
    `###`/`####` headings, paragraphs, bold, italic, inline code, fenced code with a
    language tag, unordered and ordered lists, blockquotes, links, simple tables.

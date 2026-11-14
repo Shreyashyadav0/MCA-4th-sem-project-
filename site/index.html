@@ -12,6 +12,7 @@
 
 <header class="site-header">
   <div class="site-header-inner">
+    <button type="button" class="btn sidebar-toggle" id="sidebar-toggle" aria-controls="site-sidebar" aria-expanded="false">☰ Lessons</button>
     <a class="brand" href="index.html">AI Code Reviewer <span>— learning site</span></a>
     <div class="header-actions">
       <p class="progress-total" id="progress-total">Lessons done: —</p>
@@ -20,48 +21,54 @@
   </div>
 </header>
 
-<main class="page">
-  <h1>Learn this reviewer by rebuilding it</h1>
-  <p class="lede">
-    The whole repository, in dependency order. Each lesson points at the exact file and line
-    range it explains, so the code is always one click from the claim. The site is a static
-    folder: no server, no build step, no account.
-  </p>
+<div class="layout">
+  <nav class="sidebar" id="site-sidebar" aria-label="All lessons"></nav>
+  <div class="sidebar-scrim" hidden></div>
 
-  <section class="search-block" aria-label="Search lessons">
-    <label class="search-label" for="search-input">Search lessons</label>
-    <div class="search-row">
-      <input type="search" id="search-input" autocomplete="off" spellcheck="false"
-             placeholder="e.g. f-string, provider, diff">
-      <span class="search-key">Press / to focus</span>
-    </div>
-    <div id="search-results" aria-live="polite"></div>
-  </section>
-
-  <nav aria-label="Lesson parts">
-    <h2>The path</h2>
-    <div id="parts-list" tabindex="-1"></div>
-  </nav>
-
-  <noscript>
-    <p class="noscript-note">
-      This page builds the parts list with JavaScript, and JavaScript is off in this browser.
-      The lessons are plain text in the repository: start at
-      <code>docs/learning/README.md</code>, which is the source of truth for this curriculum.
+  <main class="page">
+    <h1>Learn this reviewer by rebuilding it</h1>
+    <p class="lede">
+      The whole repository, in dependency order. Each lesson points at the exact file and line
+      range it explains, so the code is always one click from the claim. The site is a static
+      folder: no server, no build step, no account.
     </p>
-  </noscript>
-</main>
+
+    <section class="search-block" aria-label="Search lessons">
+      <label class="search-label" for="search-input">Search lessons</label>
+      <div class="search-row">
+        <input type="search" id="search-input" autocomplete="off" spellcheck="false"
+               placeholder="e.g. f-string, provider, diff">
+        <span class="search-key">Press / to focus</span>
+      </div>
+      <div id="search-results" aria-live="polite"></div>
+    </section>
+
+    <nav aria-label="Lesson parts">
+      <h2>The path</h2>
+      <div id="parts-list" tabindex="-1"></div>
+    </nav>
+
+    <noscript>
+      <p class="noscript-note">
+        This page builds the parts list with JavaScript, and JavaScript is off in this browser.
+        The lessons are plain text in the repository: start at
+        <code>docs/learning/README.md</code>, which is the source of truth for this curriculum.
+      </p>
+    </noscript>
+  </main>
+</div>
 
 <footer class="site-footer">
   <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Wave log in
      <code>site/STATE.md</code>.</p>
 </footer>
 
-<!-- Script order is a contract: contracts, progress, app, search, pyodide, manifest, lessons. -->
+<!-- Script order is a contract: contracts, progress, app, search, sidebar, pyodide, manifest, sources, lessons. -->
 <script src="assets/contracts.js"></script>
 <script src="assets/progress.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/search.js"></script>
+<script src="assets/sidebar.js"></script>
 <script src="assets/pyodide-loader.js"></script>
 <script src="assets/manifest.js"></script>
 <script src="content/repo-sources.js"></script>

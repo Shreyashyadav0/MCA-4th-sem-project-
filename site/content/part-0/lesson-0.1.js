@@ -13,6 +13,7 @@ window.LESSONS.push({
   "concept_md": "### What this project is\n\nAn offline-first AI code reviewer. Point it at a unified diff or a source file and it returns findings with exactly five fields — file, line, severity, issue, suggested fix — and it can post them to a pull request as inline comments. The posting path is exercised against a fake HTTP client, not against GitHub itself — `HANDOFF.md` is the ledger on that.\n\nThe deterministic part is the product: **63 OWASP-mapped rules** that read added lines only, with no API key, no network and no model. The model is an upgrade on top of that, never a dependency. If the key is missing, the endpoint is down, or the answer does not parse, the review still completes — with one `WARNING` that says what happened, never an exception and never a silent downgrade.\n\n### What you will be able to do by the end\n\n- Read every module in `app/` without a guide beside you.\n- Rebuild `models.py`, `parser.py`, `rules.py` and `engine.py` from memory, each one proved by the test suite rather than by feeling.\n- Explain the fallback architecture: what degrades, where the single `WARNING` comes from, and why the degraded path calls the rule engine directly (ADR 0004).\n- State the provider precedence — `sarvam > local > mock` — and name the one function that decides it.\n- Defend the honesty limits in `HANDOFF.md` at a viva, including the things that are simulated rather than real.\n\n### The shape of the thing\n\n| Stage | Module | What it decides |\n|---|---|---|\n| Parse | `app/parser.py` | which lines the diff actually added |\n| Review | `app/rules.py` | which of the 63 deterministic rules fire |\n| Choose | `app/engine.py` | sarvam, local or mock — in one place |\n| Anchor | `app/parser.py` | whether a comment can attach to a line |\n| Post | `app/github_client.py` | inline comments, or a summary when anchoring fails |\n\n### Start here\n\n```console\npython -m pytest -q tests\npython reviewer.py samples/sample.diff\n```\n\nThe first command tells you whether the environment is sound. The second shows the whole pipeline on a real diff: mode `mock`, four findings, verdict `block`, exit code 0.\n\n> 640 passed, 1 skipped is the number to expect at this commit. If yours differs, stop and fix the pins in `requirements.lock` before learning anything — otherwise you are studying a different program from the one this site describes.\n\n### How to read this site\n\nEvery lesson has a concept, a worked example, something to try, an exercise, and the mistakes people actually make. The links at the bottom point at the exact file and line range the lesson is about: read that code, close it, and write it again from memory.\n\nThe site is a learning aid. `docs/learning/` is the source of truth.",
   "code_examples": [
     {
+      "id": "0.1-ex-0",
       "lang": "python",
       "caption": "The real rule engine, running on the real sample diff — press Run",
       "code": "from app.models import verdict_for\nfrom app.parser import parse_diff\nfrom app.rules import review_diff\n\nwith open(\"samples/sample.diff\", encoding=\"utf-8\") as handle:\n    bundle = parse_diff(handle.read(), source=\"samples/sample.diff\")\n\nfindings = review_diff(bundle)\nprint(\"files changed:\", bundle.files_changed)\nprint(\"findings     :\", len(findings))\nfor finding in findings:\n    print(f\"  {finding.severity.value:8} {finding.file}:{finding.line}\")\nprint(\"verdict      :\", verdict_for(findings))\n",
@@ -31,6 +32,7 @@ window.LESSONS.push({
       "expected_output": "files changed: 2\nfindings     : 4\n  CRITICAL app/db.py:3\n  CRITICAL app/db.py:3\n  CRITICAL app/db.py:7\n  MEDIUM   app/report.py:1\nverdict      : block"
     },
     {
+      "id": "0.1-ex-1",
       "lang": "console",
       "caption": "The same thing from a shell — this half needs a terminal",
       "code": "python -m pytest -q tests\npython reviewer.py samples/sample.diff",
@@ -52,6 +54,41 @@ window.LESSONS.push({
     "solution": "Both agree: **4 findings, verdict block** — three CRITICAL in `app/db.py` (lines 3, 3 and 7) and one MEDIUM in `app/report.py`.\n\n```console\n$ python -m pytest -q tests\n640 passed, 1 skipped\n```\n\nThe browser run and the CLI run the same `app/rules.py` over the same diff, which is the whole claim: no model is involved in either.\n\n> If your counts differ, suspect the interpreter and the install before anything else: check `python --version` against `.python-version`, and install from `requirements.lock`.",
     "explanation": "This is the first honesty check of the course. Every later lesson quotes a number from the repository, and a number you cannot reproduce is a number you do not have."
   },
+  "quiz": [
+    {
+      "q": "How many findings does the rule engine produce for samples/sample.diff?",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "63"
+      ],
+      "answer": 1,
+      "why": "Four: three CRITICAL in app/db.py and one MEDIUM in app/report.py. 63 is the number of rules, not findings."
+    },
+    {
+      "q": "Which command runs the test suite?",
+      "options": [
+        "python -m pytest -q tests",
+        "python reviewer.py tests",
+        "pytest site/",
+        "python -m unittest"
+      ],
+      "answer": 0,
+      "why": "The suite lives in tests/ and is run with pytest; the other commands either do something else or nothing."
+    },
+    {
+      "q": "Where is the choice between sarvam, local and mock decided?",
+      "options": [
+        "Separately in each surface (CLI, API, webhook)",
+        "In app/engine.py, in one place",
+        "In every module that needs a provider",
+        "In the command-line flags only"
+      ],
+      "answer": 1,
+      "why": "app/engine.py holds PROVIDERS and select_provider; every surface calls it, so the precedence cannot drift between them."
+    }
+  ],
   "common_mistakes": [
     "Reading all 157 tracked files first. Read README.md, HANDOFF.md, ARCHITECTURE.md and the ADRs, then follow the lessons — they point at the line ranges that matter.",
     "Trusting a test count from an older note. The suite is 640 passed, 1 skipped at the frozen commit; a different number means your environment is not the pinned one.",

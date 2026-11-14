@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try it yourself — AI Code Reviewer</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="tryit-page">
+<a class="skip-link" href="#tryit-code">Skip to the editor</a>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="index.html">AI Code Reviewer <span>— learning site</span></a>
+    <div class="header-actions">
+      <a class="btn" id="tryit-back" href="index.html">Back to the lesson</a>
+      <button type="button" class="btn" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme">Dark mode</button>
+    </div>
+  </div>
+</header>
+
+<main class="tryit">
+  <div class="tryit-bar">
+    <h1 id="tryit-title">Try it yourself</h1>
+    <div class="tryit-actions">
+      <button type="button" class="btn btn-run" id="tryit-run">Run</button>
+      <button type="button" class="btn" id="tryit-reset">Reset</button>
+      <button type="button" class="btn" id="tryit-copy">Copy</button>
+    </div>
+  </div>
+
+  <div class="split" id="tryit-split">
+    <div class="pane pane-left">
+      <label class="visually-hidden" for="tryit-code">Code</label>
+      <textarea id="tryit-code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"></textarea>
+    </div>
+    <div class="divider" id="tryit-divider" role="separator" aria-orientation="vertical"
+         aria-label="Resize the panes" tabindex="0"></div>
+    <div class="pane pane-right">
+      <pre id="tryit-output" class="example-output" tabindex="0" role="region" aria-label="Output"></pre>
+      <div class="terminal-panel" id="tryit-terminal" hidden></div>
+    </div>
+  </div>
+
+  <p class="tryit-status" id="tryit-status" role="status" aria-live="polite"></p>
+</main>
+
+<script src="assets/contracts.js"></script>
+<script src="assets/progress.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/search.js"></script>
+<script src="assets/sidebar.js"></script>
+<script src="assets/pyodide-loader.js"></script>
+<script src="assets/manifest.js"></script>
+<script src="content/repo-sources.js"></script>
+<script src="content/part-0/lesson-0.1.js"></script>
+<script src="content/part-1/lesson-1.1.js"></script>
+<script>
+  /* The split editor. Everything it needs is already in memory — window.LESSONS
+   * carries the snippet, window.PyRun runs it — so file:// needs no fetch. */
+  (function () {
+    "use strict";
+
+    var C = window.CONTRACTS;
+    var original = "";
+    var example = null;
+    var lesson = null;
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function param(name) {
+      var query = String(window.location.search || "").replace(/^\?/, "");
+      var pairs = query ? query.split("&") : [];
+      for (var i = 0; i < pairs.length; i += 1) {
+        var pair = pairs[i].split("=");
+        if (decodeURIComponent(pair[0]) === name) {
+          return decodeURIComponent((pair.slice(1).join("=") || "").replace(/\+/g, " "));
+        }
+      }
+      return "";
+    }
+
+    function lessonById(id) {
+      var list = Array.isArray(window.LESSONS) ? window.LESSONS : [];
+      for (var i = 0; i < list.length; i += 1) {
+        if (String(list[i].id) === String(id)) {
+          return list[i];
+        }
+      }
+      return null;
+    }
+
+    function terminalCommand(item) {
+      if (item.lang === "python") {
+        return "python - <<'PY'\n" + String(item.code || "").replace(/\s+$/, "") + "\nPY";
+      }
+      return String(item.code || "").trim();
+    }
+
+    function setStatus(text) {
+      var status = $("tryit-status");
+      if (status) {
+        status.textContent = text || "";
+      }
+    }
+
+    function showOutput(text) {
+      var output = $("tryit-output");
+      var terminal = $("tryit-terminal");
+      if (terminal) {
+        terminal.hidden = true;
+      }
+      if (output) {
+        output.hidden = false;
+        output.textContent = text;
+      }
+    }
+
+    /* A terminal-tier example has no Run: it shows the command and what it
+     * prints, and says why it cannot run here. */
+    function showTerminal(item, reason) {
+      var output = $("tryit-output");
+      var terminal = $("tryit-terminal");
+      var run = $("tryit-run");
+      if (output) {
+        output.hidden = true;
+      }
+      if (run) {
+        run.hidden = true;
+      }
+      if (!terminal) {
+        return;
+      }
+      terminal.hidden = false;
+      terminal.innerHTML = "";
+
+      var title = document.createElement("p");
+      title.className = "terminal-title";
+      title.textContent = "Run it in a terminal, from the repository root";
+      terminal.appendChild(title);
+
+      var command = document.createElement("pre");
+      command.className = "code terminal-command";
+      var commandCode = document.createElement("code");
+      commandCode.textContent = terminalCommand(item);
+      command.appendChild(commandCode);
+      terminal.appendChild(command);
+
+      if (item.expected_output) {
+        var label = document.createElement("p");
+        label.className = "terminal-title";
+        label.textContent = "Expected output";
+        terminal.appendChild(label);
+        var expected = document.createElement("pre");
+        expected.className = "code terminal-output";
+        var expectedCode = document.createElement("code");
+        expectedCode.textContent = item.expected_output;
+        expected.appendChild(expectedCode);
+        terminal.appendChild(expected);
+      }
+
+      var why = document.createElement("p");
+      why.className = "terminal-why";
+      why.textContent = "Why not in the browser: " + (reason || item.why_not || "this example needs a terminal.");
+      terminal.appendChild(why);
+    }
+
+    function runCode() {
+      var code = $("tryit-code").value;
+      var button = $("tryit-run");
+      button.disabled = true;
+      button.textContent = "Running…";
+      setStatus("Running…");
+
+      window.PyRun.run(code, {
+        packages: example.packages || [],
+        files: example.files || []
+      }).then(function (result) {
+        button.disabled = false;
+        button.textContent = "Run";
+        setStatus("");
+
+        if (result.error_kind === "load") {
+          showTerminal(
+            example,
+            "the Python runtime could not be loaded — the page is offline, or the download was blocked."
+          );
+          return;
+        }
+        if (result.error_kind === "setup") {
+          showOutput("This example asks for something that does not exist:\n\n" + result.error);
+          return;
+        }
+        if (result.ok) {
+          var text = result.stdout;
+          if (result.stderr) {
+            text += (text ? "\n" : "") + result.stderr;
+          }
+          showOutput(text || "(no output)");
+          return;
+        }
+        var pane = result.stdout ? result.stdout + "\n" : "";
+        if (result.stderr) {
+          pane += result.stderr + "\n";
+        }
+        showOutput(pane + "This is what the error looks like:\n\n" + result.error);
+      });
+    }
+
+    function copyCode() {
+      var button = $("tryit-copy");
+      var text = $("tryit-code").value;
+      var done = function (ok) {
+        button.textContent = ok ? "Copied" : "Press Ctrl+C";
+        window.setTimeout(function () {
+          button.textContent = "Copy";
+        }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          done(true);
+        }, function () {
+          done(false);
+        });
+        return;
+      }
+      var area = document.createElement("textarea");
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      var ok = false;
+      try {
+        ok = document.execCommand("copy") === true;
+      } catch (error) {
+        ok = false;
+      }
+      document.body.removeChild(area);
+      done(ok);
+    }
+
+    function bindSplit() {
+      var split = $("tryit-split");
+      var divider = $("tryit-divider");
+      if (!split || !divider) {
+        return;
+      }
+      var dragging = false;
+
+      var setSplit = function (percent) {
+        var clamped = Math.max(20, Math.min(80, percent));
+        split.style.setProperty("--split", clamped + "%");
+        divider.setAttribute("aria-valuenow", String(Math.round(clamped)));
+      };
+
+      divider.setAttribute("aria-valuemin", "20");
+      divider.setAttribute("aria-valuemax", "80");
+      setSplit(50);
+
+      var fromPointer = function (event) {
+        var box = split.getBoundingClientRect();
+        setSplit(((event.clientX - box.left) / box.width) * 100);
+      };
+
+      divider.addEventListener("pointerdown", function (event) {
+        dragging = true;
+        divider.setPointerCapture(event.pointerId);
+        event.preventDefault();
+      });
+      divider.addEventListener("pointermove", function (event) {
+        if (dragging) {
+          fromPointer(event);
+        }
+      });
+      divider.addEventListener("pointerup", function (event) {
+        dragging = false;
+        divider.releasePointerCapture(event.pointerId);
+      });
+      divider.addEventListener("keydown", function (event) {
+        var current = Number(divider.getAttribute("aria-valuenow")) || 50;
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          setSplit(current - 5);
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          setSplit(current + 5);
+        }
+      });
+    }
+
+    function bindTheme() {
+      var button = $("theme-toggle");
+      var stored = "light";
+      try {
+        stored = window.localStorage.getItem(C.THEME_KEY) === "dark" ? "dark" : "light";
+      } catch (error) {
+        stored = "light";
+      }
+      document.documentElement.setAttribute("data-theme", stored);
+
+      var sync = function () {
+        var dark = document.documentElement.getAttribute("data-theme") === "dark";
+        button.textContent = dark ? "Light mode" : "Dark mode";
+        button.setAttribute("aria-pressed", dark ? "true" : "false");
+      };
+      button.addEventListener("click", function () {
+        var dark = document.documentElement.getAttribute("data-theme") === "dark";
+        var next = dark ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        try {
+          window.localStorage.setItem(C.THEME_KEY, next);
+        } catch (error) {
+          /* storage refused: the page still renders */
+        }
+        sync();
+      });
+      sync();
+    }
+
+    function boot() {
+      bindTheme();
+      bindSplit();
+
+      lesson = lessonById(param("id"));
+      var index = Number(param("ex") || "0");
+      if (!lesson || !lesson.code_examples || !lesson.code_examples[index]) {
+        $("tryit-title").textContent = "No such example";
+        $("tryit-code").value = "";
+        $("tryit-code").disabled = true;
+        $("tryit-run").hidden = true;
+        $("tryit-reset").hidden = true;
+        setStatus("That link does not point at an example in this build of the site.");
+        return;
+      }
+
+      example = lesson.code_examples[index];
+      original = example.code;
+      document.title = "Try it — " + lesson.id + " " + lesson.title;
+      $("tryit-title").textContent = lesson.id + " · " + (example.caption || "Example " + (index + 1));
+      $("tryit-back").href = "lesson.html?id=" + encodeURIComponent(lesson.id);
+      $("tryit-code").value = original;
+
+      var tier = example.run_tier || (example.runnable === true ? "browser" : "terminal");
+      if (tier === "terminal") {
+        showTerminal(example);
+      } else if (!window.PyRun.isAvailable()) {
+        showTerminal(example, "Python cannot run in this browser right now — it needs a one-time download.");
+      }
+
+      $("tryit-run").addEventListener("click", runCode);
+      $("tryit-reset").addEventListener("click", function () {
+        $("tryit-code").value = original;
+        $("tryit-output").textContent = "";
+        setStatus("Reset to the original snippet.");
+        window.setTimeout(function () {
+          setStatus("");
+        }, 1800);
+      });
+      $("tryit-copy").addEventListener("click", copyCode);
+
+      /* Tab indents two spaces rather than leaving the editor; Ctrl-Enter runs. */
+      $("tryit-code").addEventListener("keydown", function (event) {
+        if (event.key === "Tab") {
+          event.preventDefault();
+          var field = event.target;
+          var start = field.selectionStart;
+          var end = field.selectionEnd;
+          field.value = field.value.slice(0, start) + "  " + field.value.slice(end);
+          field.selectionStart = field.selectionEnd = start + 2;
+        } else if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault();
+          if (!$("tryit-run").hidden) {
+            runCode();
+          }
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot, { once: true });
+    } else {
+      boot();
+    }
+  })();
+</script>
+</body>
+</html>

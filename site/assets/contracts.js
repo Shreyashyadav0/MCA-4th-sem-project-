@@ -35,14 +35,32 @@
     { n: 12, title: "Surfaces: CLI, API, webhook, GitHub", lessons: 10 }
   ];
 
+  /* The lesson object, as of schema version 2. This comment is the reference a
+   * lesson author reads; tools/validate_lessons.py enforces it.
+   *
+   *   id            "1.3"            part and number, order = part*100 + n
+   *   part, part_title, title, order, duration_min
+   *   concept_md    markdown, subset in MARKDOWN_SUBSET below
+   *   code_examples [ { id: "1.3-ex-0", lang, caption, code, runnable, run_tier,
+   *                     expected_output?, why_not?, packages?, files? } ]
+   *                 `id` is stable and is what tryit.html addresses:
+   *                 tryit.html?id=1.3&ex=0. It never changes once written.
+   *   try_it        { prompt, starter, solution, explanation }
+   *   exercise      { prompt, hint, solution, explanation }
+   *   quiz          [ { q, options: [..], answer: <index>, why } ]
+   *                 Optional in Wave 1.6, required from Wave 2 onward. `answer`
+   *                 is the index of the correct option; `why` is one sentence
+   *                 and is shown whether the answer was right or wrong.
+   *   common_mistakes, project_links, learn_more, glossary_terms
+   */
   window.CONTRACTS = {
     PARTS: PARTS,
 
-    /* The version of the lesson object shape documented in site/README.md.
-     * Nothing enforces it yet: it is a stamp a later wave can compare against
-     * when the shape changes, so content authored for version 1 is identifiable
-     * rather than silently reinterpreted. */
-    SCHEMA_VERSION: 1,
+    /* The version of the lesson object shape. Version 2 (Wave 1.6) added
+     * `code_examples[].id` and `quiz`; version 1 lessons have neither. Nothing
+     * enforces the stamp — the validator checks the fields themselves — but it
+     * tells a later wave what it is looking at. */
+    SCHEMA_VERSION: 2,
 
     /* localStorage keys. Both are namespaced and versioned so a future format
      * change can ignore old data instead of crashing on it. */
