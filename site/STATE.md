@@ -10,6 +10,9 @@ is the bug.
 | 1a | 2026-11-14 | `dd561fe` | 0 added, 14 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 1.5 | 2026-11-14 | `4c70195` | 2 added, 10 changed | 0 new; `0.1` and `1.1` rewritten with live examples | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 1.6 | 2026-11-14 | `f24c9de` | 2 added, 9 changed | 0 new; `0.1` and `1.1` gained example ids and quizzes | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1.6a | 2026-11-14 | `346619e` | 0 added, 8 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1.6b | 2026-11-14 | `8e36944` | 0 added, 6 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 2 | 2026-11-14 | `ade2c8d` | 14 added, 5 changed | 14 (`0.2`–`0.4`, `1.2`–`1.12`) | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -486,3 +489,89 @@ parses every `<script>` tag regardless of attributes or quoting, ignores
   the accessibility tree.
 - Printing the editor before pressing Run prints an empty output pane, because
   the pane is empty. That is the page, not the stylesheet.
+
+## Curriculum changes
+
+**Wave 2 — 104 lessons became 108.** Parts 0 and 1 were enlarged: Part 0 from 2
+lessons to 4, Part 1 from 10 to 12. The reason is that setup and typing deserve
+their own lessons — every later part assumes a working environment and a reader
+who can read a type annotation, and both were previously compressed into a single
+orientation lesson. The remaining wave map is now 16 / 32 / 48 / 64 / 92 / 108.
+
+## Wave 2 — Parts 0 and 1
+
+Fourteen new lessons: `0.2`, `0.3`, `0.4` (Orientation, now complete at 4) and
+`1.2`–`1.12` (Python fundamentals, now complete at 12). `0.1` and `1.1` were not
+touched.
+
+**Changed.** `assets/contracts.js` (PARTS: part 0 → 4, part 1 → 12 — the array
+lives there and nowhere else), `assets/manifest.js` (14 paths appended in id
+order), `index.html` / `lesson.html` / `tryit.html` (one `<script>` per lesson, in
+manifest order), `STATE.md`.
+
+**Tiers, as declared and as verified.** Thirteen examples are `browser` and were
+executed twice — once under CPython and once in the browser through the real
+runner; three are `terminal` (`0.2`, `0.3`, `0.4`, `1.11`) and carry both
+`expected_output` and `why_not`.
+
+**Gate results, verbatim.**
+
+```
+$ python site/tools/validate_lessons.py
+OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,0.2,0.3,0.4,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,1.10,1.11,1.12
+
+$ python site/tools/embed_sources.py --check
+OK repo-sources.js matches 7 embedded files
+
+$ python -m pytest -q tests
+640 passed, 1 skipped
+
+$ git status --porcelain
+(only site/ paths)
+```
+
+**Every browser example executed, with its real output** (CPython 3.12.13, then
+re-checked in the page for 1.2):
+
+```
+0.1 ex0  files changed: 2 / findings: 4 / verdict: block
+1.1 ex0  CRITICAL app/db.py:3 / verdict: block
+1.1 ex1  CRITICAL  app/db.py:3 / MEDIUM    app/report.py:1
+1.2 ex0  {'CRITICAL': 2, 'MEDIUM': 1} / 2 distinct files: ['app/db.py', 'app/report.py']
+1.3 ex0  {'file': 'app/db.py', ...} / {'return': dict[str, str]}
+1.4 ex0  Point(x=3.0, y=4.0) / magnitude: 5.0 / FrozenInstanceError -> cannot assign to field 'x'
+1.5 ex0  caught as the parent: AuthError - no credential configured / finally runs …
+1.6 ex0  imported: hello reader / run directly
+1.7 ex0  read back: 'line one\n' / enter block / inside BLOCK / exit block
+1.8 ex0  before severity_rank / after severity_rank / rank: 2 / name kept: severity_rank
+1.9 ex0  2 added lines: ['added one', 'added two'] / lazy: generator
+1.10 ex0 loaded: [...] / old start/count: 1 5 / new start/count: 1 8 / section: 'def check():'
+1.12 ex0 running mock / ['rule-engine finding'] / running local / … / Literal aliases: …
+```
+
+**Browser checks.** Index: 16 lessons loaded, Part 0 `0/4`, Part 1 `0/12`,
+Part 2 `0/8 planned`, 16 sidebar links. Search: `Protocol` → 1.12 and 1.7,
+`f-string` → 1.1, `comprehension` → 1.2, `zzzz` → 0. Lesson 1.2 pressed Run and
+printed its stated output from the real `app.models` import; position line
+"Part 1 · Lesson 2 of 12"; three quiz questions; try-it link
+`tryit.html?id=1.2&ex=0`. Lesson 1.11 shows no Run button, a visible terminal
+panel with its command and why line, and all eight sections. `tryit.html?id=1.12&ex=0`
+preloads that lesson's snippet.
+
+**Decisions and deviations.**
+
+- `app/db.py` and `app/engine.py` are embedded but NOT importable in the browser:
+  both import `app.config`, which needs `pydantic-settings`. Lessons that cite
+  them quote them; `0.4`'s example is `terminal` for exactly this reason, and no
+  lesson points a Run button at them.
+- Lesson 1.7 says plainly that `app/` reads files with `pathlib.read_text`
+  rather than `with open(...)`; there is no real `with open(` in `app/` to cite,
+  so it cites `cli.py:read_source` and the rule in `rules.py` that recommends the
+  pattern to other people's code.
+- `tryit.html` had to change too: it loads every lesson so it can address an
+  example, and the brief named only `manifest.js` and the PARTS array.
+- Lesson 1.9's first draft called `added_lines` a property; it is a method
+  (`app/parser.py:144`), while `added_line_count` is a property. Corrected before
+  the commit.
+- Word counts of the new lessons run 221–306; `1.1` is 537 words and was left
+  alone because Wave 2 must not re-author it.

@@ -21,6 +21,20 @@
 
   [
     "content/part-0/lesson-0.1.js",
-    "content/part-1/lesson-1.1.js"
+    "content/part-0/lesson-0.2.js",
+    "content/part-0/lesson-0.3.js",
+    "content/part-0/lesson-0.4.js",
+    "content/part-1/lesson-1.1.js",
+    "content/part-1/lesson-1.2.js",
+    "content/part-1/lesson-1.3.js",
+    "content/part-1/lesson-1.4.js",
+    "content/part-1/lesson-1.5.js",
+    "content/part-1/lesson-1.6.js",
+    "content/part-1/lesson-1.7.js",
+    "content/part-1/lesson-1.8.js",
+    "content/part-1/lesson-1.9.js",
+    "content/part-1/lesson-1.10.js",
+    "content/part-1/lesson-1.11.js",
+    "content/part-1/lesson-1.12.js"
   ];
 })();

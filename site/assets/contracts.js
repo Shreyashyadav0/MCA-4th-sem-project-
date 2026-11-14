@@ -23,8 +23,8 @@
    * `lessons` is the planned count for the part, not the count shipped so far:
    * a part is complete when Progress.partCounts(n).total equals it. */
   var PARTS = [
-    { n: 0, title: "Orientation", lessons: 2 },
-    { n: 1, title: "Python fundamentals", lessons: 10 },
+    { n: 0, title: "Orientation", lessons: 4 },
+    { n: 1, title: "Python fundamentals", lessons: 12 },
     { n: 2, title: "Typing and data modelling", lessons: 8 },
     { n: 3, title: "Testing with pytest", lessons: 8 },
     { n: 4, title: "HTTP and FastAPI", lessons: 8 },
