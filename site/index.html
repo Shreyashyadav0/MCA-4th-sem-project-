@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Code Reviewer — learn it from the code</title>
+<meta name="description" content="A W3Schools-style static learning site for the Autonomous AI Code Reviewer. Works offline, opens by double-clicking this file.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to the lesson list</a>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="index.html">AI Code Reviewer <span>— learning site</span></a>
+    <div class="header-actions">
+      <p class="progress-total" id="progress-total">0 of 0 lessons done</p>
+      <button type="button" class="btn" id="theme-toggle" aria-pressed="false">Dark mode</button>
+    </div>
+  </div>
+</header>
+
+<main class="page" id="main">
+  <h1>Learn this reviewer by rebuilding it</h1>
+  <p class="lede">
+    Thirteen parts, 104 lessons, one repository. Each lesson points at the exact file and line
+    range it explains, so the code is always one click from the claim. The site is a static
+    folder: no server, no build step, no account.
+  </p>
+
+  <section class="search-block" aria-labelledby="search-label">
+    <label class="search-label" id="search-label" for="search-input">Search lessons</label>
+    <div class="search-row">
+      <input type="search" id="search-input" autocomplete="off" spellcheck="false"
+             placeholder="e.g. f-string, provider, diff" aria-describedby="search-key-hint">
+      <span class="search-key" id="search-key-hint">Press / to focus</span>
+    </div>
+    <div id="search-results" aria-live="polite"></div>
+  </section>
+
+  <section aria-labelledby="parts-heading">
+    <h2 id="parts-heading">The path</h2>
+    <div id="parts-list"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Built from
+     commit <code>ca96890</code> of the repository.</p>
+</footer>
+
+<!-- Script order is a contract: contracts, progress, app, search, pyodide, manifest, lessons. -->
+<script src="assets/contracts.js"></script>
+<script src="assets/progress.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/search.js"></script>
+<script src="assets/pyodide-loader.js"></script>
+<script src="assets/manifest.js"></script>
+<script src="content/part-0/lesson-0.1.js"></script>
+<script src="content/part-1/lesson-1.1.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    window.App.initIndex();
+  });
+</script>
+</body>
+</html>

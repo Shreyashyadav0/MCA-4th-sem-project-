@@ -206,6 +206,7 @@ Stated because a reviewer will find them anyway:
 | [docs/report/](docs/report) | the technical report and synopsis, with their generator |
 | [docs/diagrams/](docs/diagrams) | eleven figures, each generated from the code |
 | [docs/learning/](docs/learning) | a seven-track curriculum for rebuilding this from memory |
+| `site/` | W3Schools-style learning site. Open `site/index.html` |
 | [RESUME.md](RESUME.md) · [HANDOFF.md](HANDOFF.md) | recovery checklist and the honesty ledger |
 | [CHANGELOG.md](CHANGELOG.md) | phase-by-phase history with test counts |
 
