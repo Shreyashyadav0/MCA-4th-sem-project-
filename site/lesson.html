@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to the lesson</a>
+<a class="skip-link" href="#lesson-title">Skip to the lesson</a>
 
 <header class="site-header">
   <div class="site-header-inner">
@@ -18,45 +18,45 @@
   </div>
 </header>
 
-<main class="page" id="main">
+<main class="page">
   <nav class="breadcrumb" id="lesson-nav" aria-label="Breadcrumb"></nav>
 
   <article>
-    <h1 id="lesson-title">Loading lesson…</h1>
+    <h1 id="lesson-title" tabindex="-1">Lesson</h1>
     <div class="lesson-meta-bar" id="lesson-meta"></div>
 
-    <section class="lesson-section" aria-labelledby="concept-heading">
-      <h2 id="concept-heading">Concept</h2>
+    <section class="lesson-section" aria-label="Concept">
+      <h2>Concept</h2>
       <div id="lesson-concept"></div>
     </section>
 
-    <section class="lesson-section" aria-labelledby="examples-heading">
-      <h2 id="examples-heading">Code</h2>
+    <section class="lesson-section" aria-label="Code">
+      <h2>Code</h2>
       <div id="lesson-examples"></div>
     </section>
 
-    <section class="lesson-section" aria-labelledby="try-heading">
-      <h2 id="try-heading">Try it</h2>
+    <section class="lesson-section" aria-label="Try it">
+      <h2>Try it</h2>
       <div id="lesson-tryit"></div>
     </section>
 
-    <section class="lesson-section" aria-labelledby="exercise-heading">
-      <h2 id="exercise-heading">Exercise</h2>
+    <section class="lesson-section" aria-label="Exercise">
+      <h2>Exercise</h2>
       <div id="lesson-exercise"></div>
     </section>
 
-    <section class="lesson-section" aria-labelledby="mistakes-heading">
-      <h2 id="mistakes-heading">Common mistakes</h2>
+    <section class="lesson-section" aria-label="Common mistakes">
+      <h2>Common mistakes</h2>
       <ul class="mistake-list" id="lesson-mistakes"></ul>
     </section>
 
-    <section class="lesson-section" aria-labelledby="links-heading">
-      <h2 id="links-heading">In the repository</h2>
+    <section class="lesson-section" aria-label="In the repository">
+      <h2>In the repository</h2>
       <ul class="link-list" id="lesson-links"></ul>
     </section>
 
-    <section class="lesson-section" aria-labelledby="glossary-heading">
-      <h2 id="glossary-heading">Glossary</h2>
+    <section class="lesson-section" aria-label="Glossary">
+      <h2>Glossary</h2>
       <ul class="glossary-list" id="lesson-glossary"></ul>
     </section>
   </article>
@@ -64,14 +64,23 @@
   <div class="lesson-footer">
     <button type="button" class="btn btn-done" id="mark-done" aria-pressed="false">Mark done</button>
     <div class="pager">
-      <a id="prev-link" href="#">← Previous</a>
-      <a id="next-link" href="#">Next →</a>
+      <a id="prev-link" aria-disabled="true">← Start of the path</a>
+      <a id="next-link" aria-disabled="true">End of the written path →</a>
     </div>
   </div>
+
+  <noscript>
+    <p class="noscript-note">
+      This page renders a lesson with JavaScript, and JavaScript is off in this browser.
+      The lessons are plain text in the repository: start at
+      <code>docs/learning/README.md</code>.
+    </p>
+  </noscript>
 </main>
 
 <footer class="site-footer">
-  <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth.</p>
+  <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Wave log in
+     <code>site/STATE.md</code>.</p>
 </footer>
 
 <!-- Script order is a contract: contracts, progress, app, search, pyodide, manifest, lessons. -->
@@ -84,9 +93,16 @@
 <script src="content/part-0/lesson-0.1.js"></script>
 <script src="content/part-1/lesson-1.1.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    window.App.initLesson();
-  });
+  (function () {
+    function boot() {
+      window.App.initLesson();
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot, { once: true });
+    } else {
+      boot();
+    }
+  })();
 </script>
 </body>
 </html>

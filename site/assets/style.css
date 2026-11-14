@@ -83,11 +83,15 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-/* Visible focus on every interactive element, in both themes. */
+/* Visible focus on every interactive element, in both themes. The ring is
+ * two-tone: the accent outline alone disappears on .btn-run and .skip-link,
+ * which are filled with that same accent, so a background-coloured halo sits
+ * outside it and guarantees one of the two bands contrasts. */
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
   border-radius: var(--radius);
+  box-shadow: 0 0 0 6px var(--bg);
 }
 
 .visually-hidden {
@@ -98,6 +102,7 @@ a:hover {
   padding: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -188,6 +193,19 @@ h3 {
   margin: var(--space-5) 0 var(--space-2);
 }
 
+/* A long unbroken identifier in a heading, link or inline code must wrap, or a
+ * 320px viewport scrolls sideways. `pre` keeps overflow-x instead. */
+h1,
+h2,
+h3,
+h4,
+.lesson-link,
+.link-path,
+code {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 h4 {
   font-size: 1rem;
   margin: var(--space-4) 0 var(--space-2);
@@ -233,8 +251,15 @@ input[type="search"] {
   font: inherit;
   color: var(--text);
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--muted);
   border-radius: var(--radius);
+}
+
+/* The placeholder is the one visible colour a UA sets, so it is pinned to a
+ * token; the default ~54% of the text colour fails AA on the light theme. */
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 .search-key {
@@ -246,7 +271,6 @@ input[type="search"] {
 .search-hint,
 .search-count,
 .search-empty-hint,
-.search-empty-title,
 .search-part,
 .search-snippet {
   color: var(--muted);
@@ -322,6 +346,7 @@ input[type="search"] {
 
 .part-pending {
   background: var(--surface);
+  border-style: dashed;
 }
 
 .part-head {
@@ -417,6 +442,15 @@ input[type="search"] {
 
 .crumb-sep {
   color: var(--muted);
+}
+
+.crumb-part {
+  color: var(--muted);
+}
+
+.crumb-current {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .lesson-meta-bar {
@@ -736,18 +770,21 @@ details.solution[open] summary {
     --accent-contrast: #ffffff;
     --code-bg: #f4f4f4;
     --code-text: #000000;
+    --sev-critical: #a4133c;
+    --sev-high: #a63f00;
+    --sev-medium: #6f5200;
+    --sev-low: #1c5d86;
   }
 
+  /* Chrome and controls go; the terminal panel stays, because it holds the
+   * expected output of every example that cannot run in the browser. */
   .site-header,
-  .site-footer,
   .breadcrumb,
   .search-block,
   .example-actions,
   .lesson-footer,
-  .skip-link,
-  .terminal-panel,
-  #theme-toggle {
-    display: none !important;
+  .skip-link {
+    display: none;
   }
 
   body {
@@ -764,25 +801,60 @@ details.solution[open] summary {
     text-decoration: underline;
   }
 
-  pre.code,
-  table,
-  blockquote,
-  details.solution {
+  /* Only blocks that fit on a page avoid a break; a long code sample or table
+   * must be allowed to flow, or it is clipped instead of continued. */
+  blockquote {
     break-inside: avoid;
   }
 
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* A closed <details> renders no body, and the summary is hidden in print, so
+   * the answer would vanish. Force the body visible on paper. */
   details.solution {
     border: none;
     padding: 0;
+    break-inside: auto;
   }
 
   details.solution > summary {
     display: none;
   }
 
+  details.solution > *:not(summary) {
+    display: block;
+  }
+
+  .table-wrap {
+    overflow: visible;
+  }
+
+  table {
+    font-size: 9pt;
+  }
+
+  th,
+  td {
+    word-break: break-word;
+  }
+
   .lesson-section {
     break-inside: auto;
   }
+}
+
+/* ---------------------------------------------------------------- noscript */
+
+.noscript-note {
+  max-width: var(--measure);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 
 /* --------------------------------------------------------------- narrow */

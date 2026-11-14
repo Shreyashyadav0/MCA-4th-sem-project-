@@ -10,6 +10,7 @@
   "use strict";
 
   var index = [];
+  var shortcutBound = false;
 
   function normalise(value) {
     return String(value === null || value === undefined ? "" : value)
@@ -20,15 +21,18 @@
   }
 
   /* Markdown to something readable in a one-line snippet: fences, inline code,
-   * links and list markers removed, so the snippet is prose a human can scan. */
+   * emphasis markers, links and list markers removed, so the snippet is prose a
+   * human can scan. CRLF and ~~~ fences are handled as well as ``` ones. */
   function plainText(markdown) {
     return String(markdown || "")
-      .replace(/```[A-Za-z0-9_+#.-]*\n[\s\S]*?```/g, " ")
+      .replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, " ")
       .replace(/`([^`]+)`/g, "$1")
-      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, "$1")
+      .replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, "$1")
       .replace(/^#{1,6}\s+/gm, "")
       .replace(/^>\s?/gm, "")
       .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/\*\*|__/g, "")
+      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1$2")
       .replace(/\|/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -56,20 +60,41 @@
     return index.length;
   }
 
-  function snippetFor(entry, needle) {
-    var haystack = entry.concept;
-    var position = haystack.toLowerCase().indexOf(needle);
-    if (position === -1) {
-      return haystack.slice(0, 140) + (haystack.length > 140 ? "…" : "");
-    }
+  function window_(text, position, needleLength) {
     var start = Math.max(0, position - 60);
-    var end = Math.min(haystack.length, position + needle.length + 80);
-    return (start > 0 ? "…" : "") + haystack.slice(start, end).trim() + (end < haystack.length ? "…" : "");
+    var end = Math.min(text.length, position + needleLength + 80);
+    return (start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : "");
+  }
+
+  /* The snippet is searched in the same string the match was found in, so the
+   * word the reader typed is always visible in it. When the match is only in the
+   * title, the title is the snippet rather than an unrelated first sentence. */
+  function snippetFor(entry, needle, inTitle, inConcept) {
+    if (inConcept) {
+      var haystack = entry.concept;
+      var position = haystack.toLowerCase().indexOf(needle);
+      if (position !== -1) {
+        return window_(haystack, position, needle.length);
+      }
+      var normalisedPosition = entry.conceptText.indexOf(needle);
+      if (normalisedPosition !== -1) {
+        return window_(entry.conceptText, normalisedPosition, needle.length);
+      }
+    }
+    if (inTitle) {
+      return "Title match: " + entry.title;
+    }
+    return entry.concept.slice(0, 140) + (entry.concept.length > 140 ? "…" : "");
   }
 
   function query(term) {
     var needle = normalise(term);
     if (!needle) {
+      return [];
+    }
+    /* A term with no letters or digits — ".", "(", "*" — would match almost
+     * everything after normalisation, so it is treated as no search at all. */
+    if (!/[a-z0-9]/.test(needle)) {
       return [];
     }
     var hits = [];
@@ -86,7 +111,7 @@
         part_title: entry.part_title,
         order: entry.order,
         score: (inTitle ? 3 : 0) + (inConcept ? 1 : 0),
-        snippet: snippetFor(entry, needle)
+        snippet: snippetFor(entry, needle, inTitle, inConcept)
       });
     });
     hits.sort(function (a, b) {
@@ -108,8 +133,12 @@
 
   /* "/" focuses search — but only when the keystroke is not going into a field
    * and no modifier is held, or it would steal the slash from someone typing in
-   * the search box itself. */
+   * the search box itself. Bound once; a second call is a no-op. */
   function bindShortcut() {
+    if (shortcutBound) {
+      return;
+    }
+    shortcutBound = true;
     document.addEventListener("keydown", function (event) {
       if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) {
         return;

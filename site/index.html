@@ -8,45 +8,53 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to the lesson list</a>
+<a class="skip-link" href="#parts-list">Skip to the lesson list</a>
 
 <header class="site-header">
   <div class="site-header-inner">
     <a class="brand" href="index.html">AI Code Reviewer <span>— learning site</span></a>
     <div class="header-actions">
-      <p class="progress-total" id="progress-total">0 of 0 lessons done</p>
-      <button type="button" class="btn" id="theme-toggle" aria-pressed="false">Dark mode</button>
+      <p class="progress-total" id="progress-total">Lessons done: —</p>
+      <button type="button" class="btn" id="theme-toggle" aria-pressed="false" aria-label="Switch to dark theme">Dark mode</button>
     </div>
   </div>
 </header>
 
-<main class="page" id="main">
+<main class="page">
   <h1>Learn this reviewer by rebuilding it</h1>
   <p class="lede">
-    Thirteen parts, 104 lessons, one repository. Each lesson points at the exact file and line
+    The whole repository, in dependency order. Each lesson points at the exact file and line
     range it explains, so the code is always one click from the claim. The site is a static
     folder: no server, no build step, no account.
   </p>
 
-  <section class="search-block" aria-labelledby="search-label">
-    <label class="search-label" id="search-label" for="search-input">Search lessons</label>
+  <section class="search-block" aria-label="Search lessons">
+    <label class="search-label" for="search-input">Search lessons</label>
     <div class="search-row">
       <input type="search" id="search-input" autocomplete="off" spellcheck="false"
-             placeholder="e.g. f-string, provider, diff" aria-describedby="search-key-hint">
-      <span class="search-key" id="search-key-hint">Press / to focus</span>
+             placeholder="e.g. f-string, provider, diff">
+      <span class="search-key">Press / to focus</span>
     </div>
     <div id="search-results" aria-live="polite"></div>
   </section>
 
-  <section aria-labelledby="parts-heading">
-    <h2 id="parts-heading">The path</h2>
-    <div id="parts-list"></div>
-  </section>
+  <nav aria-label="Lesson parts">
+    <h2>The path</h2>
+    <div id="parts-list" tabindex="-1"></div>
+  </nav>
+
+  <noscript>
+    <p class="noscript-note">
+      This page builds the parts list with JavaScript, and JavaScript is off in this browser.
+      The lessons are plain text in the repository: start at
+      <code>docs/learning/README.md</code>, which is the source of truth for this curriculum.
+    </p>
+  </noscript>
 </main>
 
 <footer class="site-footer">
-  <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Built from
-     commit <code>ca96890</code> of the repository.</p>
+  <p>This site is a learning aid; <code>docs/learning/</code> is the source of truth. Wave log in
+     <code>site/STATE.md</code>.</p>
 </footer>
 
 <!-- Script order is a contract: contracts, progress, app, search, pyodide, manifest, lessons. -->
@@ -59,9 +67,16 @@
 <script src="content/part-0/lesson-0.1.js"></script>
 <script src="content/part-1/lesson-1.1.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    window.App.initIndex();
-  });
+  (function () {
+    function boot() {
+      window.App.initIndex();
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot, { once: true });
+    } else {
+      boot();
+    }
+  })();
 </script>
 </body>
 </html>

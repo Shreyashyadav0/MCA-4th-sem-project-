@@ -40,7 +40,13 @@
     }
   }
 
-  function get() {
+  /* A copy, never the internal object: a caller that mutates what it gets back
+   * cannot corrupt the stored state behind the module's back. */
+  function clone(state) {
+    return { version: state.version, done: Object.assign({}, state.done) };
+  }
+
+  function loadState() {
     if (memory) {
       return memory;
     }
@@ -73,13 +79,17 @@
     writeStorage(JSON.stringify(state));
   }
 
+  function get() {
+    return clone(loadState());
+  }
+
   function isDone(id) {
-    return get().done[String(id)] === true;
+    return loadState().done[String(id)] === true;
   }
 
   function toggle(id) {
     var key = String(id);
-    var state = get();
+    var state = loadState();
     if (state.done[key] === true) {
       delete state.done[key];
     } else {
@@ -93,12 +103,13 @@
    * 0 of 0 rather than inventing lessons that do not exist. */
   function partCounts(partN) {
     var list = Array.isArray(window.LESSONS) ? window.LESSONS : [];
+    var state = loadState();
     var total = 0;
     var done = 0;
     for (var i = 0; i < list.length; i += 1) {
       if (Number(list[i].part) === Number(partN)) {
         total += 1;
-        if (isDone(list[i].id)) {
+        if (state.done[String(list[i].id)] === true) {
           done += 1;
         }
       }

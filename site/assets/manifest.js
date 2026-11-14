@@ -1,16 +1,18 @@
 /* manifest.js — the ordered list of lesson files.
  *
- * This is the single source of truth for lesson order, and the file the
- * validator reads. It writes no global and touches no DOM: it is a data file
- * wrapped in a function so that it declares nothing, which is why the array
- * below is a bare expression.
+ * This is the validator's source of truth for lesson order. At runtime the
+ * pages load lessons from their own <script src> tags, because file:// forbids
+ * fetch and the order must be fixed before the bootstrap runs; this file is the
+ * list those tags are checked against, so the two cannot drift.
  *
- * Two invariants, both checked by tools/validate_lessons.py:
+ * It writes no global and touches no DOM: the array is a bare expression inside
+ * a function, so the file declares nothing and no sixth global exists.
+ *
+ * Two invariants, both enforced by tools/validate_lessons.py:
  *   1. Every file under site/content/ appears here exactly once.
  *   2. index.html and lesson.html list these same paths, in this same order,
- *      as <script src> tags after manifest.js. Later waves append in one place
- *      and update the two pages to match; the validator fails the wave if the
- *      three lists disagree.
+ *      as <script src> tags after manifest.js. A later wave appends here and
+ *      updates both pages; the validator fails the wave if they disagree.
  *
  * Paths are relative to site/. Order is lesson order, never alphabetical.
  */

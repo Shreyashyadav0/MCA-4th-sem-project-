@@ -1,14 +1,21 @@
 /* app.js — routing, rendering, markdown.
  *
- * The only module allowed to touch the DOM. Two entry points, both called from
- * the inline bootstrap at the end of the page, never at parse time:
+ * This module owns the page chrome: the parts list, the lesson skeleton and the
+ * markdown renderer. pyodide-loader.js builds the example figures it is handed
+ * and search.js binds the "/" shortcut, so "only app.js touches the DOM" would
+ * be false; what is true is that app.js is the only module that renders lesson
+ * *content*.
+ *
+ * Two entry points, both called from the inline bootstrap at the end of the
+ * page, never at parse time:
  *   App.initIndex()   the index page
  *   App.initLesson()  the lesson page
  *
  * The markdown renderer implements exactly CONTRACTS.MARKDOWN_SUBSET and
- * nothing more. Every text node is escaped before any transformation, and the
- * only tags emitted are ones this file writes itself, so a lesson file cannot
- * inject markup by accident or on purpose.
+ * nothing more. Every text node is escaped before any transformation, the only
+ * tags emitted are ones this file writes itself, and every URL that reaches an
+ * attribute goes through safeHref — so a lesson file cannot inject markup or a
+ * script URL, by accident or on purpose.
  */
 (function () {
   "use strict";
@@ -27,40 +34,121 @@
       .replace(/'/g, "&#39;");
   }
 
+  /* The text handed to this function is already escaped, so the value returned
+   * is escaped exactly once. Anything that is not plainly a URL of an allowed
+   * shape returns "" and the caller drops the attribute. */
   function safeHref(href) {
     var raw = String(href || "").trim();
-    if (/^(https?:\/\/|mailto:|#|\.{0,2}\/)/i.test(raw)) {
-      return escapeHtml(raw);
+    if (!raw) {
+      return "";
+    }
+    if (/^https?:\/\/[^/\s]/i.test(raw) || /^mailto:[^\s]+$/i.test(raw)) {
+      return raw;
+    }
+    if (raw.charAt(0) === "#") {
+      return raw;
+    }
+    if (raw.slice(0, 2) === "//") {
+      /* protocol-relative: resolves off-site, so never a lesson link */
+      return "";
+    }
+    /* A relative path: ./x, ../x, x/y.html, x.js — no scheme, no "//" prefix,
+     * which would be protocol-relative and therefore off-site. */
+    if (/^\.{0,2}\/[A-Za-z0-9._~%\-/]+$/.test(raw) || /^[A-Za-z0-9._~%\-]+\/[A-Za-z0-9._~%\-/]*$/.test(raw) || /^[A-Za-z0-9._~%\-]+\.html?$/.test(raw)) {
+      return raw;
     }
     return "";
   }
 
   /* -------------------------------------------------------------- inline md */
 
-  function renderInline(escapedText) {
-    var slots = [];
-    var text = String(escapedText);
-
-    text = text.replace(/`([^`]+)`/g, function (match, code) {
-      slots.push("<code>" + code + "</code>");
-      return SLOT + (slots.length - 1) + SLOT;
-    });
-
-    text = text.replace(/\[([^\]]+)\]\(([^()\s]+)\)/g, function (match, label, href) {
-      var url = safeHref(href);
-      if (!url) {
-        return label;
+  /* Find the closing marker for an emphasis span, skipping markers that belong
+   * to a longer run. Returns -1 when the span is never closed, in which case the
+   * marker is shown as the literal character it is. */
+  function findClose(text, from, marker) {
+    var j = from;
+    while (j < text.length) {
+      if (text.charAt(j) === "*") {
+        if (marker === "**") {
+          if (text.charAt(j + 1) === "*") {
+            return j;
+          }
+          j += 1;
+        } else if (text.charAt(j + 1) === "*") {
+          j += 2;
+        } else {
+          return j;
+        }
+      } else {
+        j += 1;
       }
-      return '<a href="' + url + '">' + label + "</a>";
-    });
+    }
+    return -1;
+  }
 
-    text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    text = text.replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, "$1<em>$2</em>");
+  /* One scanner for inline syntax, recursive so emphasis can nest. The order of
+   * the branches is the order of precedence: code, then ***x***, then bold, then
+   * italic, then links. Deeper or crossed nesting (**a *b*** written that way
+   * round) is outside the subset and stays literal. */
+  function renderInline(escapedText) {
+    var text = String(escapedText);
+    var out = "";
+    var i = 0;
 
-    text = text.replace(new RegExp(SLOT + "(\\d+)" + SLOT, "g"), function (match, index) {
-      return slots[Number(index)];
-    });
-    return text;
+    while (i < text.length) {
+      var ch = text.charAt(i);
+
+      if (ch === "`") {
+        var codeEnd = text.indexOf("`", i + 1);
+        if (codeEnd !== -1) {
+          out += "<code>" + text.slice(i + 1, codeEnd) + "</code>";
+          i = codeEnd + 1;
+          continue;
+        }
+      } else if (ch === "*" && text.charAt(i + 1) === "*" && text.charAt(i + 2) === "*") {
+        var tripleEnd = text.indexOf("***", i + 3);
+        if (tripleEnd !== -1) {
+          out += "<strong><em>" + renderInline(text.slice(i + 3, tripleEnd)) + "</em></strong>";
+          i = tripleEnd + 3;
+          continue;
+        }
+      } else if (ch === "*" && text.charAt(i + 1) === "*") {
+        var boldEnd = findClose(text, i + 2, "**");
+        if (boldEnd !== -1) {
+          /* "**bold *it***": a run of three stars closes the italic first and the
+           * bold last, so the pair to use is the final two and the inner text
+           * keeps the star that closes the italic. */
+          var run = 0;
+          while (text.charAt(boldEnd + run) === "*") {
+            run += 1;
+          }
+          var close = run > 2 ? boldEnd + 1 : boldEnd;
+          out += "<strong>" + renderInline(text.slice(i + 2, close)) + "</strong>";
+          i = close + 2;
+          continue;
+        }
+      } else if (ch === "*") {
+        var emEnd = findClose(text, i + 1, "*");
+        if (emEnd > i + 1) {
+          out += "<em>" + renderInline(text.slice(i + 1, emEnd)) + "</em>";
+          i = emEnd + 1;
+          continue;
+        }
+      } else if (ch === "[") {
+        var link = /^\[([^\]]+)\]\(([^()\s]+)\)/.exec(text.slice(i));
+        if (link) {
+          var url = safeHref(link[2]);
+          out += url ? '<a href="' + url + '">' + link[1] + "</a>" : link[1];
+          i += link[0].length;
+          continue;
+        }
+      }
+
+      out += ch;
+      i += 1;
+    }
+
+    return out;
   }
 
   function isBlank(line) {
@@ -77,11 +165,25 @@
     );
   }
 
+  /* Split a table row on unescaped pipes, so a cell can contain "\|". */
   function splitRow(line) {
     var trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
-    return trimmed.split("|").map(function (cell) {
-      return cell.trim();
-    });
+    var cells = [];
+    var current = "";
+    for (var i = 0; i < trimmed.length; i += 1) {
+      var char = trimmed.charAt(i);
+      if (char === "\\" && trimmed.charAt(i + 1) === "|") {
+        current += "|";
+        i += 1;
+      } else if (char === "|") {
+        cells.push(current.trim());
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    cells.push(current.trim());
+    return cells;
   }
 
   function renderTable(headerLine, alignLine, bodyLines) {
@@ -107,6 +209,8 @@
     bodyLines.forEach(function (row) {
       var cells = splitRow(row);
       html.push("<tr>");
+      /* Rows are normalised to the header width: extra cells are dropped rather
+       * than silently shifting the columns. */
       headers.forEach(function (ignored, index) {
         var align = aligns[index] ? ' class="align-' + aligns[index] + '"' : "";
         html.push("<td" + align + ">" + renderInline(escapeHtml(cells[index] || "")) + "</td>");
@@ -209,12 +313,15 @@
 
       if (/^\s*\d+\.\s+/.test(line)) {
         var ordered = [];
+        var first = parseInt(line, 10) || 1;
         while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
           ordered.push(lines[i].replace(/^\s*\d+\.\s+/, ""));
           i += 1;
         }
         out.push(
-          "<ol>" +
+          "<ol" +
+            (first !== 1 ? ' start="' + first + '"' : "") +
+            ">" +
             ordered
               .map(function (item) {
                 return "<li>" + renderInline(escapeHtml(item)) + "</li>";
@@ -243,7 +350,7 @@
   }
 
   function byOrder(a, b) {
-    return a.order - b.order;
+    return (Number(a.order) || 0) - (Number(b.order) || 0);
   }
 
   function getLessonById(id) {
@@ -324,7 +431,9 @@
       var counts = window.Progress.partCounts(part.n);
 
       var section = el("section", lessons.length ? "part" : "part part-pending");
-      section.id = "part-" + part.n;
+      /* No id: the frozen DOM contract names the ids a page may carry, and a
+       * per-part anchor is not one of them. The attribute is enough. */
+      section.setAttribute("data-part", String(part.n));
 
       var head = el("div", "part-head");
       var title = el("h2", "part-title");
@@ -352,7 +461,9 @@
 
           var meta = el("span", "lesson-meta");
           meta.appendChild(el("span", "lesson-id", lesson.id));
-          meta.appendChild(el("span", "lesson-duration", lesson.duration_min + " min"));
+          if (lesson.duration_min) {
+            meta.appendChild(el("span", "lesson-duration", lesson.duration_min + " min"));
+          }
           if (window.Progress.isDone(lesson.id)) {
             var flag = el("span", "lesson-done", "done");
             flag.setAttribute("title", "You marked this lesson done");
@@ -604,8 +715,12 @@
     if (meta) {
       meta.innerHTML = "";
       meta.appendChild(el("span", "meta-id", "Lesson " + lesson.id));
-      meta.appendChild(el("span", "meta-part", "Part " + lesson.part + " · " + lesson.part_title));
-      meta.appendChild(el("span", "meta-duration", lesson.duration_min + " min"));
+      meta.appendChild(
+        el("span", "meta-part", "Part " + lesson.part + " · " + (lesson.part_title || "Untitled part"))
+      );
+      if (lesson.duration_min) {
+        meta.appendChild(el("span", "meta-duration", lesson.duration_min + " min"));
+      }
     }
 
     var nav = document.getElementById("lesson-nav");
@@ -616,10 +731,16 @@
       nav.appendChild(home);
       nav.appendChild(el("span", "crumb-sep", " / "));
       var part = partByNumber(lesson.part);
-      var partLabel = el("span", "crumb-part", "Part " + lesson.part + " — " + (part ? part.title : lesson.part_title));
+      var partLabel = el(
+        "span",
+        "crumb-part",
+        "Part " + lesson.part + " — " + (part ? part.title : lesson.part_title || "")
+      );
       nav.appendChild(partLabel);
       nav.appendChild(el("span", "crumb-sep", " / "));
-      nav.appendChild(el("span", "crumb-current", lesson.id));
+      var current = el("span", "crumb-current", lesson.id);
+      current.setAttribute("aria-current", "page");
+      nav.appendChild(current);
     }
 
     var concept = document.getElementById("lesson-concept");
@@ -651,8 +772,7 @@
     showSection("lesson-exercise", hasExercise);
 
     var hasMistakes = fillList("lesson-mistakes", lesson.common_mistakes, function (text) {
-      var item = el("li", null, text);
-      return item;
+      return el("li", null, text);
     });
     showSection("lesson-mistakes", hasMistakes);
 
@@ -664,8 +784,7 @@
       links.innerHTML = "";
       (lesson.project_links || []).forEach(function (link) {
         var item = el("li", "link-item");
-        var code = el("code", "link-path", link.path);
-        item.appendChild(code);
+        item.appendChild(el("code", "link-path", link.path));
         if (link.lines) {
           item.appendChild(el("span", "link-lines", " lines " + link.lines));
         }
@@ -673,11 +792,17 @@
         links.appendChild(item);
       });
       (lesson.learn_more || []).forEach(function (link) {
+        var href = safeHref(link.href);
         var item = el("li", "link-item");
-        var anchor = el("a", null, link.label);
-        anchor.href = link.href;
-        anchor.rel = "noopener noreferrer";
-        item.appendChild(anchor);
+        if (href) {
+          var anchor = el("a", null, link.label);
+          anchor.href = href;
+          anchor.rel = "noopener noreferrer";
+          item.appendChild(anchor);
+        } else {
+          /* A URL outside the allowed shapes is shown as text, never as a link. */
+          item.appendChild(el("span", null, link.label));
+        }
         links.appendChild(item);
       });
     }
@@ -697,6 +822,7 @@
     if (!button) {
       return;
     }
+    button.hidden = false;
     var sync = function () {
       var done = window.Progress.isDone(lesson.id);
       button.textContent = done ? "Done — click to undo" : "Mark done";
@@ -708,6 +834,12 @@
       sync();
     });
     sync();
+  }
+
+  function disablePager(link, text) {
+    link.removeAttribute("href");
+    link.textContent = text;
+    link.setAttribute("aria-disabled", "true");
   }
 
   function bindPrevNext(lesson) {
@@ -728,9 +860,7 @@
         prevLink.textContent = "← " + prev.id + " " + prev.title;
         prevLink.removeAttribute("aria-disabled");
       } else {
-        prevLink.removeAttribute("href");
-        prevLink.textContent = "← Start of the path";
-        prevLink.setAttribute("aria-disabled", "true");
+        disablePager(prevLink, "← Start of the path");
       }
     }
 
@@ -741,10 +871,17 @@
         nextLink.textContent = next.id + " " + next.title + " →";
         nextLink.removeAttribute("aria-disabled");
       } else {
-        nextLink.removeAttribute("href");
-        nextLink.textContent = "End of the written path →";
-        nextLink.setAttribute("aria-disabled", "true");
+        disablePager(nextLink, "End of the written path →");
       }
+    }
+  }
+
+  function decode(value) {
+    try {
+      return decodeURIComponent(String(value || "").replace(/\+/g, " "));
+    } catch (err) {
+      /* A malformed escape is not a lesson id; treat it as no id at all. */
+      return "";
     }
   }
 
@@ -753,18 +890,26 @@
     var params = search ? search.split("&") : [];
     for (var i = 0; i < params.length; i += 1) {
       var pair = params[i].split("=");
-      if (decodeURIComponent(pair[0]) === "id") {
-        return decodeURIComponent((pair[1] || "").replace(/\+/g, " "));
+      if (decode(pair[0]) === "id") {
+        return decode(pair.slice(1).join("="));
       }
     }
+    /* The hash is only read when it looks like an id, so the page's own
+     * in-page links (#lesson-concept, #lesson-title) cannot be mistaken for one. */
     var hash = String(window.location.hash || "").replace(/^#/, "");
-    return hash ? decodeURIComponent(hash) : "";
+    return /^\d+\.\d+$/.test(hash) ? decode(hash) : "";
   }
 
   function renderMissing(id) {
+    document.title = "Lesson not found — AI Code Reviewer, learned from the code";
+
     var title = document.getElementById("lesson-title");
     if (title) {
       title.textContent = id ? "No lesson with id " + id : "No lesson selected";
+    }
+    var meta = document.getElementById("lesson-meta");
+    if (meta) {
+      meta.innerHTML = "";
     }
     var concept = document.getElementById("lesson-concept");
     if (concept) {
@@ -774,6 +919,7 @@
           "[Back to all lessons](index.html)"
       );
     }
+    showSection("lesson-concept", true);
     ["lesson-examples", "lesson-tryit", "lesson-exercise", "lesson-mistakes", "lesson-links", "lesson-glossary"].forEach(
       function (key) {
         showSection(key, false);
@@ -782,6 +928,14 @@
     var done = document.getElementById("mark-done");
     if (done) {
       done.hidden = true;
+    }
+    var prevLink = document.getElementById("prev-link");
+    if (prevLink) {
+      disablePager(prevLink, "← Start of the path");
+    }
+    var nextLink = document.getElementById("next-link");
+    if (nextLink) {
+      disablePager(nextLink, "End of the written path →");
     }
   }
 

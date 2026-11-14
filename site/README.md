@@ -18,10 +18,11 @@ blocked. Opening `index.html` from a web server works too, but nothing requires 
 
 ```
 site/
+  README.md                      this file
   index.html                     the parts list, search, progress, theme toggle
   lesson.html                    one lesson, addressed as lesson.html?id=1.1
   assets/contracts.js            PARTS, storage keys, the markdown subset
-  assets/app.js                  router, renderer, the only DOM code
+  assets/app.js                  router, renderer, page chrome
   assets/search.js               client-side search over titles and concepts
   assets/progress.js             "Mark done" state in localStorage
   assets/pyodide-loader.js       optional in-browser Python
@@ -76,8 +77,9 @@ Standard library only. It parses `assets/manifest.js`, extracts each pushed less
 object, and checks the frozen schema, the id/order arithmetic, the `part_title`
 against `CONTRACTS.PARTS`, that every `project_links` path exists (and its line
 range fits), that no `concept_md` contains raw HTML, that `content/` and the
-manifest list the same files, and that both pages load the manifest's lessons in
-manifest order. It exits non-zero with one line per problem.
+manifest list the same files, that both pages load the manifest's lessons in
+manifest order, and that each page carries exactly the ids the DOM contract
+names — no missing id, no extra one. It exits non-zero with one line per problem.
 
 ## Adding a lesson
 
@@ -93,7 +95,9 @@ manifest order. It exits non-zero with one line per problem.
    `concept_md` is markdown only, and only the subset in `CONTRACTS.MARKDOWN_SUBSET`:
    `###`/`####` headings, paragraphs, bold, italic, inline code, fenced code with a
    language tag, unordered and ordered lists, blockquotes, links, simple tables.
-   No raw HTML, no images, no footnotes.
+   No raw HTML, no images, no footnotes. Emphasis nests one level — `***both***`
+   or `*italic with **bold** inside*`; anything deeper, or the two markers
+   crossed, stays literal text.
 
 2. Append its path to `assets/manifest.js`, in lesson order.
 3. Add the same `<script src>` to `index.html` and `lesson.html`, in the same place.

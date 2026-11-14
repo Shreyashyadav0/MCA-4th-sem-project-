@@ -20,6 +20,8 @@ What it checks
  8. Every file under content/ is listed in the manifest exactly once.
  9. index.html and lesson.html load the manifest's paths, in manifest order,
     after manifest.js — so the three lists cannot drift apart.
+10. Each page carries exactly the ids the DOM contract names: none missing, and
+    no extra id that would let a later wave invent a parallel hook.
 
 Exit status is 0 with a one-line summary, or 1 with one line per failure.
 """
@@ -38,6 +40,16 @@ MANIFEST = SITE / "assets" / "manifest.js"
 CONTRACTS = SITE / "assets" / "contracts.js"
 CONTENT = SITE / "content"
 PAGES = ("index.html", "lesson.html")
+
+# The frozen DOM contract: these ids, and only these, on each page.
+REQUIRED_IDS = {
+    "index.html": ["parts-list", "search-input", "search-results", "theme-toggle", "progress-total"],
+    "lesson.html": [
+        "lesson-title", "lesson-meta", "lesson-concept", "lesson-examples", "lesson-tryit",
+        "lesson-exercise", "lesson-mistakes", "lesson-links", "lesson-glossary",
+        "mark-done", "prev-link", "next-link", "lesson-nav",
+    ],
+}
 
 LESSON_KEYS = {
     "id": str,
@@ -64,11 +76,12 @@ EXERCISE_KEYS = {"prompt", "hint", "solution", "explanation"}
 LINK_KEYS = {"label", "path", "lines"}
 LEARN_KEYS = {"label", "href"}
 
-RAW_HTML = re.compile(r"<[A-Za-z/!][^>]*>")
+RAW_HTML = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(\s[^<>]*)?/?>")
+FENCED_CODE = re.compile(r"^```[^\n]*\n[\s\S]*?^```[^\n]*$", re.MULTILINE)
 PART_ENTRY = re.compile(
     r"\{\s*n:\s*(\d+)\s*,\s*title:\s*\"([^\"]+)\"\s*,\s*lessons:\s*(\d+)\s*\}"
 )
-ID_PATTERN = re.compile(r"^(\d+)\.(\d+)$")
+ID_PATTERN = re.compile(r"^(0|[1-9]\d*)\.([1-9]\d*)$")
 LINES_PATTERN = re.compile(r"^(\d+)(?:\s*-\s*(\d+))?$")
 PUSH_CALL = "window.LESSONS.push("
 
@@ -91,9 +104,19 @@ class Report:
 def read_text(path: Path, report: Report) -> str:
     try:
         return path.read_text(encoding="utf-8")
-    except OSError as error:
-        report.fail(str(path.relative_to(REPO)), f"cannot be read ({error})")
+    except UnicodeDecodeError:
+        report.fail(relative(path), "cannot be decoded as UTF-8")
         return ""
+    except OSError as error:
+        report.fail(relative(path), f"cannot be read ({error})")
+        return ""
+
+
+def relative(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO))
+    except ValueError:
+        return str(path)
 
 
 def parse_manifest(text: str, report: Report) -> list[str]:
@@ -118,6 +141,47 @@ def parse_parts(text: str, report: Report) -> dict[int, dict[str, object]]:
     return parts
 
 
+def code_mask(text: str) -> list[bool]:
+    """True where a character is code, False inside a string or a comment.
+
+    Needed because a lesson may quote the authoring pattern in its own prose,
+    and the one real push() call has to be found without being fooled by it.
+    """
+    mask = [True] * len(text)
+    i = 0
+    length = len(text)
+    while i < length:
+        char = text[i]
+        if char == '"':
+            j = i + 1
+            while j < length:
+                if text[j] == "\\":
+                    j += 2
+                    continue
+                if text[j] == '"':
+                    j += 1
+                    break
+                j += 1
+            for k in range(i, min(j, length)):
+                mask[k] = False
+            i = j
+        elif char == "/" and text[i + 1 : i + 2] == "*":
+            end = text.find("*/", i + 2)
+            end = length if end == -1 else end + 2
+            for k in range(i, end):
+                mask[k] = False
+            i = end
+        elif char == "/" and text[i + 1 : i + 2] == "/":
+            end = text.find("\n", i)
+            end = length if end == -1 else end
+            for k in range(i, end):
+                mask[k] = False
+            i = end
+        else:
+            i += 1
+    return mask
+
+
 def extract_object(text: str, where: str, report: Report) -> dict | None:
     """Pull the single object literal out of a lesson file.
 
@@ -125,14 +189,24 @@ def extract_object(text: str, where: str, report: Report) -> dict | None:
     unbalance the scan. The literal must be JSON-compatible, which is the one
     authoring rule the content files carry.
     """
-    if text.count(PUSH_CALL) != 1:
-        report.fail(where, f"expected exactly one {PUSH_CALL} call, found {text.count(PUSH_CALL)}")
-        return None
     if "window.LESSONS = window.LESSONS || [];" not in text:
         report.fail(where, "missing the 'window.LESSONS = window.LESSONS || [];' initialiser")
         return None
 
-    start = text.index(PUSH_CALL) + len(PUSH_CALL)
+    mask = code_mask(text)
+    calls = [
+        index
+        for index in range(len(text))
+        if mask[index] and text.startswith(PUSH_CALL, index)
+    ]
+    if not calls:
+        report.fail(where, f"no {PUSH_CALL} call found")
+        return None
+    if len(calls) > 1:
+        report.fail(where, f"expected exactly one {PUSH_CALL} call, found {len(calls)}")
+        return None
+
+    start = calls[0] + len(PUSH_CALL)
     while start < len(text) and text[start] in " \t\r\n":
         start += 1
     if start >= len(text) or text[start] != "{":
@@ -319,6 +393,11 @@ def check_project_links(lesson: dict, where: str, report: Report) -> None:
         if not isinstance(raw_path, str) or not raw_path.strip():
             continue
         target = REPO / raw_path
+        try:
+            target.resolve().relative_to(REPO.resolve())
+        except ValueError:
+            report.fail(where, f"project_links path escapes the repository: {raw_path}")
+            continue
         if not target.is_file():
             report.fail(where, f"project_links path does not exist in the repo: {raw_path}")
             continue
@@ -348,6 +427,12 @@ def check_pages(paths: list[str], report: Report) -> None:
         text = read_text(target, report)
         if not text:
             continue
+        found_ids = re.findall(r'\bid="([^"]+)"', text)
+        wanted = REQUIRED_IDS.get(page, [])
+        for missing in [name for name in wanted if name not in found_ids]:
+            report.fail(page, f"missing contract id '#{missing}'")
+        for extra in [name for name in found_ids if name not in wanted]:
+            report.fail(page, f"unexpected id '#{extra}' — the DOM contract names exactly {len(wanted)}")
         listed = re.findall(r'<script\s+src="(content/[^"]+)"\s*>\s*</script>', text)
         if listed != expected:
             report.fail(
@@ -400,7 +485,7 @@ def main() -> int:
 
         concept = lesson.get("concept_md")
         if isinstance(concept, str):
-            hits = RAW_HTML.findall(concept)
+            hits = RAW_HTML.findall(FENCED_CODE.sub(" ", concept))
             if hits:
                 report.fail(relative, f"concept_md contains raw HTML: {', '.join(sorted(set(hits))[:4])}")
 
@@ -451,7 +536,7 @@ def main() -> int:
                 )
 
     on_disk = sorted(
-        str(path.relative_to(SITE)).replace("\\", "/") for path in CONTENT.rglob("*.js")
+        str(path.relative_to(SITE)).replace("\\", "/") for path in CONTENT.rglob("*") if path.is_file()
     ) if CONTENT.is_dir() else []
     for found in on_disk:
         if found not in paths:

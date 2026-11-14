@@ -38,8 +38,10 @@
   window.CONTRACTS = {
     PARTS: PARTS,
 
-    /* Bumped only when the lesson object shape changes. The validator refuses
-     * a lesson written against a different version than this one. */
+    /* The version of the lesson object shape documented in site/README.md.
+     * Nothing enforces it yet: it is a stamp a later wave can compare against
+     * when the shape changes, so content authored for version 1 is identifiable
+     * rather than silently reinterpreted. */
     SCHEMA_VERSION: 1,
 
     /* localStorage keys. Both are namespaced and versioned so a future format
@@ -48,8 +50,10 @@
     THEME_KEY: "ai-reviewer-learning-theme-v1",
     STORAGE_VERSION: 1,
 
-    /* The exact markdown the renderer supports. Anything outside this list is
-     * not rendered: it is escaped and shown as text. No raw HTML, ever. */
+    /* The exact markdown the renderer supports, listed for authors. Anything
+     * outside it is escaped and shown as text; no raw HTML, ever. This list is
+     * descriptive — app.js implements it and the validator does not derive from
+     * it — so a change here and a change in renderMarkdown must be made together. */
     MARKDOWN_SUBSET: [
       "heading-3",
       "heading-4",
