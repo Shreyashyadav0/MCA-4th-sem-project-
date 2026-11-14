@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.lock
+
+      - name: Install from the lock
+        env:
+          PIP_USER: "0"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock
+
+      - name: Test suite (offline, no secrets)
+        run: python -m pytest -q tests
+
+      - name: Prove the suite needs no network
+        run: python scripts/verify_offline.py

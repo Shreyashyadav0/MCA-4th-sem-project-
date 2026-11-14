@@ -1,0 +1,30 @@
+# Secrets — never commit a real key or token.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv-verify/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local artifacts
+benchmarks/out/
+rebuild/**/__pycache__/
+.learning-progress.json
+
+# Deliverables are committed on purpose: this repository is a submission.
+!docs/report/out/*.pdf
+!docs/report/out/*.docx
+!docs/presentation/*.pptx
+!docs/presentation/*.pdf
+!docs/diagrams/*.png
+
+# Runtime artefacts
+data/
+*.db

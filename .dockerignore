@@ -1,0 +1,20 @@
+# Keep the build context small and secret-free.
+.git
+.gitignore
+**/__pycache__
+**/*.pyc
+.venv
+.venv-verify
+.pytest_cache
+.mypy_cache
+.ruff_cache
+tests
+docs
+benchmarks
+rebuild
+node_modules
+*.zip
+*.pptx
+*.pdf
+.env
+!.env.example

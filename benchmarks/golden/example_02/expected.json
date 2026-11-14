@@ -1,0 +1,19 @@
+{
+  "note": "FORMAT EXAMPLE — not part of the evaluation set. Labels below are illustrative.",
+  "findings": [
+    {
+      "file": "app/config.py",
+      "line_start": 3,
+      "line_end": 3,
+      "category": "secrets",
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "app/config.py",
+      "line_start": 4,
+      "line_end": 4,
+      "category": "config",
+      "severity": "HIGH"
+    }
+  ]
+}

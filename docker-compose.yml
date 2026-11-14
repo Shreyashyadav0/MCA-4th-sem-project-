@@ -1,0 +1,99 @@
+# =============================================================================
+#  Docker Compose for the Autonomous AI Code Reviewer & PR Assistant
+# =============================================================================
+#
+#  Quick start (no keys, no config needed):
+#
+#      docker compose up --build
+#      curl http://127.0.0.1:8000/health
+#      curl "http://127.0.0.1:8000/test-review?provider=mock"
+#
+#  ---------------------------------------------------------------------------
+#  POINTING THE CONTAINER AT A HOST-RUNNING LM STUDIO
+#  ---------------------------------------------------------------------------
+#  LM Studio runs on YOUR machine, not in the container. "localhost" inside the
+#  container is the container itself, so http://localhost:1234/v1 will NOT reach
+#  your host's LM Studio. The address depends on the platform:
+#
+#    * Docker Desktop (macOS / Windows)
+#        http://host.docker.internal:1234/v1   works out of the box.
+#        Nothing else to configure -- set LMSTUDIO_BASE_URL to that value.
+#
+#    * Linux (native docker engine)
+#        host.docker.internal does NOT exist by default. Add the mapping
+#            extra_hosts:
+#              - "host.docker.internal:host-gateway"
+#        (commented out below -- uncomment it) and then use
+#        http://host.docker.internal:1234/v1 exactly as on Desktop.
+#        On Docker Engine 20.10+ the host-gateway alias is built in; on older
+#        engines, instead bind LM Studio to 0.0.0.0 and use the docker bridge
+#        gateway IP (typically 172.17.0.1) with
+#        LMSTUDIO_BASE_URL=http://172.17.0.1:1234/v1 .
+#
+#  Also: start the LM Studio server with "Serve on Local Network" enabled (or
+#  bind 0.0.0.0) -- a server listening only on 127.0.0.1 of the host is not
+#  reachable from a container even with the right gateway.
+#
+#  =============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-code-reviewer:local
+    container_name: ai-code-reviewer
+
+    # host:container. Change the left side if 8000 is taken on your machine.
+    ports:
+      - "8000:8000"
+
+    # Optional by design: `required: false` means `docker compose up` succeeds
+    # when .env does not exist. Copy .env.example to .env only if you want keys.
+    # (`required:` needs Docker Compose v2.24 or newer.)
+    env_file:
+      - path: .env
+        required: false
+
+    # Everything below is optional; the app degrades to the local rule engine
+    # when nothing is set. Uncomment and edit as needed -- or put the same keys
+    # in .env, which is the tidier route.
+    #
+    # environment:
+    #   # Live Sarvam reviews. Without it: mode=mock, no network calls.
+    #   SARVAM_API_KEY: "your-sarvam-key"
+    #   SARVAM_MODEL: "sarvam-m"
+    #   # Point the reviewer at a host LM Studio / any OpenAI-compatible server.
+    #   LMSTUDIO_BASE_URL: "http://host.docker.internal:1234/v1"
+    #   LMSTUDIO_MODEL: "qwen2.5-coder-7b-instruct"
+    #   # PR integration: needs a token to read/post on GitHub.
+    #   GITHUB_TOKEN: "ghp_xxx"
+    #   # auto (default) | live | mock
+    #   REVIEW_MODE: "auto"
+
+    # Linux only: makes host.docker.internal resolve to the host. Harmless on
+    # Docker Desktop, unnecessary there. Uncomment on Linux to use LM Studio.
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
+    healthcheck:
+      # Same probe as the Dockerfile HEALTHCHECK; duplicated here so
+      # `docker compose ps` reports health without rebuilding the image.
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).read()"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+    restart: unless-stopped
+
+    # The app keeps no state; a read-only root filesystem is safe and pins the
+    # container to "reads code, returns findings". Uncomment after first run if
+    # your platform's /tmp handling needs adjusting.
+    # read_only: true
+    # tmpfs:
+    #   - /tmp

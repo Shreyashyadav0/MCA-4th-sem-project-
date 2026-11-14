@@ -1,0 +1,9 @@
+# Normalise line endings so the suite behaves identically on every platform.
+* text=auto eol=lf
+
+# Generated binaries: mark them so git never tries to diff them.
+*.png binary
+*.pdf binary
+*.pptx binary
+*.docx binary
+*.zip binary

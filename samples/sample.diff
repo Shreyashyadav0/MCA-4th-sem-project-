@@ -1,0 +1,25 @@
+diff --git a/app/db.py b/app/db.py
+index 3926f43..f17d112 100644
+--- a/app/db.py
++++ b/app/db.py
+@@ -1,5 +1,8 @@
+ import sqlite3
+ 
++API_TOKEN = "ghp_exampleTokenValue1234567890"
++
+ 
+ def get_user(uid):
+-    return None
++    query = f"SELECT * FROM users WHERE id = {uid}"
++    return sqlite3.connect("app.db").execute(query).fetchone()
+diff --git a/app/report.py b/app/report.py
+new file mode 100644
+index 0000000..4064cb7
+--- /dev/null
++++ b/app/report.py
+@@ -0,0 +1,5 @@
++def render(rows):
++    out = ""
++    for row in rows:
++        out += str(row)
++    return out
