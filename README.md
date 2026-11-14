@@ -7,8 +7,6 @@ A code-review engine that runs with **no API key, no network and no model** — 
 [![Offline](https://img.shields.io/badge/suite-zero%20network-1F4E79)](scripts/verify_offline.py)
 [![Licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
-`MCSP-232` project · MCA (semester IV) · IGNOU · Shreyash Yadav
-
 ---
 
 ## What it does
@@ -172,7 +170,7 @@ What is deliberately **not** tested: a real model's output, a real GitHub post, 
 
 ## Project status
 
-This is a semester-IV submission, so the repository states plainly what has been run and what has not.
+The repository states plainly what has been run and what has not, because a reviewer should not have to discover the difference.
 
 | | |
 |---|---|
@@ -205,7 +203,7 @@ Stated because a reviewer will find them anyway:
 | [DEMO.md](DEMO.md) | three demo variants with expected output |
 | [TESTING.md](TESTING.md) | what the layers cover and what they do not |
 | [docs/decisions/](docs/decisions) | seven ADRs, each with context, decision and consequences |
-| [docs/report/](docs/report) | the MCSP-232 report and synopsis, with their generator |
+| [docs/report/](docs/report) | the technical report and synopsis, with their generator |
 | [docs/diagrams/](docs/diagrams) | eleven figures, each generated from the code |
 | [docs/learning/](docs/learning) | a seven-track curriculum for rebuilding this from memory |
 | [RESUME.md](RESUME.md) · [HANDOFF.md](HANDOFF.md) | recovery checklist and the honesty ledger |
@@ -221,6 +219,10 @@ Stated because a reviewer will find them anyway:
 4. SARIF export so results land in an existing code-scanning dashboard.
 
 ---
+
+## Author
+
+Built by **Shreyash Yadav** — [github.com/Shreyashyadav0](https://github.com/Shreyashyadav0).
 
 ## Licence
 
