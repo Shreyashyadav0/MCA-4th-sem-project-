@@ -12,27 +12,47 @@
  * real machine — same file, same bytes, no paraphrase.
  *
  * Three tiers, declared by each example as data-tier:
- *   browser      stdlib or a package Pyodide bundles; runs immediately
- *   browser-pkg  runs after micropip installs a pure-Python wheel (network once)
+ *   browser      stdlib, or a package from the Pyodide distribution; runs now
+ *   browser-pkg  the same, with a wheel the distribution ships separately
+ *                (loaded through pyodide.loadPackage — never PyPI)
  *   terminal     cannot run here; the panel says so, with the command to run
  *
- * Failure is not an exception. A Python traceback is shown as a teaching
- * moment; a runtime that cannot load turns every Run into Copy + terminal.
+ * Failure is not an exception, and the kinds of failure are kept apart:
+ *   load    the runtime never arrived (offline, blocked, slow) -> terminal panel
+ *   setup   a lesson asked for a file or package that does not exist -> shown
+ *   python  the snippet raised -> the traceback, which is a teaching moment
+ * Only a load failure hides the Run button; the other two are fixable and keep
+ * it available.
+ *
+ * WHAT THIS IS NOT. Lesson code is arbitrary Python running in the reader's
+ * page. It can import `js` and reach the page (localStorage, the network). The
+ * site is a folder the reader chose to open, and its lessons are trusted input;
+ * the runner is a convenience, not a sandbox. A `while True:` in an example
+ * freezes the tab — Pyodide cannot be interrupted from a file:// page, because a
+ * Web Worker cannot be created from that origin and SharedArrayBuffer needs
+ * headers the site cannot set.
  */
 (function () {
   "use strict";
 
   var PYODIDE_VERSION = "0.28.0";
   var CDN_BASE = "https://cdn.jsdelivr.net/pyodide/v" + PYODIDE_VERSION + "/full/";
+  /* Integrity of the one file we execute; the rest are data Pyodide loads. */
+  var PYODIDE_JS_SRI =
+    "sha384-aD6ek5pFVnSSMGK0qubk9ZJdMYGjPs8F6jdJaDJiyZbTcH9jLWR4LJNJ7yY430qI";
   var LOAD_TIMEOUT_MS = 120000;
   var FS_ROOT = "/home/pyodide";
+  var MAX_OUTPUT = 64 * 1024;
+  var PACKAGE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
   var runtime = null;
   var loading = null;
   var loadFailed = false;
   var pathReady = false;
   var loadedPackages = {};
-  var wired = false;
+  var queue = Promise.resolve(); /* one run at a time: stdout is shared */
+  var wired = typeof WeakSet === "function" ? new WeakSet() : null;
+  var sources = null; /* snapshot of REPO_SOURCES, taken once */
 
   function isAvailable() {
     if (runtime) {
@@ -42,6 +62,13 @@
       return false;
     }
     return navigator.onLine !== false;
+  }
+
+  function embeddedSources() {
+    if (!sources) {
+      sources = Object.assign({}, window.REPO_SOURCES || {});
+    }
+    return sources;
   }
 
   function injectScript() {
@@ -57,6 +84,8 @@
 
       script.src = CDN_BASE + "pyodide.js";
       script.async = true;
+      script.integrity = PYODIDE_JS_SRI;
+      script.crossOrigin = "anonymous";
       script.onload = function () {
         if (!settled) {
           settled = true;
@@ -104,7 +133,7 @@
 
   function ensurePath(pyodide) {
     if (pathReady) {
-      return Promise.resolve();
+      return;
     }
     pyodide.runPython(
       "import sys\n" +
@@ -112,13 +141,18 @@
         "    sys.path.insert(0, " + JSON.stringify(FS_ROOT) + ")\n"
     );
     pathReady = true;
-    return Promise.resolve();
   }
 
   function ensurePackages(pyodide, packages) {
     var wanted = Array.isArray(packages) ? packages.filter(Boolean) : [];
-    var missing = wanted.filter(function (name) {
-      return !loadedPackages[name];
+    var missing = [];
+    wanted.forEach(function (name) {
+      if (!PACKAGE_NAME.test(name)) {
+        throw new Error("'" + name + "' is not a package name — only names from the Pyodide distribution can be loaded");
+      }
+      if (!loadedPackages[name]) {
+        missing.push(name);
+      }
     });
     if (!missing.length) {
       return Promise.resolve();
@@ -131,85 +165,141 @@
   }
 
   /* Write the repository files an example declares into the virtual filesystem,
-   * at the same relative path they have in the repository. */
+   * at the same relative path they have in the repository. The path is checked:
+   * a lesson may not reach outside FS_ROOT, and may only name a file that was
+   * actually embedded. */
   function materialise(pyodide, files) {
     var wanted = Array.isArray(files) ? files : [];
     if (!wanted.length) {
-      return [];
+      return;
     }
-    var sources = window.REPO_SOURCES || {};
-    var written = [];
+    var available = embeddedSources();
     wanted.forEach(function (relative) {
-      if (!Object.prototype.hasOwnProperty.call(sources, relative)) {
-        throw new Error("no embedded source for " + relative + " — run site/tools/embed_sources.py");
+      var clean = String(relative).replace(/^\.\//, "");
+      if (!clean || clean.charAt(0) === "/" || clean.indexOf("..") !== -1) {
+        throw new Error("'" + relative + "' is not a path inside the repository");
       }
-      var absolute = FS_ROOT + "/" + relative;
+      if (!Object.prototype.hasOwnProperty.call(available, clean)) {
+        throw new Error("no embedded source for " + clean + " — run site/tools/embed_sources.py");
+      }
+      var absolute = FS_ROOT + "/" + clean;
       var directory = absolute.slice(0, absolute.lastIndexOf("/"));
       pyodide.FS.mkdirTree(directory);
-      pyodide.FS.writeFile(absolute, sources[relative], { encoding: "utf8" });
-      written.push(relative);
+      pyodide.FS.writeFile(absolute, available[clean], { encoding: "utf8" });
     });
-    return written;
+  }
+
+  function capped(text) {
+    if (text.length <= MAX_OUTPUT) {
+      return text;
+    }
+    return text.slice(0, MAX_OUTPUT) + "\n… output truncated at " + MAX_OUTPUT / 1024 + " KB";
   }
 
   function execute(pyodide, code) {
     var stdout = [];
     var stderr = [];
     var decoder = new TextDecoder("utf-8");
+    var size = 0;
+
     /* Raw writes, not batched lines: the bytes are what CPython produced, so a
-     * newline is never lost or doubled by the transport. */
+     * newline is never lost or doubled by the transport. Output is capped so a
+     * runaway loop cannot eat the tab's memory. */
     var capture = function (sink) {
       return function (buffer) {
-        sink.push(decoder.decode(buffer, { stream: true }));
+        if (size < MAX_OUTPUT) {
+          var text = decoder.decode(buffer, { stream: true });
+          sink.push(text);
+          size += text.length;
+        }
         return buffer.length;
       };
     };
+
     pyodide.setStdout({ write: capture(stdout) });
     pyodide.setStderr({ write: capture(stderr) });
 
+    var flush = function () {
+      /* Anything written without a trailing newline is still buffered in Python
+       * at this point; without the flush it surfaces inside the NEXT run. */
+      try {
+        pyodide.runPython("import sys\nsys.stdout.flush()\nsys.stderr.flush()\n");
+      } catch (error) {
+        /* a half-dead runtime must not mask the original result */
+      }
+      var tailOut = decoder.decode();
+      if (tailOut) {
+        stdout.push(tailOut);
+      }
+    };
+
     return pyodide.runPythonAsync(code).then(
-      function (result) {
-        var out = stdout.join("");
-        if (result !== undefined && result !== null && String(result) !== "undefined" && String(result) !== "None") {
-          out += String(result) + "\n";
-        }
-        return { ok: true, stdout: out, stderr: stderr.join(""), error: "" };
+      function () {
+        flush();
+        return {
+          ok: true,
+          stdout: capped(stdout.join("")),
+          stderr: capped(stderr.join("")),
+          error: "",
+          error_kind: ""
+        };
       },
       function (error) {
-        /* A Python exception is content, not a crash: hand back the traceback. */
+        flush();
         return {
           ok: false,
-          stdout: stdout.join(""),
-          stderr: stderr.join(""),
-          error: String(error && error.message ? error.message : error)
+          stdout: capped(stdout.join("")),
+          stderr: capped(stderr.join("")),
+          error: String(error && error.message ? error.message : error),
+          error_kind: "python"
         };
       }
     );
   }
 
-  /* run(code, {packages, files}) -> Promise<{ok, stdout, stderr, error}> */
+  function failure(error, kind) {
+    return {
+      ok: false,
+      stdout: "",
+      stderr: "",
+      error: String(error && error.message ? error.message : error),
+      error_kind: kind
+    };
+  }
+
+  /* run(code, {packages, files}) -> Promise<{ok, stdout, stderr, error, error_kind}>
+   *
+   * Runs are serialised: Pyodide has one interpreter and one stdout handler, so
+   * two concurrent runs would interleave into whichever buffer was registered
+   * last. Queueing is the only honest option without a worker. */
   function run(code, opts) {
     var options = opts || {};
-    return init()
-      .then(function (pyodide) {
-        return ensurePath(pyodide)
-          .then(function () {
-            return ensurePackages(pyodide, options.packages);
-          })
-          .then(function () {
+    var job = queue
+      .then(function () {
+        return init().then(
+          function (pyodide) {
+            ensurePath(pyodide);
             materialise(pyodide, options.files);
-            return execute(pyodide, code);
-          });
+            return ensurePackages(pyodide, options.packages).then(function () {
+              return execute(pyodide, code);
+            });
+          },
+          function (error) {
+            return failure(error, "load");
+          }
+        );
       })
+      /* run() must never reject: a bad package name, a bad path or a bug in this
+       * file is a result the caller can render, not an exception it must catch. */
       .catch(function (error) {
-        return {
-          ok: false,
-          stdout: "",
-          stderr: "",
-          error: String(error && error.message ? error.message : error),
-          load_failed: true
-        };
+        return failure(error, "setup");
       });
+    /* Keep the chain alive whatever happened to this job. */
+    queue = job.then(
+      function () {},
+      function () {}
+    );
+    return job;
   }
 
   /* ------------------------------------------------------------------ DOM */
@@ -350,11 +440,10 @@
       }
 
       run(codeOf(figure), { packages: packages, files: files }).then(function (result) {
-        button.disabled = false;
-        button.textContent = "Run again";
         setStatus(figure, "");
 
-        if (result.load_failed) {
+        if (result.error_kind === "load") {
+          button.disabled = false;
           showTerminal(
             figure,
             "The Python runtime could not be loaded — the page is offline, or the download was blocked. " +
@@ -362,6 +451,16 @@
           );
           return;
         }
+
+        button.disabled = false;
+        button.textContent = "Run again";
+
+        if (result.error_kind === "setup") {
+          /* A lesson bug, not the reader's network: say what it is, keep Run. */
+          showOutput(figure, "This example asks for something that does not exist:\n\n" + result.error);
+          return;
+        }
+
         if (result.ok) {
           var text = result.stdout;
           if (result.stderr) {
@@ -370,28 +469,65 @@
           showOutput(figure, text || "(no output)");
           return;
         }
+
         /* A traceback is a teaching moment, so it is shown, not hidden. */
-        var pane = "This is what the error looks like:\n\n" + result.error;
+        var pane = "";
         if (result.stdout) {
-          pane = result.stdout + "\n" + pane;
+          pane += result.stdout;
         }
+        if (result.stderr) {
+          pane += (pane ? "\n" : "") + result.stderr;
+        }
+        pane += (pane ? "\n" : "") + "This is what the error looks like:\n\n" + result.error;
         showOutput(figure, pane);
       });
     });
   }
 
-  /* Wire every rendered example on the page. Idempotent: a second call is a
-   * no-op, so a page that renders in stages cannot double-bind a button. */
+  /* Wire every rendered example on the page. Each figure is wired once, so a
+   * page that renders in stages (or re-renders a section) still ends up with
+   * live buttons and never with a double-bound one. */
   function attachAll() {
-    if (wired) {
-      return;
-    }
-    wired = true;
     var figures = document.querySelectorAll(".example");
     for (var i = 0; i < figures.length; i += 1) {
-      wireCopy(figures[i]);
-      wireRun(figures[i]);
+      var figure = figures[i];
+      if (wired) {
+        if (wired.has(figure)) {
+          continue;
+        }
+        wired.add(figure);
+      } else if (figure.getAttribute("data-wired") === "1") {
+        continue;
+      } else {
+        figure.setAttribute("data-wired", "1");
+      }
+      wireCopy(figure);
+      wireRun(figure);
     }
+  }
+
+  /* A transient outage should not cost the reader the Run button for the rest of
+   * the session: when the browser comes back online, offer it again. */
+  if (window.addEventListener) {
+    window.addEventListener("online", function () {
+      if (!loadFailed || runtime) {
+        return;
+      }
+      loadFailed = false;
+      var figures = document.querySelectorAll('.example[data-tier="browser"], .example[data-tier="browser-pkg"]');
+      for (var i = 0; i < figures.length; i += 1) {
+        var button = find(figures[i], ".btn-run");
+        var terminal = find(figures[i], ".terminal-panel");
+        if (button) {
+          button.hidden = false;
+          button.disabled = false;
+          button.textContent = "Run";
+        }
+        if (terminal && terminal.getAttribute("data-own") !== "1") {
+          terminal.hidden = true;
+        }
+      }
+    });
   }
 
   window.PyRun = {

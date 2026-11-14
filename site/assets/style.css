@@ -605,8 +605,12 @@ th {
   font-weight: 600;
 }
 
+/* A disabled control still has to be readable, so the state is carried by
+ * colour and cursor rather than by fading the label into the background. */
 .btn[disabled] {
-  opacity: 0.6;
+  background: var(--surface);
+  color: var(--muted);
+  border-color: var(--border);
   cursor: progress;
 }
 
@@ -638,12 +642,6 @@ th {
   color: var(--text);
 }
 
-.terminal-note {
-  margin: var(--space-2) 0 0;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
 .terminal-panel pre.code {
   margin: 0 0 var(--space-2);
 }
@@ -665,7 +663,8 @@ th {
   content: "";
   width: 0.75rem;
   height: 0.75rem;
-  border: 2px solid var(--border);
+  flex: 0 0 auto;
+  border: 2px solid var(--muted);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: pyrun-spin 0.9s linear infinite;
@@ -681,12 +680,7 @@ th {
   }
 }
 
-.btn-run[disabled] {
-  opacity: 0.7;
-  cursor: progress;
-}
-
-/* stdout, stderr and tracebacks: monospace, whitespace preserved exactly. */
+/* stdout, stderr and tracebacks: monospace, whitespace preserved. */
 .example-output {
   margin-top: var(--space-2);
   max-height: 26rem;
@@ -699,6 +693,23 @@ th {
 
 .example-output[hidden] {
   display: none;
+}
+
+/* The expected output of a runnable example: folded away, because the point is
+ * to run it, but there when a reader wants to know what to look for. */
+details.expected-output {
+  margin-top: var(--space-2);
+  max-width: var(--measure);
+}
+
+details.expected-output summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+details.expected-output pre.code {
+  margin-top: var(--space-2);
 }
 
 .terminal-why {
@@ -830,6 +841,8 @@ details.solution[open] summary {
     --accent-contrast: #ffffff;
     --code-bg: #f4f4f4;
     --code-text: #000000;
+    /* --sev-* are re-declared here because the dark theme overrides them with
+     * pastels that are unreadable on white paper. */
     --sev-critical: #a4133c;
     --sev-high: #a63f00;
     --sev-medium: #6f5200;
@@ -865,6 +878,23 @@ details.solution[open] summary {
    * must be allowed to flow, or it is clipped instead of continued. */
   blockquote {
     break-inside: avoid;
+  }
+
+  /* A scroll box prints as a truncated box: on paper the whole result is shown,
+   * and the loading line (a frozen spinner) is not printed at all. */
+  .example-output,
+  pre.code,
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .example-status {
+    display: none;
+  }
+
+  details.expected-output > summary {
+    display: none;
   }
 
   p,

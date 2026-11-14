@@ -10,8 +10,10 @@ What it checks
  1. assets/manifest.js declares an ordered list of lesson paths.
  2. Each listed file exists and pushes exactly one object literal.
  3. The object matches the frozen schema: every key present, no unknown key,
-    correct types, `expected_output` present exactly when `runnable` is false,
-    and `try_it` / `exercise` carrying all four keys.
+    correct types, `try_it` / `exercise` carrying all four keys, and a valid
+    `run_tier` — `terminal` examples carry `expected_output` and a `why_not`,
+    the other tiers may carry `expected_output` (for the offline fallback) and
+    may not carry `why_not`.
  4. `id` is "<part>.<n>", `order` is part*100 + n, ids and orders unique.
  5. `part_title` matches the PARTS array in assets/contracts.js.
  6. Every `project_links` path exists in the repository, and a `lines` range
@@ -115,13 +117,18 @@ class Report:
 
 def read_text(path: Path, report: Report) -> str:
     try:
-        return path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         report.fail(relative(path), "cannot be decoded as UTF-8")
         return ""
     except OSError as error:
         report.fail(relative(path), f"cannot be read ({error})")
         return ""
+    if text.startswith("\ufeff"):
+        report.fail(relative(path), "starts with a byte-order mark")
+    if not text.strip():
+        report.fail(relative(path), "is empty")
+    return text
 
 
 def relative(path: Path) -> str:
@@ -315,7 +322,7 @@ def check_schema(lesson: dict, where: str, report: Report) -> None:
                 continue
 
             tier = example.get("run_tier")
-            if tier is None:
+            if "run_tier" not in example:
                 continue  # already reported by the required-key check above
             if tier not in RUN_TIERS:
                 report.fail(label, f"run_tier '{tier}' is not one of {', '.join(RUN_TIERS)}")
@@ -422,6 +429,33 @@ def check_schema(lesson: dict, where: str, report: Report) -> None:
                     report.fail(label, f"'{key}' must be a non-empty string")
 
 
+def check_bundle_freshness(report: Report) -> None:
+    """The bundle is generated, so a stale one is a defect, not a surprise.
+
+    Runs the same comparison `embed_sources.py --check` runs, through the same
+    module, so the two can never disagree.
+    """
+    tools = str(Path(__file__).resolve().parent)
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    try:
+        import embed_sources
+    except ImportError as error:  # pragma: no cover - the file ships beside this one
+        report.fail("tools/embed_sources.py", f"cannot be imported ({error})")
+        return
+    try:
+        embed_sources.render()
+    except embed_sources.SourceProblem as error:
+        report.fail("content/repo-sources.js", f"cannot be regenerated — {error}")
+        return
+    stale = embed_sources.drifted()
+    if stale:
+        report.fail(
+            "content/repo-sources.js",
+            "is stale against its sources: " + ", ".join(stale) + " — run python site/tools/embed_sources.py",
+        )
+
+
 def embedded_sources(report: Report) -> set[str]:
     """Keys of window.REPO_SOURCES, so an example cannot ask for a file that was
     never embedded."""
@@ -435,7 +469,12 @@ def embedded_sources(report: Report) -> set[str]:
     except json.JSONDecodeError:
         report.fail("content/repo-sources.js", "is not a JSON object literal")
         return set()
-    return set(parsed) if isinstance(parsed, dict) else set()
+    if not isinstance(parsed, dict):
+        return set()
+    for key, value in parsed.items():
+        if not isinstance(value, str) or not value.strip():
+            report.fail("content/repo-sources.js", f"embedded '{key}' is empty")
+    return set(parsed)
 
 
 def check_example_sources(lesson: dict, where: str, available: set[str], report: Report) -> None:
@@ -492,21 +531,28 @@ def check_pages(paths: list[str], report: Report) -> None:
         text = read_text(target, report)
         if not text:
             continue
-        found_ids = re.findall(r'\bid="([^"]+)"', text)
+        found_ids = [m[0] or m[1] for m in re.findall(r"""\bid\s*=\s*(?:"([^"]*)"|'([^']*)')""", text)]
+        seen = set()
+        for name in found_ids:
+            if name in seen:
+                report.fail(page, f"duplicate id '#{name}' — the contract allows it once")
+            seen.add(name)
         wanted = REQUIRED_IDS.get(page, [])
         for missing in [name for name in wanted if name not in found_ids]:
             report.fail(page, f"missing contract id '#{missing}'")
         for extra in [name for name in found_ids if name not in wanted]:
             report.fail(page, f"unexpected id '#{extra}' — the DOM contract names exactly {len(wanted)}")
-        listed = [
-            src
-            for src in re.findall(r'<script\s+src="(content/[^"]+)"\s*>\s*</script>', text)
-            if src not in NON_LESSON
-        ]
-        if 'src="content/repo-sources.js"' not in text:
+        tags = re.findall(r'<script\b[^>]*\bsrc\s*=\s*"([^"]+)"[^>]*>', text)
+        listed = [src for src in tags if src.startswith("content/") and src not in NON_LESSON]
+        sources_tags = [index for index, src in enumerate(tags) if src == "content/repo-sources.js"]
+        if not sources_tags:
             report.fail(page, "does not load content/repo-sources.js before the lessons")
-        elif listed and text.index('src="content/repo-sources.js"') > text.index(listed[0]):
-            report.fail(page, "loads content/repo-sources.js after the first lesson")
+        elif len(sources_tags) > 1:
+            report.fail(page, "loads content/repo-sources.js more than once")
+        else:
+            first_lesson = next((i for i, src in enumerate(tags) if src in listed), None)
+            if first_lesson is not None and sources_tags[0] > first_lesson:
+                report.fail(page, "loads content/repo-sources.js after the first lesson")
         if listed != expected:
             report.fail(
                 page,
@@ -528,6 +574,7 @@ def check_pages(paths: list[str], report: Report) -> None:
 def main() -> int:
     report = Report()
 
+    check_bundle_freshness(report)
     sources = embedded_sources(report)
     manifest_text = read_text(MANIFEST, report)
     contracts_text = read_text(CONTRACTS, report)
@@ -640,4 +687,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    extra = [arg for arg in sys.argv[1:]]
+    if extra:
+        print("FAIL unknown argument(s): %s — usage: validate_lessons.py" % " ".join(extra))
+        sys.exit(2)
     sys.exit(main())

@@ -29,7 +29,7 @@ window.LESSONS.push({
     },
     {
       "lang": "python",
-      "caption": "Alignment with a format spec, over two real findings",
+      "caption": "Alignment with a format spec, over two validated Finding objects",
       "code": "from app.models import Finding\n\nfindings = [\n    Finding(\n        file=\"app/db.py\",\n        line=\"3\",\n        severity=\"CRITICAL\",\n        issue=\"A GitHub token literal is committed here.\",\n        suggested_fix=\"Revoke the token.\",\n    ),\n    Finding(\n        file=\"app/report.py\",\n        line=\"1\",\n        severity=\"MEDIUM\",\n        issue=\"A public function without full annotations.\",\n        suggested_fix=\"Annotate the parameters and the return type.\",\n    ),\n]\n\nfor finding in findings:\n    print(f\"{finding.severity.value:<10}{finding.file}:{finding.line}\")\n",
       "runnable": true,
       "run_tier": "browser",

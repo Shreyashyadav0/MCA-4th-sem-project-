@@ -65,10 +65,19 @@
       memory = emptyState();
       return memory;
     }
+    /* Only ids this build actually has: a hand-edited or foreign value must not
+     * be able to make every isDone() call walk a hundred thousand keys. */
+    var known = {};
+    var lessons = Array.isArray(window.LESSONS) ? window.LESSONS : [];
+    lessons.forEach(function (lesson) {
+      known[String(lesson.id)] = true;
+    });
     memory = { version: C.STORAGE_VERSION, done: {} };
+    var kept = 0;
     Object.keys(parsed.done).forEach(function (id) {
-      if (parsed.done[id] === true) {
+      if (kept < 500 && parsed.done[id] === true && (known[id] === true || !lessons.length)) {
         memory.done[id] = true;
+        kept += 1;
       }
     });
     return memory;

@@ -37,11 +37,11 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "these are shell commands: they start a process, run a test suite and read the repository from disk. A browser page has no shell, no repository checkout and no subprocess.",
-      "expected_output": "640 passed, 1 skipped\n\ntarget   : samples/sample.diff\nmode     : mock\nprovider : mock\nmodel    : local-rules\nfiles    : 2 changed\nfindings : 4 (CRITICAL 3, HIGH 0, MEDIUM 1, LOW 0)\nnote     : mock mode: no SARVAM_API_KEY or LMSTUDIO_BASE_URL configured; local rule engine used\nnote     : local rule engine: 63 deterministic rules, no network, no API key\n\nchanged lines:\n  modified  app/db.py  (+4: 3-4, 7-8)\n  added     app/report.py  (+5: 1-5)\n\nverdict  : block\n\n# abridged: the four findings, their suggested fixes and their anchors are\n# omitted. Everything above is verbatim; pytest also prints a timing."
+      "expected_output": "640 passed, 1 skipped\n\ntarget   : samples/sample.diff\nmode     : mock\nprovider : mock\nmodel    : local-rules\nfiles    : 2 changed\nfindings : 4 (CRITICAL 3, HIGH 0, MEDIUM 1, LOW 0)\nnote     : mock mode: no SARVAM_API_KEY or LMSTUDIO_BASE_URL configured; local rule engine used\nnote     : local rule engine: 63 deterministic rules, no network, no API key\n\nchanged lines:\n  modified  app/db.py  (+4: 3-4, 7-8)\n  added     app/report.py  (+5: 1-5)\n\nverdict  : block\n\n# abridged: the four findings, their suggested fixes and their anchors are\n# omitted. Everything above is stdout, verbatim; pytest also prints a timing.\n# stderr carries one WARNING: local review degraded to the local rule engine."
     }
   ],
   "try_it": {
-    "prompt": "Press Run on the first example and read the six lines it prints. Then change one thing and press Run again: set `min_severity=Severity.HIGH` on the `review_diff` call and watch which findings survive.\n\n`review_diff` takes `min_severity` as a keyword-only argument, and `Severity` is importable from `app.models`.",
+    "prompt": "Press Run on the first example and read the seven lines it prints. Then change one thing and press Run again: set `min_severity=Severity.HIGH` on the `review_diff` call and watch which findings survive.\n\n`review_diff` takes `min_severity` as a keyword-only argument, and `Severity` is importable from `app.models`.",
     "starter": "from app.models import Severity, verdict_for\nfrom app.parser import parse_diff\nfrom app.rules import review_diff\n\nwith open(\"samples/sample.diff\", encoding=\"utf-8\") as handle:\n    bundle = parse_diff(handle.read())\n\nfindings = review_diff(bundle)          # add min_severity=Severity.HIGH here\nprint(len(findings), \"findings\")\nprint(\"verdict:\", verdict_for(findings))\n",
     "solution": "from app.models import Severity, verdict_for\nfrom app.parser import parse_diff\nfrom app.rules import review_diff\n\nwith open(\"samples/sample.diff\", encoding=\"utf-8\") as handle:\n    bundle = parse_diff(handle.read())\n\nall_findings = review_diff(bundle)\nhigh_only = review_diff(bundle, min_severity=Severity.HIGH)\nprint(\"all      :\", len(all_findings), verdict_for(all_findings))\nprint(\"HIGH+    :\", len(high_only), verdict_for(high_only))\n",
     "explanation": "`min_severity` drops findings below the threshold before they reach the result, so the count falls from 4 to 3 and the verdict stays `block` — three CRITICAL findings are still enough to block. Filtering never invents a finding; it can only remove one, which is why the verdict can only move towards `approve`."
@@ -60,19 +60,19 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "What it does, how to run it, and the honest status table",
+      "label": "What it does and how to run it",
       "path": "README.md",
-      "lines": ""
+      "lines": "12-57"
+    },
+    {
+      "label": "The honesty ledger: what is real, simulated and deferred",
+      "path": "HANDOFF.md",
+      "lines": "1-38"
     },
     {
       "label": "The recovery checklist for picking the project back up",
       "path": "RESUME.md",
-      "lines": ""
-    },
-    {
-      "label": "The honesty ledger: real, simulated, deferred",
-      "path": "HANDOFF.md",
-      "lines": ""
+      "lines": "1-25"
     }
   ],
   "learn_more": [

@@ -41,8 +41,8 @@ Every code example declares `run_tier`, and the page behaves accordingly.
 
 | Tier | What happens | Needs |
 |---|---|---|
-| `browser` | Press **Run**; it executes in the page with Pyodide | nothing extra — stdlib, or a package Pyodide bundles |
-| `browser-pkg` | Same, after `micropip` installs a pure-Python wheel | the network, once |
+| `browser` | Press **Run**; it executes in the page with Pyodide | stdlib, or a package from the Pyodide distribution — fetched on the first Run |
+| `browser-pkg` | Same, after `pyodide.loadPackage` fetches a wheel the distribution ships separately | the network, once |
 | `terminal` | No Run button: **Copy**, the exact command, the expected output, and a line saying why it cannot run here | a terminal |
 
 Pyodide runs CPython in WebAssembly, and nothing is downloaded until the first
@@ -67,8 +67,19 @@ same four findings and the same `block` verdict the CLI reports.
 What cannot be imported: `app/config.py` needs `pydantic-settings`, which Pyodide
 does not ship, and both `app/db.py` and `app/engine.py` import it. Those two are
 embedded for reading and quoting only. `sqlite3` is unvendored from the Pyodide
-stdlib, so an example using sqlalchemy must list
-`"packages": ["sqlalchemy", "sqlite3"]`.
+stdlib, and loading `sqlalchemy` alone did not pull it in during Wave 1.5's
+acceptance run, so an example using sqlalchemy must list
+`"packages": ["sqlalchemy", "sqlite3"]` explicitly.
+
+### What this is not
+
+Lesson code is arbitrary Python running in the reader's page: it can `import js`
+and reach `localStorage` or the network. The site is a folder you chose to open
+and its lessons are trusted input — the runner is a convenience, not a sandbox. A
+`while True:` in an example freezes the tab, because Pyodide cannot be interrupted
+from a `file://` page: a Web Worker cannot be created from that origin, and
+`SharedArrayBuffer` needs headers the site cannot set. Runaway output is capped at
+64 KB so a print loop cannot eat the tab's memory.
 
 ### When it fails
 
@@ -76,7 +87,8 @@ stdlib, so an example using sqlalchemy must list
   "This is what the error looks like:". Run stays available.
 - The **runtime cannot load** (offline, blocked, slow): every Run becomes the
   terminal panel, with the command, the expected output and a line saying why.
-  Nothing throws, and the console stays clean.
+  Nothing throws, and the console stays clean. A browser example shows its expected
+  output when it carries one; a `terminal` example always carries one.
 - A **10 MB download** happens on the first Run only, never on page load.
 
 ## Progress and theme
@@ -95,8 +107,8 @@ working for the session and simply will not remember. Nothing throws.
 python site/tools/validate_lessons.py     # exit 0 and one summary line when clean
 ```
 
-Standard library only. It parses `assets/manifest.js`, extracts each pushed lesson
-object, and checks the frozen schema, the id/order arithmetic, the `part_title`
+Standard library only. It reads `assets/manifest.js` for the path list, parses the
+pushed object out of each lesson file, and checks the frozen schema, the id/order arithmetic, the `part_title`
 against `CONTRACTS.PARTS`, that every `project_links` path exists (and its line
 range fits), that no `concept_md` contains raw HTML, that `content/` and the
 manifest list the same files, that both pages load the manifest's lessons in

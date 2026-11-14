@@ -1,10 +1,10 @@
 /* app.js — routing, rendering, markdown.
  *
- * This module owns the page chrome: the parts list, the lesson skeleton and the
- * markdown renderer. pyodide-loader.js builds the example figures it is handed
- * and search.js binds the "/" shortcut, so "only app.js touches the DOM" would
- * be false; what is true is that app.js is the only module that renders lesson
- * *content*.
+ * This module owns the page chrome: the parts list, the lesson skeleton, the
+ * example figures and the markdown renderer. pyodide-loader.js wires the buttons
+ * and status lines of those figures and search.js binds the "/" shortcut, so
+ * "only app.js touches the DOM" would be false; what is true is that app.js is
+ * the only module that renders lesson *content*.
  *
  * Two entry points, both called from the inline bootstrap at the end of the
  * page, never at parse time:
@@ -21,7 +21,6 @@
   "use strict";
 
   var C = window.CONTRACTS;
-  var SLOT = "\u0000";
 
   /* ------------------------------------------------------------------ text */
 
@@ -48,8 +47,9 @@
     if (raw.charAt(0) === "#") {
       return raw;
     }
-    if (raw.slice(0, 2) === "//") {
-      /* protocol-relative: resolves off-site, so never a lesson link */
+    if (raw.slice(0, 2) === "//" || raw.indexOf("..") !== -1) {
+      /* protocol-relative resolves off-site, and ".." climbs out of the site:
+       * neither is a lesson link. */
       return "";
     }
     /* A relative path: ./x, ../x, x/y.html, x.js — no scheme, no "//" prefix,
@@ -673,12 +673,7 @@
       figure.appendChild(el("figcaption", "code-caption", example.caption));
     }
 
-    var pre = el("pre", "code");
-    if (example.lang) {
-      pre.setAttribute("data-lang", example.lang);
-    }
-    pre.appendChild(el("code", null, example.code));
-    figure.appendChild(pre);
+    figure.appendChild(codeFigure(null, example.code, example.lang));
 
     var actions = el("div", "example-actions");
     if (tier !== "terminal") {
@@ -692,17 +687,30 @@
     actions.appendChild(copyBtn);
     figure.appendChild(actions);
 
+    /* One live region per figure, on the result: the status line repeats what
+     * the button already says, and two live regions announce everything twice. */
     var status = el("div", "example-status");
     status.hidden = true;
-    status.setAttribute("role", "status");
-    status.setAttribute("aria-live", "polite");
     figure.appendChild(status);
 
     var output = el("pre", "code example-output");
     output.hidden = true;
-    output.setAttribute("role", "status");
+    output.setAttribute("role", "region");
+    output.setAttribute("aria-label", "Output");
     output.setAttribute("aria-live", "polite");
+    output.tabIndex = 0; /* a long traceback must be reachable by keyboard */
     figure.appendChild(output);
+
+    /* A browser example's expected output is not needed to run it, but a reader
+     * wants to know what to look for — so it is offered, folded away. */
+    if (tier !== "terminal" && example.expected_output) {
+      var expected = el("details", "expected-output");
+      expected.appendChild(el("summary", null, "Expected output"));
+      var expectedBody = el("pre", "code");
+      expectedBody.appendChild(el("code", null, example.expected_output));
+      expected.appendChild(expectedBody);
+      figure.appendChild(expected);
+    }
 
     var terminal = el("div", "terminal-panel");
     terminal.hidden = tier !== "terminal";
@@ -838,9 +846,17 @@
       lesson.code_examples.forEach(function (example) {
         renderExample(examples, example);
       });
-      /* One pass over the rendered figures; the runner owns the buttons. */
-      if (window.PyRun && typeof window.PyRun.attachAll === "function") {
-        window.PyRun.attachAll();
+      /* One pass over the rendered figures; the runner owns the buttons. A
+       * broken runner must degrade to "no Run button", never to a half-rendered
+       * lesson, so this call cannot throw past here. */
+      try {
+        if (window.PyRun && typeof window.PyRun.attachAll === "function") {
+          window.PyRun.attachAll();
+        }
+      } catch (error) {
+        if (window.console && window.console.warn) {
+          window.console.warn("The Python runner failed to attach:", error);
+        }
       }
     }
     showSection("lesson-examples", hasExamples);
@@ -966,24 +982,33 @@
     try {
       return decodeURIComponent(String(value || "").replace(/\+/g, " "));
     } catch (err) {
-      /* A malformed escape is not a lesson id; treat it as no id at all. */
-      return "";
+      return null; /* a malformed escape is not a lesson id */
     }
   }
 
+  /* Returns {id, broken}: "no id at all" falls back to the first lesson, while a
+   * link that carries an id we cannot read is a broken link, not a default. */
   function requestedLessonId() {
     var search = String(window.location.search || "").replace(/^\?/, "");
     var params = search ? search.split("&") : [];
     for (var i = 0; i < params.length; i += 1) {
       var pair = params[i].split("=");
       if (decode(pair[0]) === "id") {
-        return decode(pair.slice(1).join("="));
+        var raw = pair.slice(1).join("=");
+        var value = decode(raw);
+        if (value === null) {
+          return { id: "", broken: true };
+        }
+        return { id: value, broken: false };
       }
     }
     /* The hash is only read when it looks like an id, so the page's own
      * in-page links (#lesson-concept, #lesson-title) cannot be mistaken for one. */
     var hash = String(window.location.hash || "").replace(/^#/, "");
-    return /^\d+\.\d+$/.test(hash) ? decode(hash) : "";
+    if (/^\d+\.\d+$/.test(hash)) {
+      return { id: decode(hash) || "", broken: false };
+    }
+    return { id: "", broken: false };
   }
 
   function renderMissing(id) {
@@ -1004,6 +1029,17 @@
           "the parts list shows what exists so far.\n\n" +
           "[Back to all lessons](index.html)"
       );
+    }
+    var nav = document.getElementById("lesson-nav");
+    if (nav) {
+      nav.innerHTML = "";
+      var home = el("a", null, "All lessons");
+      home.href = "index.html";
+      nav.appendChild(home);
+      nav.appendChild(el("span", "crumb-sep", " / "));
+      var current = el("span", "crumb-current", id ? "Not found" : "No lesson selected");
+      current.setAttribute("aria-current", "page");
+      nav.appendChild(current);
     }
     showSection("lesson-concept", true);
     ["lesson-examples", "lesson-tryit", "lesson-exercise", "lesson-mistakes", "lesson-links", "lesson-glossary"].forEach(
@@ -1027,7 +1063,12 @@
 
   function initLesson() {
     applyStoredTheme();
-    var id = requestedLessonId();
+    var request = requestedLessonId();
+    if (request.broken) {
+      renderMissing("");
+      return;
+    }
+    var id = request.id;
     var lesson = id ? getLessonById(id) : allLessons().sort(byOrder)[0] || null;
     if (!lesson) {
       renderMissing(id);

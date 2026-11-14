@@ -7,7 +7,8 @@ is the bug.
 | Wave | Date | Base commit | Files added | Lessons added | Validator |
 |---|---|---|---|---|---|
 | 1 | 2026-11-14 | `ca96890` (frozen reference) | 14 | 2 (`0.1`, `1.1`) | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
-| 1.5 | 2026-11-14 | `4c70195` | 3 added, 8 changed | 0 new; `0.1` and `1.1` rewritten with live examples | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1a | 2026-11-14 | `dd561fe` | 0 added, 14 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1.5 | 2026-11-14 | `4c70195` | 2 added, 10 changed | 0 new; `0.1` and `1.1` rewritten with live examples | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -258,6 +259,88 @@ that wants sqlalchemy must list `"packages": ["sqlalchemy", "sqlite3"]`.
   other two tiers, where it is used only by the offline fallback. The brief asks
   for the fallback to show "the expected_output", which a browser example can only
   do if it is allowed to carry one.
-- `assets/app.js` had to change although the brief assigned only five files: the
-  new API renders examples and wires them in one pass, so the page markup had to
-  move with it. `validate_lessons.py` also changed, as the brief's gate requires.
+- `assets/app.js`, `index.html`, `lesson.html` and `validate_lessons.py` all
+  changed although the brief assigned five files to five agents: the new API
+  renders examples and wires them in one pass, so the page markup and both pages
+  had to move with it, and the gate had to learn the tiers.
+
+## Wave 1.5a — second audit round
+
+Nine independent auditors read the Wave 1.5 tree: the runner (which ran its own
+acceptance suite in a browser), the source-embedding generator, the renderer and
+pages, the stylesheet, the gate, both lessons, the documentation, and a
+cross-cutting security review. 79 findings came back: 6 blockers, 21 major, the
+rest minor and nit. Every one was triaged; the real defects were fixed here.
+
+**Blockers fixed.**
+
+1. `run()` reported *every* failure as a load failure, so a lesson asking for a
+   file that was not embedded told the reader "the page is offline" while the
+   runtime was healthy. Failures now carry `error_kind`: `load` (terminal
+   fallback, Run hidden), `setup` (the message is shown, Run stays) or `python`
+   (traceback shown).
+2. `embed_sources.py` read in text mode, so a CRLF source file was silently
+   rewritten to LF — the bundle was not byte-identical, which is the one thing it
+   promises. It now reads bytes and decodes; proven with a CRLF copy of
+   `app/parser.py`.
+3. `run_tier: null` skipped the entire tier block, so `runnable`, `why_not`,
+   `expected_output` and `packages` went unchecked.
+4. An empty lesson file was skipped instead of failed.
+5. An empty page was skipped instead of failed.
+6. The gate never checked whether `repo-sources.js` matched its sources, so a
+   stale bundle could ship. It now regenerates and compares, through the same
+   module `--check` uses.
+
+**Major fixes.**
+
+- Runner: stdout/stderr are flushed before a run resolves (a `print(end="")` used
+  to vanish and reappear inside the *next* run); the last expression's value is no
+  longer appended to stdout; runs are serialised through a queue, because two
+  concurrent runs shared one stdout handler and interleaved; `attachAll()` wires
+  figures it has not seen yet instead of being a permanent one-shot; stderr is
+  shown on the traceback path too; output is capped at 64 KB; a lesson's `files`
+  may no longer contain `..` or an absolute path, and may only name an embedded
+  file; `packages` must be distribution names, not URLs; `REPO_SOURCES` is
+  snapshotted at first use so a lesson cannot swap the sources under the runner;
+  the CDN script now carries a `sha384` integrity hash and `crossorigin`; the
+  `micropip` comment that described code that did not exist is gone; coming back
+  online re-offers the Run button instead of leaving it hidden for the session.
+- Renderer: `PyRun.attachAll()` is called inside a try/catch, so a broken runner
+  degrades to "no Run button" instead of a half-rendered lesson; a browser
+  example's expected output is now readable in a folded `<details>`; the output
+  pane is a focusable region with one live region per figure (it was announcing
+  twice); a malformed `?id=` is reported as a broken link instead of silently
+  showing the first lesson; the not-found page has a breadcrumb; the lesson page
+  hides its sections in markup so a JS-less reader sees the note, not seven empty
+  headings.
+- CSS: a disabled Run button was 3.82:1 (faded accent) and is now explicit
+  colours; the spinner track was 1.42:1 and could shrink to nothing; a print
+  preview truncated the output pane and printed a frozen spinner; `pre.code`
+  clipped on paper; a dead duplicate `.example-output` block and four redundant
+  print tokens are gone.
+- Gate: duplicate page ids are rejected; `<script defer src=…>` and single-quoted
+  ids are understood; a BOM is reported; an empty embedded value is rejected;
+  unknown flags are rejected with exit 2; the docstring now states the rule the
+  code enforces.
+- Lessons: "six lines" was seven; the terminal block is labelled stdout-only and
+  names the stderr WARNING; `project_links` carry real line ranges instead of
+  empty strings; the second example's caption no longer implies engine output.
+- Docs: the `browser` and `browser-pkg` rows described `micropip` and "nothing
+  extra", neither of which was true; the sqlite3 note now records what was
+  observed rather than what the lock file claims; the validator description no
+  longer says it extracts objects from the manifest; this table gained the missing
+  Wave 1a row and the correct file counts.
+
+**Accepted, not fixed.**
+
+- An infinite loop in an example freezes the tab. Interrupting Pyodide needs a
+  `SharedArrayBuffer` interrupt buffer or a Worker, and neither is available from
+  `file://`. Stated in `site/README.md` under "What this is not".
+- Lesson code is not sandboxed: it can `import js` and reach `localStorage` and
+  the network. Documented rather than pretended otherwise; a Worker-based sandbox
+  is the real fix and it cannot run from `file://`.
+- The acceptance suite is run ad hoc and its harness is not committed, so the
+  transcript below is reported, not reproducible from the repository alone.
+- `HANDOFF.md` in the frozen repo still quotes 638 and 637 tests in two places.
+  That file is outside `site/` and frozen; the site must not repeat those numbers,
+  and does not.

@@ -6,9 +6,13 @@
  *
  * Regenerate with:  python site/tools/embed_sources.py
  * Check it is current:  python site/tools/embed_sources.py --check
+ * (site/tools/validate_lessons.py runs that check too.)
  *
  * Importable in the browser: app/__init__.py, app/models.py, app/parser.py, app/rules.py
  * Embedded for reading only: app/db.py, app/engine.py, samples/sample.diff
+ *   db.py and engine.py import app.config, which needs pydantic-settings — not
+ *   shipped by Pyodide; engine.py also imports app.openai_compat_provider, which
+ *   is not embedded.
  */
 window.REPO_SOURCES = {
   "app/__init__.py": "\"\"\"Autonomous AI Code Reviewer & PR Assistant \u2014 application package.\"\"\"\n\n__version__: str = \"0.1.0\"\n",
