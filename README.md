@@ -59,8 +59,8 @@ Three design rules follow from that, and they are the reason the code is shaped 
 ## Quick start
 
 ```bash
-git clone https://github.com/Shreyashyadav0/mca-4th-sem-project.git
-cd mca-4th-sem-project
+git clone https://github.com/Shreyashyadav0/ai-code-reviewer.git
+cd ai-code-reviewer
 
 pip install -r requirements.lock     # 37 pinned distributions
 python -m pytest -q tests            # 640 passed, 1 skipped
