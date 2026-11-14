@@ -63,12 +63,27 @@ REQUIRED_IDS = {
         "lesson-exercise", "lesson-mistakes", "lesson-links", "lesson-glossary",
         "mark-done", "prev-link", "next-link", "lesson-nav",
         "lesson-quiz", "lesson-position", "site-sidebar", "sidebar-toggle",
+        "theme-toggle",
     ],
     "tryit.html": [
         "tryit-title", "tryit-code", "tryit-output", "tryit-run", "tryit-reset",
         "tryit-copy", "tryit-back", "tryit-status", "tryit-terminal",
         "tryit-split", "tryit-divider", "theme-toggle",
     ],
+}
+
+# The asset scripts each page loads, in order. tryit.html is a tool page: it has
+# no sidebar, no search box and no lesson renderer, so it loads neither.
+PAGE_SCRIPTS = {
+    "index.html": [
+        "contracts.js", "progress.js", "app.js", "search.js",
+        "sidebar.js", "pyodide-loader.js", "manifest.js",
+    ],
+    "lesson.html": [
+        "contracts.js", "progress.js", "app.js", "search.js",
+        "sidebar.js", "pyodide-loader.js", "manifest.js",
+    ],
+    "tryit.html": ["contracts.js", "pyodide-loader.js", "manifest.js"],
 }
 
 QUIZ_KEYS = {"q", "options", "answer", "why"}
@@ -273,13 +288,25 @@ def extract_object(text: str, where: str, report: Report) -> dict | None:
         return None
 
     literal = text[start:end]
+
+    def reject_duplicates(pairs):
+        seen = set()
+        for key, _ in pairs:
+            if key in seen:
+                raise ValueError(f"duplicate key '{key}'")
+            seen.add(key)
+        return dict(pairs)
+
     try:
-        parsed = json.loads(literal)
+        parsed = json.loads(literal, object_pairs_hook=reject_duplicates)
     except json.JSONDecodeError as error:
         report.fail(
             where,
             f"pushed object is not JSON-compatible ({error.msg} at line {error.lineno}, col {error.colno})",
         )
+        return None
+    except ValueError as error:
+        report.fail(where, f"pushed object is not JSON-compatible ({error})")
         return None
     if not isinstance(parsed, dict):
         report.fail(where, "the pushed value is not an object")
@@ -541,6 +568,20 @@ def check_example_sources(lesson: dict, where: str, available: set[str], report:
                 )
 
 
+def authored_strings(lesson: dict):
+    """Every string a lesson author writes that the reader sees as text."""
+    for index, item in enumerate(lesson.get("quiz") or []):
+        if isinstance(item, dict):
+            yield f"quiz[{index}].q", item.get("q")
+            yield f"quiz[{index}].why", item.get("why")
+            for oi, option in enumerate(item.get("options") or []):
+                yield f"quiz[{index}].options[{oi}]", option
+    for index, example in enumerate(lesson.get("code_examples") or []):
+        if isinstance(example, dict):
+            yield f"code_examples[{index}].caption", example.get("caption")
+            yield f"code_examples[{index}].why_not", example.get("why_not")
+
+
 def check_example_ids(
     lesson: dict, where: str, seen: dict[str, str], report: Report
 ) -> None:
@@ -645,10 +686,7 @@ def check_pages(paths: list[str], report: Report) -> None:
                 re.search(r'src="assets/([a-z-]+\.js)"', tag).group(1)
                 for tag in re.findall(r'<script\s+src="assets/[a-z-]+\.js"\s*>\s*</script>', text)
             ]
-            wanted = [
-                "contracts.js", "progress.js", "app.js", "search.js",
-                "sidebar.js", "pyodide-loader.js", "manifest.js",
-            ]
+            wanted = PAGE_SCRIPTS.get(page, [])
             if order != wanted:
                 report.fail(page, f"script order is {order}, expected {wanted}")
 
@@ -694,6 +732,13 @@ def main() -> int:
             hits = RAW_HTML.findall(FENCED_CODE.sub(" ", concept))
             if hits:
                 report.fail(relative, f"concept_md contains raw HTML: {', '.join(sorted(set(hits))[:4])}")
+        # Quiz text and captions are rendered as text, but they are also the
+        # place an author is most likely to paste markup by accident.
+        for where_text, value in authored_strings(lesson):
+            if isinstance(value, str):
+                hits = RAW_HTML.findall(FENCED_CODE.sub(" ", value))
+                if hits:
+                    report.fail(relative, f"{where_text} contains raw HTML: {', '.join(sorted(set(hits))[:3])}")
 
         lessons.append(lesson)
         lesson_where[id(lesson)] = relative

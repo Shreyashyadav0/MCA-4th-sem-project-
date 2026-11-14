@@ -75,7 +75,7 @@ window.LESSONS.push({
         "python -m unittest"
       ],
       "answer": 0,
-      "why": "The suite lives in tests/ and is run with pytest; the other commands either do something else or nothing."
+      "why": "The suite lives in tests/ and is pytest-style, so pytest is what runs it; bare `python -m unittest` finds nothing because no test there is a unittest class."
     },
     {
       "q": "Where is the choice between sarvam, local and mock decided?",

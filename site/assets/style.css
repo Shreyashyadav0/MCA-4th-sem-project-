@@ -24,6 +24,8 @@
   --sev-high: #a63f00;
   --sev-medium: #6f5200;
   --sev-low: #1c5d86;
+  --scrim: #0b1220;
+  --divider: #6b7688;
   --radius: 8px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -50,6 +52,8 @@
   --sev-high: #ffb27a;
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
+  --scrim: #000000;
+  --divider: #8892a4;
 }
 
 /* ------------------------------------------------------------------- reset */
@@ -622,11 +626,6 @@ th {
   content: "\2713  ";
 }
 
-.example-output {
-  margin-top: var(--space-2);
-  white-space: pre-wrap;
-}
-
 .terminal-panel {
   margin-top: var(--space-3);
   padding: var(--space-3);
@@ -793,16 +792,6 @@ details.solution[open] summary {
   justify-content: space-between;
 }
 
-.pager {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.pager a {
-  font-size: 0.9375rem;
-}
-
 .pager a[aria-disabled="true"] {
   color: var(--muted);
   text-decoration: none;
@@ -847,7 +836,8 @@ details.solution[open] summary {
   overscroll-behavior: contain;
   border-right: 1px solid var(--border);
   background: var(--surface);
-  padding: var(--space-3) 0 var(--space-6);
+  /* Inline padding keeps the 3px focus ring + halo inside the scroll box. */
+  padding: var(--space-3) var(--space-1) var(--space-6);
 }
 
 .sidebar-toggle {
@@ -1167,10 +1157,19 @@ details.solution[open] summary {
 }
 
 .divider {
+  position: relative;
   cursor: col-resize;
-  background: var(--border);
+  background: var(--divider);
   border: 0;
   padding: 0;
+}
+
+/* An 8px track is a hard target; the hit area is 24px without changing the
+ * visual width (WCAG 2.5.8). */
+.divider::before {
+  content: "";
+  position: absolute;
+  inset: 0 -8px;
 }
 
 .divider:hover,
@@ -1221,13 +1220,25 @@ details.solution[open] summary {
     max-width: 86vw;
     z-index: 30;
     transform: translateX(-100%);
-    transition: transform 0.18s ease-out;
+    /* Off-screen is not enough: visibility takes the drawer out of the tab order
+     * and out of the accessibility tree, which aria-hidden alone cannot do. */
+    visibility: hidden;
+    /* Visibility flips instantly on open and only after the slide on close, so
+     * the drawer is never invisible while it is being used. */
+    transition: transform 0.18s ease-out, visibility 0s linear 0.18s;
     border-right: 1px solid var(--border);
     box-shadow: 0 0 0 1px var(--border);
   }
 
   body.sidebar-open .sidebar {
     transform: none;
+    visibility: visible;
+    transition: transform 0.18s ease-out, visibility 0s;
+  }
+
+  /* The page behind the drawer must not scroll under it. */
+  body.sidebar-open {
+    overflow: hidden;
   }
 
   .sidebar-close {
@@ -1243,8 +1254,8 @@ details.solution[open] summary {
     position: fixed;
     inset: 0;
     z-index: 20;
-    background: var(--bg);
-    opacity: 0.6;
+    background: var(--scrim);
+    opacity: 0.55;
   }
 
   .split {
@@ -1259,6 +1270,10 @@ details.solution[open] summary {
 
   .divider {
     cursor: row-resize;
+  }
+
+  .divider::before {
+    inset: -8px 0;
   }
 }
 
@@ -1294,6 +1309,10 @@ details.solution[open] summary {
   .sidebar,
   .sidebar-scrim,
   .sidebar-toggle,
+  .tryit,
+  .split,
+  .pane,
+  .split textarea,
   .pager,
   .quiz-actions,
   .btn-tryit,
@@ -1309,6 +1328,17 @@ details.solution[open] summary {
 
   .quiz-question {
     break-inside: avoid;
+  }
+
+  /* An open drawer's scrim is fixed and would print as a veil over the page;
+   * the narrow-width rule that shows it outranks the list above, so it is
+   * repeated here at the same specificity. */
+  body.sidebar-open .sidebar-scrim {
+    display: none;
+  }
+
+  .sidebar {
+    visibility: hidden;
   }
 
   body {

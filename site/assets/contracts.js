@@ -5,12 +5,13 @@
  * If a later wave needs a new constant, the wave that needs it edits this file
  * deliberately and records the change in site/STATE.md.
  *
- * Globals defined by the site (exactly six, no others):
+ * Globals defined by the site (exactly seven, no others):
  *   window.CONTRACTS  this file
  *   window.App        assets/app.js      router, renderer, helpers
  *   window.Search     assets/search.js   client-side index
  *   window.Progress   assets/progress.js localStorage progress
- *   window.PyRun      assets/pyodide-loader.js  optional in-browser Python
+ *   window.Sidebar    assets/sidebar.js  the lesson tree
+ *   window.PyRun      assets/pyodide-loader.js  in-browser Python
  *   window.LESSONS    the content files, an array built by push()
  */
 (function () {
@@ -43,14 +44,19 @@
    *   concept_md    markdown, subset in MARKDOWN_SUBSET below
    *   code_examples [ { id: "1.3-ex-0", lang, caption, code, runnable, run_tier,
    *                     expected_output?, why_not?, packages?, files? } ]
-   *                 `id` is stable and is what tryit.html addresses:
-   *                 tryit.html?id=1.3&ex=0. It never changes once written.
+   *                 `id` must be "<lesson id>-ex-<index>", unique across the
+   *                 site. It is positional: inserting an example renumbers the
+   *                 ones after it, so append rather than insert. tryit.html is
+   *                 addressed as tryit.html?id=1.3&ex=0 (the index), and the
+   *                 lesson page emits that link for you.
    *   try_it        { prompt, starter, solution, explanation }
    *   exercise      { prompt, hint, solution, explanation }
-   *   quiz          [ { q, options: [..], answer: <index>, why } ]
-   *                 Optional in Wave 1.6, required from Wave 2 onward. `answer`
-   *                 is the index of the correct option; `why` is one sentence
-   *                 and is shown whether the answer was right or wrong.
+   *   quiz          [ { q, options: [..], answer: <int index>, why } ]
+   *                 Optional in Wave 1.6, required from Wave 2 onward.
+   *                 The gate enforces: 3 to 5 questions; at least two non-empty
+   *                 options each; `answer` an integer inside options; `why` a
+   *                 non-empty string, shown whether the answer was right or
+   *                 wrong. No HTML in q/options/why.
    *   common_mistakes, project_links, learn_more, glossary_terms
    */
   window.CONTRACTS = {

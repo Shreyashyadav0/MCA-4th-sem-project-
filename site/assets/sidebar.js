@@ -15,7 +15,9 @@
   "use strict";
 
   var C = window.CONTRACTS;
-  var rendered = false;
+  var bound = false;      /* drawer listeners are bound once, never per render */
+  var collapsed = {};     /* part numbers the reader has closed, remembered */
+  var root = null;        /* the nav this module rendered into */
 
   function lessonsOf(part) {
     var list = Array.isArray(window.LESSONS) ? window.LESSONS : [];
@@ -56,40 +58,58 @@
     return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
   }
 
-  function bindDrawer(root) {
+  function setDrawer(rootNode, open) {
     var toggle = document.getElementById("sidebar-toggle");
-    var scrim = document.querySelector(".sidebar-scrim");
-    if (!toggle) {
+    if (!rootNode) {
       return;
     }
-
-    var setOpen = function (open) {
-      document.body.classList.toggle("sidebar-open", open);
+    document.body.classList.toggle("sidebar-open", open);
+    if (toggle) {
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      root.setAttribute("aria-hidden", isNarrow() && !open ? "true" : "false");
-      if (open) {
-        var first = root.querySelector("a, button");
-        if (first) {
-          first.focus();
-        }
-      } else {
-        toggle.focus();
+    }
+    var narrow = isNarrow();
+    /* A drawer that is off-screen must not be reachable by Tab or by a screen
+     * reader, and `inert` is what actually enforces that. */
+    rootNode.setAttribute("aria-hidden", narrow && !open ? "true" : "false");
+    if ("inert" in rootNode) {
+      rootNode.inert = narrow && !open;
+    }
+    var page = document.querySelector(".page");
+    if (page && "inert" in page) {
+      page.inert = narrow && open;
+    }
+    if (open) {
+      var first = rootNode.querySelector("a, button");
+      if (first) {
+        first.focus();
       }
-    };
+    } else if (toggle) {
+      toggle.focus();
+    }
+  }
+
+  function bindDrawer(rootNode) {
+    var toggle = document.getElementById("sidebar-toggle");
+    var scrim = document.querySelector(".sidebar-scrim");
+    if (!toggle || bound) {
+      return;
+    }
+    bound = true;
 
     toggle.addEventListener("click", function () {
-      setOpen(!document.body.classList.contains("sidebar-open"));
+      setDrawer(root, !document.body.classList.contains("sidebar-open"));
     });
 
-    var close = root.querySelector(".sidebar-close");
-    if (close) {
-      close.addEventListener("click", function () {
-        setOpen(false);
-      });
-    }
+    /* The close button is re-created on every render, so it is delegated from the
+     * container instead of bound per instance. */
+    rootNode.addEventListener("click", function (event) {
+      if (event.target && event.target.className === "sidebar-close") {
+        setDrawer(root, false);
+      }
+    });
     if (scrim) {
       scrim.addEventListener("click", function () {
-        setOpen(false);
+        setDrawer(root, false);
       });
     }
 
@@ -97,7 +117,7 @@
       var open = document.body.classList.contains("sidebar-open");
       if (event.key === "Escape" && open) {
         event.preventDefault();
-        setOpen(false);
+        setDrawer(root, false);
         return;
       }
       /* Focus trap: while the drawer is open, Tab stays inside it. */
@@ -118,13 +138,11 @@
       }
     });
 
-    root.setAttribute("aria-hidden", isNarrow() ? "true" : "false");
+    setDrawer(root, false);
+    /* Recompute on every resize: the wide->narrow direction used to leave the
+     * off-screen drawer exposed to the accessibility tree. */
     window.addEventListener("resize", function () {
-      if (!isNarrow()) {
-        document.body.classList.remove("sidebar-open");
-        toggle.setAttribute("aria-expanded", "false");
-        root.setAttribute("aria-hidden", "false");
-      }
+      setDrawer(root, isNarrow() && document.body.classList.contains("sidebar-open"));
     });
   }
 
@@ -165,12 +183,15 @@
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      var openByDefault = lessons.length > 0;
+      var openByDefault = lessons.length > 0 && collapsed[part.n] !== true;
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
-      toggle.appendChild(
-        el("span", "side-part-count", lessons.length ? tally.done + "/" + tally.total : "0/" + part.lessons)
-      );
+      /* Both numbers are real: done/written, with the planned total named
+       * separately so a part that is half written cannot look half done. */
+      var countLabel = lessons.length
+        ? tally.done + "/" + tally.total
+        : "0/" + part.lessons + " planned";
+      toggle.appendChild(el("span", "side-part-count", countLabel));
       group.appendChild(toggle);
 
       var body = el("div", "side-body");
@@ -199,10 +220,14 @@
       }
       group.appendChild(body);
 
+      toggle.setAttribute("aria-controls", "side-body-" + part.n);
+      body.id = "side-body-" + part.n;
+
       toggle.addEventListener("click", function () {
         var open = toggle.getAttribute("aria-expanded") === "true";
         toggle.setAttribute("aria-expanded", open ? "false" : "true");
         body.hidden = open;
+        collapsed[part.n] = open;
       });
 
       scroller.appendChild(group);
@@ -210,8 +235,8 @@
 
     container.appendChild(scroller);
 
-    /* The current part is always expanded, whatever its default was. */
-    if (currentPart !== null) {
+    /* The current part opens itself once; after that the reader's collapse wins. */
+    if (currentPart !== null && collapsed[currentPart] !== true) {
       var active = container.querySelector('.side-part[data-part="' + currentPart + '"]');
       if (active) {
         var activeToggle = active.querySelector(".side-toggle");
@@ -225,8 +250,11 @@
       }
     }
 
+    root = container;
     bindDrawer(container);
-    rendered = true;
+    if (bound) {
+      setDrawer(container, document.body.classList.contains("sidebar-open"));
+    }
   }
 
   window.Sidebar = {

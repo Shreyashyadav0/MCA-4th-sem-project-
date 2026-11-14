@@ -571,7 +571,13 @@
       renderParts(partsList);
     }
     if (window.Sidebar) {
-      window.Sidebar.render(document.getElementById("site-sidebar"), "");
+      try {
+        window.Sidebar.render(document.getElementById("site-sidebar"), "");
+      } catch (error) {
+        if (window.console && window.console.warn) {
+          window.console.warn("The sidebar failed to render:", error);
+        }
+      }
     }
     updateTotal();
     bindThemeToggle();
@@ -733,9 +739,9 @@
 
     if (example.expected_output) {
       terminal.appendChild(el("p", "terminal-title", "Expected output"));
-      var expected = el("pre", "code terminal-output");
-      expected.appendChild(el("code", null, example.expected_output));
-      terminal.appendChild(expected);
+      var terminalOutput = el("pre", "code terminal-output");
+      terminalOutput.appendChild(el("code", null, example.expected_output));
+      terminal.appendChild(terminalOutput);
     }
     if (example.why_not) {
       terminal.appendChild(el("p", "terminal-why", "Why not in the browser: " + example.why_not));
@@ -805,9 +811,10 @@
     return hasAny;
   }
 
-  /* A quiz is three to five questions with instant feedback. Nothing is stored
-   * and nothing is scored beyond this session: the `why` is the teaching, the
-   * mark is only a signpost. */
+  /* A quiz is three to five questions (the gate enforces the range). Feedback
+   * appears when the reader presses Check answers — instant in the sense that it
+   * needs no submission anywhere. Nothing is stored and nothing is scored beyond
+   * this session: the `why` is the teaching, the mark is only a signpost. */
   function renderQuiz(id, quiz) {
     var node = document.getElementById(id);
     if (!node) {
@@ -824,16 +831,34 @@
       event.preventDefault();
     });
 
+    var rendered = [];
     questions.forEach(function (item, qi) {
+      var options = Array.isArray(item.options) ? item.options : [];
+      if (!options.length) {
+        /* An unanswerable question is a content bug: skip it rather than render a
+         * fieldset the reader can never answer. */
+        return;
+      }
       var field = el("fieldset", "quiz-question");
-      field.appendChild(el("legend", "quiz-legend", qi + 1 + ". " + item.q));
+      field.appendChild(el("legend", "quiz-legend", rendered.length + 1 + ". " + item.q));
 
-      (item.options || []).forEach(function (option, oi) {
+      options.forEach(function (option, oi) {
         var label = el("label", "quiz-option");
         var input = document.createElement("input");
         input.type = "radio";
-        input.name = "quiz-" + id + "-" + qi;
+        input.name = "quiz-" + id + "-" + rendered.length;
         input.value = String(oi);
+        /* Changing an answer must clear the old mark, or the page argues with
+         * the reader about a question they have already re-answered. */
+        input.addEventListener("change", function () {
+          field.classList.remove("is-right", "is-wrong");
+          var stale = field.querySelector(".quiz-verdict");
+          if (stale) {
+            stale.hidden = true;
+            stale.className = "quiz-verdict";
+            stale.textContent = "";
+          }
+        });
         label.appendChild(input);
         label.appendChild(el("span", "quiz-option-text", option));
         field.appendChild(label);
@@ -841,9 +866,13 @@
 
       var verdict = el("p", "quiz-verdict");
       verdict.hidden = true;
+      verdict.setAttribute("role", "status");
+      verdict.setAttribute("aria-live", "polite");
       field.appendChild(verdict);
       form.appendChild(field);
+      rendered.push(item);
     });
+    questions = rendered;
 
     var actions = el("div", "quiz-actions");
     var check = el("button", "btn btn-check", "Check answers");
@@ -870,13 +899,17 @@
           verdict.className = "quiz-verdict is-unanswered";
           continue;
         }
-        var correct = Number(picked.value) === Number(item.answer);
+        var answer = Number(item.answer);
+        var inRange = answer >= 0 && answer < (item.options || []).length;
+        var correct = inRange && Number(picked.value) === answer;
         field.classList.add(correct ? "is-right" : "is-wrong");
         verdict.hidden = false;
         verdict.className = "quiz-verdict " + (correct ? "is-right" : "is-wrong");
         verdict.textContent = correct
           ? "Correct. " + (item.why || "")
-          : "Not quite — the answer is “" + item.options[item.answer] + "”. " + (item.why || "");
+          : inRange
+            ? "Not quite — the answer is “" + item.options[answer] + "”. " + (item.why || "")
+            : "Not quite. " + (item.why || "");
       }
     });
 
@@ -890,6 +923,7 @@
         fields[index].classList.remove("is-right", "is-wrong");
         var verdict = fields[index].querySelector(".quiz-verdict");
         verdict.hidden = true;
+        verdict.className = "quiz-verdict";
         verdict.textContent = "";
       }
     });
@@ -947,8 +981,10 @@
      * is what a reader needs to know how long the part is. */
     var positionLine = document.getElementById("lesson-position");
     if (positionLine) {
-      positionLine.textContent =
-        "Part " + lesson.part + " · Lesson " + position + " of " + planned;
+      /* "of 10 planned" when the part is only partly written, so the count never
+       * claims lessons that do not exist yet. */
+      var of = siblings.length >= planned ? planned : planned + " planned";
+      positionLine.textContent = "Part " + lesson.part + " · Lesson " + position + " of " + of;
     }
 
     var concept = document.getElementById("lesson-concept");
@@ -1038,6 +1074,7 @@
     bindMarkDone(lesson);
     bindPrevNext(lesson);
     bindArrowKeys();
+    bindThemeToggle();
   }
 
   function bindMarkDone(lesson) {
@@ -1055,6 +1092,14 @@
     button.addEventListener("click", function () {
       window.Progress.toggle(lesson.id);
       sync();
+      /* The tick and the part count live in the sidebar, so it has to be told. */
+      if (window.Sidebar) {
+        try {
+          window.Sidebar.render(document.getElementById("site-sidebar"), lesson.id);
+        } catch (error) {
+          /* a broken sidebar must not take the button down with it */
+        }
+      }
     });
     sync();
   }
@@ -1103,8 +1148,14 @@
     }
   }
 
-  /* Left/Right follow the pager, unless the reader is typing. */
+  /* Left/Right follow the pager, unless the reader is typing. Bound once. */
+  var arrowsBound = false;
+
   function bindArrowKeys() {
+    if (arrowsBound) {
+      return;
+    }
+    arrowsBound = true;
     document.addEventListener("keydown", function (event) {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
         return;
@@ -1190,22 +1241,26 @@
       nav.appendChild(current);
     }
     showSection("lesson-concept", true);
-    ["lesson-examples", "lesson-tryit", "lesson-exercise", "lesson-mistakes", "lesson-links", "lesson-glossary"].forEach(
+    ["lesson-examples", "lesson-tryit", "lesson-exercise", "lesson-quiz", "lesson-mistakes", "lesson-links", "lesson-glossary"].forEach(
       function (key) {
         showSection(key, false);
       }
     );
+    var position = document.getElementById("lesson-position");
+    if (position) {
+      position.textContent = "";
+    }
     var done = document.getElementById("mark-done");
     if (done) {
       done.hidden = true;
     }
     var prevLink = document.getElementById("prev-link");
     if (prevLink) {
-      disablePager(prevLink, "← Start of the path");
+      disablePager(prevLink, "❮ Start of the path");
     }
     var nextLink = document.getElementById("next-link");
     if (nextLink) {
-      disablePager(nextLink, "End of the written path →");
+      disablePager(nextLink, "End of the written path ❯");
     }
   }
 
@@ -1214,6 +1269,13 @@
     var request = requestedLessonId();
     if (request.broken) {
       renderMissing("");
+      if (window.Sidebar) {
+        try {
+          window.Sidebar.render(document.getElementById("site-sidebar"), "");
+        } catch (error) {
+          /* nothing to do */
+        }
+      }
       return;
     }
     var id = request.id;
@@ -1221,13 +1283,23 @@
     if (!lesson) {
       renderMissing(id);
       if (window.Sidebar) {
-        window.Sidebar.render(document.getElementById("site-sidebar"), "");
+        try {
+          window.Sidebar.render(document.getElementById("site-sidebar"), "");
+        } catch (error) {
+          /* nothing to do: the lesson body is the important half */
+        }
       }
       return;
     }
     renderLesson(lesson);
     if (window.Sidebar) {
-      window.Sidebar.render(document.getElementById("site-sidebar"), lesson.id);
+      try {
+        window.Sidebar.render(document.getElementById("site-sidebar"), lesson.id);
+      } catch (error) {
+        if (window.console && window.console.warn) {
+          window.console.warn("The sidebar failed to render:", error);
+        }
+      }
     }
   }
 

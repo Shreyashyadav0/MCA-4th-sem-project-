@@ -45,11 +45,8 @@
   <p class="tryit-status" id="tryit-status" role="status" aria-live="polite"></p>
 </main>
 
+<!-- Only what this page uses: the runner, the constants and the content. -->
 <script src="assets/contracts.js"></script>
-<script src="assets/progress.js"></script>
-<script src="assets/app.js"></script>
-<script src="assets/search.js"></script>
-<script src="assets/sidebar.js"></script>
 <script src="assets/pyodide-loader.js"></script>
 <script src="assets/manifest.js"></script>
 <script src="content/repo-sources.js"></script>
@@ -70,13 +67,22 @@
       return document.getElementById(id);
     }
 
+    function decode(value) {
+      try {
+        return decodeURIComponent(String(value || "").replace(/\+/g, " "));
+      } catch (error) {
+        return null; /* a malformed escape is not a value */
+      }
+    }
+
     function param(name) {
       var query = String(window.location.search || "").replace(/^\?/, "");
       var pairs = query ? query.split("&") : [];
       for (var i = 0; i < pairs.length; i += 1) {
         var pair = pairs[i].split("=");
-        if (decodeURIComponent(pair[0]) === name) {
-          return decodeURIComponent((pair.slice(1).join("=") || "").replace(/\+/g, " "));
+        if (decode(pair[0]) === name) {
+          var value = decode(pair.slice(1).join("="));
+          return value === null ? "" : value;
         }
       }
       return "";
@@ -92,11 +98,12 @@
       return null;
     }
 
-    function terminalCommand(item) {
+    function terminalCommand(item, code) {
+      var body = typeof code === "string" ? code : item.code;
       if (item.lang === "python") {
-        return "python - <<'PY'\n" + String(item.code || "").replace(/\s+$/, "") + "\nPY";
+        return "python - <<'PY'\n" + String(body || "").replace(/\s+$/, "") + "\nPY";
       }
-      return String(item.code || "").trim();
+      return String(body || "").trim();
     }
 
     function setStatus(text) {
@@ -120,7 +127,7 @@
 
     /* A terminal-tier example has no Run: it shows the command and what it
      * prints, and says why it cannot run here. */
-    function showTerminal(item, reason) {
+    function showTerminal(item, reason, code) {
       var output = $("tryit-output");
       var terminal = $("tryit-terminal");
       var run = $("tryit-run");
@@ -144,7 +151,7 @@
       var command = document.createElement("pre");
       command.className = "code terminal-command";
       var commandCode = document.createElement("code");
-      commandCode.textContent = terminalCommand(item);
+      commandCode.textContent = terminalCommand(item, code);
       command.appendChild(commandCode);
       terminal.appendChild(command);
 
@@ -167,11 +174,29 @@
       terminal.appendChild(why);
     }
 
+    function restoreRun() {
+      var button = $("tryit-run");
+      var terminal = $("tryit-terminal");
+      if (!button || !window.PyRun.isAvailable()) {
+        return;
+      }
+      button.hidden = false;
+      button.disabled = false;
+      button.textContent = "Run";
+      if (terminal) {
+        terminal.hidden = true;
+      }
+    }
+
     function runCode() {
       var code = $("tryit-code").value;
       var button = $("tryit-run");
+      if (button.disabled) {
+        return;
+      }
       button.disabled = true;
-      button.textContent = "Running…";
+      /* The first run downloads the runtime, so say that rather than "Running…". */
+      button.textContent = window.PyRun.isAvailable() && $("tryit-output").textContent ? "Running…" : "Loading Python…";
       setStatus("Running…");
 
       window.PyRun.run(code, {
@@ -185,7 +210,8 @@
         if (result.error_kind === "load") {
           showTerminal(
             example,
-            "the Python runtime could not be loaded — the page is offline, or the download was blocked."
+            "the Python runtime could not be loaded — the page is offline, or the download was blocked.",
+            code
           );
           return;
         }
@@ -219,13 +245,21 @@
         }, 1400);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () {
-          done(true);
-        }, function () {
-          done(false);
-        });
+        navigator.clipboard.writeText(text).then(
+          function () {
+            done(true);
+          },
+          function () {
+            /* Permission refused (file:// often does): fall back to the old way. */
+            done(legacyCopy(text));
+          }
+        );
         return;
       }
+      done(legacyCopy(text));
+    }
+
+    function legacyCopy(text) {
       var area = document.createElement("textarea");
       area.value = text;
       document.body.appendChild(area);
@@ -237,7 +271,7 @@
         ok = false;
       }
       document.body.removeChild(area);
-      done(ok);
+      return ok;
     }
 
     function bindSplit() {
@@ -258,9 +292,17 @@
       divider.setAttribute("aria-valuemax", "80");
       setSplit(50);
 
+      var stacked = function () {
+        return window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+      };
+
       var fromPointer = function (event) {
         var box = split.getBoundingClientRect();
-        setSplit(((event.clientX - box.left) / box.width) * 100);
+        /* Stacked, the split is horizontal: the divider moves with clientY. */
+        var ratio = stacked()
+          ? (event.clientY - box.top) / box.height
+          : (event.clientX - box.left) / box.width;
+        setSplit(ratio * 100);
       };
 
       divider.addEventListener("pointerdown", function (event) {
@@ -279,14 +321,22 @@
       });
       divider.addEventListener("keydown", function (event) {
         var current = Number(divider.getAttribute("aria-valuenow")) || 50;
-        if (event.key === "ArrowLeft") {
+        var back = stacked() ? "ArrowUp" : "ArrowLeft";
+        var forward = stacked() ? "ArrowDown" : "ArrowRight";
+        if (event.key === back) {
           event.preventDefault();
           setSplit(current - 5);
-        } else if (event.key === "ArrowRight") {
+        } else if (event.key === forward) {
           event.preventDefault();
           setSplit(current + 5);
         }
       });
+
+      var syncOrientation = function () {
+        divider.setAttribute("aria-orientation", stacked() ? "horizontal" : "vertical");
+      };
+      syncOrientation();
+      window.addEventListener("resize", syncOrientation);
     }
 
     function bindTheme() {
@@ -323,13 +373,21 @@
       bindSplit();
 
       lesson = lessonById(param("id"));
+      if (lesson) {
+        /* The back link is useful as soon as the lesson is known, even if the
+         * example index is wrong. */
+        $("tryit-back").href = "lesson.html?id=" + encodeURIComponent(lesson.id);
+      }
+
       var index = Number(param("ex") || "0");
       if (!lesson || !lesson.code_examples || !lesson.code_examples[index]) {
+        document.title = "No such example — AI Code Reviewer";
         $("tryit-title").textContent = "No such example";
         $("tryit-code").value = "";
         $("tryit-code").disabled = true;
         $("tryit-run").hidden = true;
         $("tryit-reset").hidden = true;
+        $("tryit-copy").hidden = true;
         setStatus("That link does not point at an example in this build of the site.");
         return;
       }
@@ -349,9 +407,12 @@
       }
 
       $("tryit-run").addEventListener("click", runCode);
+      window.addEventListener("online", restoreRun);
+
       $("tryit-reset").addEventListener("click", function () {
         $("tryit-code").value = original;
         $("tryit-output").textContent = "";
+        restoreRun();
         setStatus("Reset to the original snippet.");
         window.setTimeout(function () {
           setStatus("");
@@ -361,6 +422,9 @@
 
       /* Tab indents two spaces rather than leaving the editor; Ctrl-Enter runs. */
       $("tryit-code").addEventListener("keydown", function (event) {
+        if (event.key === "Tab" && event.shiftKey) {
+          return; /* Shift-Tab leaves the field, as it should */
+        }
         if (event.key === "Tab") {
           event.preventDefault();
           var field = event.target;
@@ -370,7 +434,8 @@
           field.selectionStart = field.selectionEnd = start + 2;
         } else if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
           event.preventDefault();
-          if (!$("tryit-run").hidden) {
+          var runButton = $("tryit-run");
+          if (!runButton.hidden && !runButton.disabled) {
             runCode();
           }
         }
