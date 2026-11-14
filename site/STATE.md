@@ -7,6 +7,7 @@ is the bug.
 | Wave | Date | Base commit | Files added | Lessons added | Validator |
 |---|---|---|---|---|---|
 | 1 | 2026-11-14 | `ca96890` (frozen reference) | 14 | 2 (`0.1`, `1.1`) | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
+| 1.5 | 2026-11-14 | `4c70195` | 3 added, 8 changed | 0 new; `0.1` and `1.1` rewritten with live examples | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -161,3 +162,102 @@ what changed and why, so a later wave does not reintroduce any of it.
   second inline script, which the init contract forbids.
 - 104 `<script src>` lines per page at full size. Mechanical and gate-checked; a
   manifest-driven loader is the alternative if it becomes painful.
+
+## Wave 1.5 — the in-browser runner
+
+Wave 1 shipped a runner that could only execute snippets with no project
+imports, which made almost every example a "copy this into a terminal" block.
+This wave replaces it: a lesson can now run the repository's own modules in the
+browser, because the source files are embedded and written into Pyodide's virtual
+filesystem before the code executes.
+
+**Added.** `site/tools/embed_sources.py` (generates `site/content/repo-sources.js`
+from seven real files: `app/__init__.py`, `app/models.py`, `app/parser.py`,
+`app/rules.py`, `app/db.py`, `app/engine.py`, `samples/sample.diff`).
+`site/content/repo-sources.js` is generated, 138 KB, and `--check` fails when it
+is stale.
+
+**Rewritten.** `assets/pyodide-loader.js` (Pyodide 0.28.0; API is now
+`init / isAvailable / run / attachAll`), `assets/style.css` (output pane, spinner,
+loading state, terminal panel, `why_not` line), both seed lessons (each now has a
+live example and a declared `run_tier`), `tools/validate_lessons.py` (tier checks),
+`assets/app.js` (renders example figures from the tier data; the runner wires
+them).
+
+**Verified package lists, checked 2026-11-14** against
+`https://cdn.jsdelivr.net/pyodide/v0.28.0/full/pyodide-lock.json`
+(340 packages, lock version `0.28.0.dev0`):
+
+```
+PRESENT  pydantic 2.10.6   pydantic-core 2.27.2   sqlalchemy 2.0.39
+         pytest 8.3.5      httpx 0.28.1           openai 1.68.2
+         numpy 2.2.5       pyyaml 6.0.2            micropip 0.10.0
+ABSENT   fastapi   starlette   uvicorn   pydantic-settings   sarvamai
+```
+
+**The six acceptance tests, run in headless Chromium over `file://`,** with the
+runner byte-identical to the shipped file except for one constant: the pod reaches
+the internet only through a proxy Chromium does not use, so the CDN was mirrored
+locally and `CDN_BASE` pointed at `127.0.0.1`. Verbatim stdout:
+
+```
+1 hello | ok=true
+hello
+
+2 pydantic extra=forbid | ok=true
+ValidationError:
+1 validation error for Note
+stray
+  Extra inputs are not permitted [type=extra_forbidden, input_value='not allowed', input_type=str]
+
+3 app.models.Finding | ok=true
+CRITICAL app/db.py:3
+verdict: block
+
+4 app.parser on sample.diff | ok=true
+files changed: 2
+first hunk: @@ -1,5 +1,8 @@
+
+5 app.rules on sample.diff | ok=true
+findings: 4
+  CRITICAL app/db.py:3
+  CRITICAL app/db.py:3
+  CRITICAL app/db.py:7
+  MEDIUM   app/report.py:1
+verdict: block
+
+6 sqlalchemy | ok=true
+[(1, 'CRITICAL')]
+
+fatal: none        page console: clean        elapsed: 45 s for all six
+```
+
+Test 5 is the claim that matters: the same `app/rules.py`, over the same diff,
+gives the same four findings and the same `block` verdict as the CLI.
+
+**Offline degradation, verified.** With `CDN_BASE` pointed at a dead port and
+lesson 0.1 loaded on `file://`: the page renders normally, one Run press turns the
+browser-tier example into a visible terminal panel with the expected output and a
+line saying the runtime could not be loaded, the terminal-tier example keeps its
+own `why_not`, no uncaught error, console clean.
+
+**What cannot be imported, and why.** `app/db.py` and `app/engine.py` both do
+`from app.config import Settings`, and `app/config.py` needs `pydantic-settings`,
+which Pyodide does not ship. So those two files are embedded for reading and
+quoting, not for import; a lesson must not promise otherwise. Test 6 therefore
+exercises the sqlalchemy stack directly rather than `app.db`. `sqlite3` is
+unvendored from the Pyodide stdlib and must be loaded as a package — an example
+that wants sqlalchemy must list `"packages": ["sqlalchemy", "sqlite3"]`.
+
+**Deviations from the brief.**
+
+- The brief's module table says `app/engine.py` and `app/db.py` import in the
+  browser. They do not, for the `pydantic-settings` reason above. The lessons do
+  not rely on either.
+- `expected_output` is now required on `terminal` examples and *optional* on the
+  other two tiers, where it is used only by the offline fallback. The brief asks
+  for the fallback to show "the expected_output", which a browser example can only
+  do if it is allowed to carry one.
+- `assets/app.js` had to change although the brief assigned only five files: the
+  new API renders examples and wires them in one pass, so the page markup had to
+  move with it. `validate_lessons.py` also changed, as the brief's gate requires.

@@ -14,28 +14,46 @@ window.LESSONS.push({
   "code_examples": [
     {
       "lang": "python",
-      "caption": "Print a finding-shaped dict with an f-string",
-      "code": "finding = {\n    \"file\": \"app/db.py\",\n    \"line\": \"3\",\n    \"severity\": \"CRITICAL\",\n    \"issue\": \"A GitHub token literal is committed here.\",\n    \"suggested_fix\": \"Revoke the token, then read it at runtime.\",\n}\n\nprint(f\"{finding['severity']}: {finding['issue']}\")\nprint(f\"{finding['file']}:{finding['line']} — {finding['severity']}\")\n",
-      "runnable": true
+      "caption": "A real Finding, imported from app/models.py — press Run",
+      "code": "from app.models import Finding, verdict_for\n\nfinding = Finding(\n    file=\"app/db.py\",\n    line=\"3\",\n    severity=\"CRITICAL\",\n    issue=\"A GitHub token literal is committed here.\",\n    suggested_fix=\"Revoke the token, then read it at runtime.\",\n)\n\nprint(f\"{finding.severity.value} {finding.file}:{finding.line}\")\nprint(finding.issue)\nprint(\"verdict:\", verdict_for([finding]))\n",
+      "runnable": true,
+      "run_tier": "browser",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py"
+      ],
+      "expected_output": "CRITICAL app/db.py:3\nA GitHub token literal is committed here.\nverdict: block"
     },
     {
       "lang": "python",
-      "caption": "Alignment with a format spec — the shape the exercise asks for",
-      "code": "for label, count in ((\"high\", 3), (\"medium\", 2), (\"low\", 0)):\n    print(f\"{label:<8}{count}\")\n",
-      "runnable": true
+      "caption": "Alignment with a format spec, over two real findings",
+      "code": "from app.models import Finding\n\nfindings = [\n    Finding(\n        file=\"app/db.py\",\n        line=\"3\",\n        severity=\"CRITICAL\",\n        issue=\"A GitHub token literal is committed here.\",\n        suggested_fix=\"Revoke the token.\",\n    ),\n    Finding(\n        file=\"app/report.py\",\n        line=\"1\",\n        severity=\"MEDIUM\",\n        issue=\"A public function without full annotations.\",\n        suggested_fix=\"Annotate the parameters and the return type.\",\n    ),\n]\n\nfor finding in findings:\n    print(f\"{finding.severity.value:<10}{finding.file}:{finding.line}\")\n",
+      "runnable": true,
+      "run_tier": "browser",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py"
+      ],
+      "expected_output": "CRITICAL  app/db.py:3\nMEDIUM    app/report.py:1"
     }
   ],
   "try_it": {
-    "prompt": "Write `summarize(findings)` that takes a list of finding-shaped dicts and returns one line of counts in the order high, medium, low — for example `3 high, 2 medium, 0 low`.\n\nThe data uses the severities the repository uses, in uppercase: `HIGH`, `MEDIUM`, `LOW`. The sentence you return uses lowercase words. The repository's ladder has a fourth value, `CRITICAL`, which this drill leaves out on purpose.",
-    "starter": "findings = [\n    {\"severity\": \"HIGH\"},\n    {\"severity\": \"HIGH\"},\n    {\"severity\": \"HIGH\"},\n    {\"severity\": \"MEDIUM\"},\n    {\"severity\": \"MEDIUM\"},\n]\n\n\ndef summarize(findings):\n    # Return a string like \"3 high, 2 medium, 0 low\"\n    ...\n\n\nprint(summarize(findings))\n",
-    "solution": "def summarize(findings):\n    counts = {\"high\": 0, \"medium\": 0, \"low\": 0}\n    for finding in findings:\n        key = finding[\"severity\"].lower()\n        if key in counts:\n            counts[key] += 1\n    return f\"{counts['high']} high, {counts['medium']} medium, {counts['low']} low\"\n",
-    "explanation": "A dict of three counters is enough because the output order is fixed and small. `key in counts` also makes the function safe against a severity it does not know about — the repository's ladder has a fourth value, `CRITICAL`, which the real `severity_counts` helper in `app/models.py` handles."
+    "prompt": "Press Run on the first example. Then change the severity to `\"HIGH\"`, press Run again, and then try `\"LOW\"`. The verdict changes; explain the three answers before you read the solution.\n\nThe severities the repository accepts are `LOW`, `MEDIUM`, `HIGH` and `CRITICAL` — anything else is a `ValidationError`, which is the next thing to try.",
+    "starter": "from app.models import Finding, verdict_for\n\nfinding = Finding(\n    file=\"app/db.py\",\n    line=\"3\",\n    severity=\"CRITICAL\",        # try \"HIGH\", then \"LOW\", then \"SEVERE\"\n    issue=\"A GitHub token literal is committed here.\",\n    suggested_fix=\"Revoke the token.\",\n)\nprint(f\"{finding.severity.value:<10}{verdict_for([finding])}\")\n",
+    "solution": "from app.models import Finding, verdict_for\n\nfor severity in (\"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\"):\n    finding = Finding(\n        file=\"app/db.py\",\n        line=\"3\",\n        severity=severity,\n        issue=\"A GitHub token literal is committed here.\",\n        suggested_fix=\"Revoke the token.\",\n    )\n    print(f\"{severity:<10}{verdict_for([finding])}\")\n",
+    "explanation": "`verdict_for` in `app/models.py` blocks on CRITICAL or HIGH, and returns `approve with comments` for MEDIUM or LOW — a LOW finding still produces a comment, which is the difference between `approve` and `approve with comments`. Passing `\"SEVERE\"` raises `ValidationError` instead: `Severity` is an enum with four legal values and the model validates at the boundary."
   },
   "exercise": {
-    "prompt": "Same function, same input, but return three aligned lines instead of one sentence. Left-align the labels to eight columns so the numbers line up:\n\n```text\nhigh    3\nmedium  2\nlow     0\n```",
-    "hint": "A format spec goes after a colon inside the braces: `{label:<8}`. Join the three lines with a newline rather than printing inside the function, so the caller decides what to do with them.",
-    "solution": "def summarize(findings):\n    counts = {\"high\": 0, \"medium\": 0, \"low\": 0}\n    for finding in findings:\n        key = finding[\"severity\"].lower()\n        if key in counts:\n            counts[key] += 1\n    return \"\\n\".join(f\"{label:<8}{count}\" for label, count in counts.items())\n",
-    "explanation": "Dicts keep insertion order, so `counts.items()` already yields high, medium, low. Returning a string instead of printing keeps the function testable: a test can assert on the value, and nothing in it depends on stdout."
+    "prompt": "Print one aligned line per finding — the severity left-aligned to ten columns, then `file:line` — for the two findings in the second example:\n\n```text\nCRITICAL  app/db.py:3\nMEDIUM    app/report.py:1\n```\n\nRun it, do not copy it: the alignment must come out of your own format spec.",
+    "hint": "A format spec goes after a colon inside the braces: `{value:<10}`. `severity` is an enum, so print `finding.severity.value` — printing the enum itself gives you `Severity.CRITICAL`.",
+    "solution": "from app.models import Finding\n\nfindings = [\n    Finding(\n        file=\"app/db.py\",\n        line=\"3\",\n        severity=\"CRITICAL\",\n        issue=\"A GitHub token literal is committed here.\",\n        suggested_fix=\"Revoke the token.\",\n    ),\n    Finding(\n        file=\"app/report.py\",\n        line=\"1\",\n        severity=\"MEDIUM\",\n        issue=\"A public function without full annotations.\",\n        suggested_fix=\"Annotate the parameters and the return type.\",\n    ),\n]\n\nfor finding in findings:\n    print(f\"{finding.severity.value:<10}{finding.file}:{finding.line}\")\n",
+    "explanation": "`<10` pads on the right to ten columns, so `CRITICAL` (8 characters) takes two spaces and `MEDIUM` (6) takes four, which is what lines the columns up. Returning or printing a value instead of assembling a sentence keeps it testable: a test can assert on the string, and nothing depends on stdout."
   },
   "common_mistakes": [
     "A mutable default argument: `def add(finding, findings=[])` builds the list once, at def time, so findings leak between reviews. Use `findings=None` and create the list inside the body.",

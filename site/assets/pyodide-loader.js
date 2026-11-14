@@ -1,70 +1,61 @@
-/* pyodide-loader.js — optional in-browser Python.
+/* pyodide-loader.js — the in-browser Python runner.
  *
- * Pyodide is a convenience, not a dependency. Nothing is fetched until the
- * reader presses Run, so opening a lesson offline makes no request at all and
- * logs no error. When the CDN cannot be reached — offline, blackholed, or slow
- * past the timeout — the example falls back to what a static site can always
- * offer: a command that really runs, and the expected output when the lesson
- * states one.
+ * Pyodide runs CPython in WebAssembly, so a lesson can execute real code instead
+ * of asking the reader to copy it into a terminal. Nothing is downloaded until
+ * the first Run press: a 10 MB runtime must never delay the page.
  *
- * Two failure modes are kept apart on purpose:
- *   - the runtime did not load  -> terminal fallback, Run removed
- *   - the snippet raised        -> the traceback is shown, Run stays available
- * Reporting a Python error as "you must be offline" would be a lie.
+ * The interesting part is the embedded source bundle. file:// forbids fetch(),
+ * so a lesson cannot read app/models.py from disk; instead
+ * site/content/repo-sources.js carries the repository's own files, and run()
+ * writes the ones an example asks for into Pyodide's virtual filesystem before
+ * executing. `from app.models import Finding` then works exactly as it does on a
+ * real machine — same file, same bytes, no paraphrase.
  *
- * PyRun.attach(container, example) builds the whole figure, so app.js never
- * writes example markup itself.
+ * Three tiers, declared by each example as data-tier:
+ *   browser      stdlib or a package Pyodide bundles; runs immediately
+ *   browser-pkg  runs after micropip installs a pure-Python wheel (network once)
+ *   terminal     cannot run here; the panel says so, with the command to run
+ *
+ * Failure is not an exception. A Python traceback is shown as a teaching
+ * moment; a runtime that cannot load turns every Run into Copy + terminal.
  */
 (function () {
   "use strict";
 
-  var PYODIDE_VERSION = "0.26.4";
-  var PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v" + PYODIDE_VERSION + "/full/pyodide.js";
-  var LOAD_TIMEOUT_MS = 20000;
+  var PYODIDE_VERSION = "0.28.0";
+  var CDN_BASE = "https://cdn.jsdelivr.net/pyodide/v" + PYODIDE_VERSION + "/full/";
+  var LOAD_TIMEOUT_MS = 120000;
+  var FS_ROOT = "/home/pyodide";
 
-  var runtime = null; /* the loaded Pyodide instance, once there is one */
-  var loading = null; /* in-flight load, so two clicks share one download */
-  var failed = false; /* set once a load has failed; no second attempt per page */
+  var runtime = null;
+  var loading = null;
+  var loadFailed = false;
+  var pathReady = false;
+  var loadedPackages = {};
+  var wired = false;
 
-  function loaded() {
-    return runtime !== null;
-  }
-
-  /* Honest and cheap: true only if the runtime is already in memory, or if the
-   * browser claims to be online and no load has failed yet. It never probes the
-   * network — a probe would defeat the point of an offline site. */
   function isAvailable() {
-    if (loaded()) {
+    if (runtime) {
       return true;
     }
-    if (failed) {
+    if (loadFailed) {
       return false;
     }
     return navigator.onLine !== false;
   }
 
-  function loadScript(src) {
+  function injectScript() {
     return new Promise(function (resolve, reject) {
       var script = document.createElement("script");
       var settled = false;
       var timer = window.setTimeout(function () {
         if (!settled) {
           settled = true;
-          cleanup();
-          reject(new Error("pyodide load timed out"));
+          reject(new Error("the Python runtime did not arrive within " + LOAD_TIMEOUT_MS / 1000 + "s"));
         }
       }, LOAD_TIMEOUT_MS);
 
-      function cleanup() {
-        window.clearTimeout(timer);
-        script.onload = null;
-        script.onerror = null;
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      }
-
-      script.src = src;
+      script.src = CDN_BASE + "pyodide.js";
       script.async = true;
       script.onload = function () {
         if (!settled) {
@@ -76,83 +67,224 @@
       script.onerror = function () {
         if (!settled) {
           settled = true;
-          cleanup();
-          reject(new Error("pyodide script failed to load"));
+          window.clearTimeout(timer);
+          reject(new Error("the Python runtime could not be downloaded"));
         }
       };
       document.head.appendChild(script);
     });
   }
 
-  function loadRuntime() {
+  /* Idempotent. Concurrent callers share one download and one init. */
+  function init() {
     if (runtime) {
       return Promise.resolve(runtime);
     }
     if (loading) {
       return loading;
     }
-    loading = loadScript(PYODIDE_URL)
+    loading = injectScript()
       .then(function () {
         if (typeof window.loadPyodide !== "function") {
-          throw new Error("loadPyodide is not a function");
+          throw new Error("pyodide.js loaded but loadPyodide is missing");
         }
-        return window.loadPyodide();
+        return window.loadPyodide({ indexURL: CDN_BASE });
       })
-      .then(function (instance) {
-        runtime = instance;
-        return instance;
+      .then(function (pyodide) {
+        runtime = pyodide;
+        return pyodide;
       })
       .catch(function (error) {
-        failed = true;
+        loadFailed = true;
         loading = null;
         throw error;
       });
     return loading;
   }
 
-  /* A command the reader can paste and run. For a Python example that is a
-   * heredoc rather than "python example.py", because no example.py exists in
-   * the repository and a command that cannot run is worse than none. */
-  function terminalCommand(example) {
-    if (example.lang === "python") {
-      return "python - <<'PY'\n" + String(example.code || "").replace(/\s+$/, "") + "\nPY";
+  function ensurePath(pyodide) {
+    if (pathReady) {
+      return Promise.resolve();
     }
-    return String(example.code || "").trim();
+    pyodide.runPython(
+      "import sys\n" +
+        "if " + JSON.stringify(FS_ROOT) + " not in sys.path:\n" +
+        "    sys.path.insert(0, " + JSON.stringify(FS_ROOT) + ")\n"
+    );
+    pathReady = true;
+    return Promise.resolve();
   }
 
-  function buildTerminal(example) {
-    var panel = document.createElement("div");
-    panel.className = "terminal-panel";
-    panel.hidden = true;
-
-    var heading = document.createElement("p");
-    heading.className = "terminal-title";
-    heading.tabIndex = -1;
-    heading.textContent = "Run it in a terminal, from the repository root";
-    panel.appendChild(heading);
-
-    var command = document.createElement("pre");
-    command.className = "code terminal-command";
-    var commandCode = document.createElement("code");
-    commandCode.textContent = terminalCommand(example);
-    command.appendChild(commandCode);
-    panel.appendChild(command);
-
-    if (example.expected_output !== undefined && example.expected_output !== null) {
-      var label = document.createElement("p");
-      label.className = "terminal-title";
-      label.textContent = "Expected output";
-      panel.appendChild(label);
-
-      var output = document.createElement("pre");
-      output.className = "code terminal-output";
-      var outputCode = document.createElement("code");
-      outputCode.textContent = example.expected_output;
-      output.appendChild(outputCode);
-      panel.appendChild(output);
+  function ensurePackages(pyodide, packages) {
+    var wanted = Array.isArray(packages) ? packages.filter(Boolean) : [];
+    var missing = wanted.filter(function (name) {
+      return !loadedPackages[name];
+    });
+    if (!missing.length) {
+      return Promise.resolve();
     }
+    return pyodide.loadPackage(missing).then(function () {
+      missing.forEach(function (name) {
+        loadedPackages[name] = true;
+      });
+    });
+  }
 
-    return panel;
+  /* Write the repository files an example declares into the virtual filesystem,
+   * at the same relative path they have in the repository. */
+  function materialise(pyodide, files) {
+    var wanted = Array.isArray(files) ? files : [];
+    if (!wanted.length) {
+      return [];
+    }
+    var sources = window.REPO_SOURCES || {};
+    var written = [];
+    wanted.forEach(function (relative) {
+      if (!Object.prototype.hasOwnProperty.call(sources, relative)) {
+        throw new Error("no embedded source for " + relative + " — run site/tools/embed_sources.py");
+      }
+      var absolute = FS_ROOT + "/" + relative;
+      var directory = absolute.slice(0, absolute.lastIndexOf("/"));
+      pyodide.FS.mkdirTree(directory);
+      pyodide.FS.writeFile(absolute, sources[relative], { encoding: "utf8" });
+      written.push(relative);
+    });
+    return written;
+  }
+
+  function execute(pyodide, code) {
+    var stdout = [];
+    var stderr = [];
+    var decoder = new TextDecoder("utf-8");
+    /* Raw writes, not batched lines: the bytes are what CPython produced, so a
+     * newline is never lost or doubled by the transport. */
+    var capture = function (sink) {
+      return function (buffer) {
+        sink.push(decoder.decode(buffer, { stream: true }));
+        return buffer.length;
+      };
+    };
+    pyodide.setStdout({ write: capture(stdout) });
+    pyodide.setStderr({ write: capture(stderr) });
+
+    return pyodide.runPythonAsync(code).then(
+      function (result) {
+        var out = stdout.join("");
+        if (result !== undefined && result !== null && String(result) !== "undefined" && String(result) !== "None") {
+          out += String(result) + "\n";
+        }
+        return { ok: true, stdout: out, stderr: stderr.join(""), error: "" };
+      },
+      function (error) {
+        /* A Python exception is content, not a crash: hand back the traceback. */
+        return {
+          ok: false,
+          stdout: stdout.join(""),
+          stderr: stderr.join(""),
+          error: String(error && error.message ? error.message : error)
+        };
+      }
+    );
+  }
+
+  /* run(code, {packages, files}) -> Promise<{ok, stdout, stderr, error}> */
+  function run(code, opts) {
+    var options = opts || {};
+    return init()
+      .then(function (pyodide) {
+        return ensurePath(pyodide)
+          .then(function () {
+            return ensurePackages(pyodide, options.packages);
+          })
+          .then(function () {
+            materialise(pyodide, options.files);
+            return execute(pyodide, code);
+          });
+      })
+      .catch(function (error) {
+        return {
+          ok: false,
+          stdout: "",
+          stderr: "",
+          error: String(error && error.message ? error.message : error),
+          load_failed: true
+        };
+      });
+  }
+
+  /* ------------------------------------------------------------------ DOM */
+
+  function parseList(figure, name) {
+    var raw = figure.getAttribute(name);
+    if (!raw) {
+      return [];
+    }
+    try {
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function find(figure, selector) {
+    return figure.querySelector(selector);
+  }
+
+  function codeOf(figure) {
+    var node = find(figure, "pre.code > code");
+    return node ? node.textContent : "";
+  }
+
+  function setStatus(figure, text) {
+    var status = find(figure, ".example-status");
+    if (!status) {
+      return;
+    }
+    status.textContent = text || "";
+    status.hidden = !text;
+  }
+
+  function showOutput(figure, text) {
+    var output = find(figure, ".example-output");
+    if (!output) {
+      return;
+    }
+    output.textContent = text;
+    output.hidden = false;
+  }
+
+  function showTerminal(figure, reason) {
+    var terminal = find(figure, ".terminal-panel");
+    var output = find(figure, ".example-output");
+    var button = find(figure, ".btn-run");
+    if (output) {
+      output.hidden = true;
+    }
+    if (terminal) {
+      terminal.hidden = false;
+      /* Say why the Run button went away: a vanished button with no explanation
+       * is worse than no button. A lesson's own why_not wins if it has one. */
+      if (!terminal.querySelector(".terminal-why") && reason) {
+        var why = document.createElement("p");
+        why.className = "terminal-why";
+        why.textContent = reason;
+        terminal.appendChild(why);
+      }
+    }
+    if (button) {
+      button.hidden = true;
+    }
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(
+        function () { return true; },
+        function () { return legacyCopy(text); }
+      );
+    }
+    return Promise.resolve(legacyCopy(text));
   }
 
   function legacyCopy(text) {
@@ -165,7 +297,7 @@
     try {
       area.select();
       ok = document.execCommand("copy") === true;
-    } catch (err) {
+    } catch (error) {
       ok = false;
     } finally {
       document.body.removeChild(area);
@@ -173,174 +305,99 @@
     return ok;
   }
 
-  function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).then(
-        function () {
-          return true;
-        },
-        function () {
-          return legacyCopy(text);
-        }
-      );
+  function wireCopy(figure) {
+    var button = find(figure, ".btn-copy");
+    if (!button) {
+      return;
     }
-    return Promise.resolve(legacyCopy(text));
-  }
-
-  function attach(container, example) {
-    var figure = document.createElement("figure");
-    figure.className = "code-figure example";
-
-    if (example.caption) {
-      var caption = document.createElement("figcaption");
-      caption.className = "code-caption";
-      caption.textContent = example.caption;
-      figure.appendChild(caption);
-    }
-
-    var pre = document.createElement("pre");
-    pre.className = "code";
-    if (example.lang) {
-      pre.setAttribute("data-lang", example.lang);
-    }
-    var code = document.createElement("code");
-    code.textContent = example.code;
-    pre.appendChild(code);
-    figure.appendChild(pre);
-
-    var actions = document.createElement("div");
-    actions.className = "example-actions";
-
-    var output = document.createElement("pre");
-    output.className = "code example-output";
-    output.hidden = true;
-    output.setAttribute("role", "status");
-    output.setAttribute("aria-live", "polite");
-
-    var terminal = buildTerminal(example);
-    var canRunInBrowser = example.runnable === true && example.lang === "python";
-    var runBtn = null;
-
-    if (canRunInBrowser) {
-      runBtn = document.createElement("button");
-      runBtn.type = "button";
-      runBtn.className = "btn btn-run";
-      runBtn.textContent = "Run";
-      runBtn.setAttribute("aria-label", "Run this example in the browser");
-      runBtn.addEventListener("click", function () {
-        run(example.code, output, terminal, runBtn);
-      });
-      actions.appendChild(runBtn);
-    }
-
-    var copyButton = document.createElement("button");
-    copyButton.type = "button";
-    copyButton.className = "btn btn-copy";
-    copyButton.textContent = "Copy code";
-    copyButton.addEventListener("click", function () {
-      copyText(example.code).then(function (ok) {
-        copyButton.textContent = ok ? "Copied" : "Press Ctrl+C";
+    button.addEventListener("click", function () {
+      copyText(codeOf(figure)).then(function (ok) {
+        button.textContent = ok ? "Copied" : "Press Ctrl+C";
         window.setTimeout(function () {
-          copyButton.textContent = "Copy code";
+          button.textContent = "Copy code";
         }, 1400);
       });
     });
-    actions.appendChild(copyButton);
-
-    figure.appendChild(actions);
-    figure.appendChild(output);
-    figure.appendChild(terminal);
-
-    /* No runtime, no button: show the terminal path immediately so the reader
-     * is never offered an action that cannot work. */
-    if (canRunInBrowser && !isAvailable() && runBtn) {
-      runBtn.hidden = true;
-      terminal.hidden = false;
-    }
-    if (!canRunInBrowser) {
-      terminal.hidden = false;
-    }
-
-    container.appendChild(figure);
-    return figure;
   }
 
-  function showTerminal(outputEl, terminalEl, button) {
-    if (outputEl) {
-      outputEl.hidden = true;
+  function wireRun(figure) {
+    var button = find(figure, ".btn-run");
+    if (!button) {
+      return;
     }
-    if (terminalEl) {
-      terminalEl.hidden = false;
-      var heading = terminalEl.querySelector(".terminal-title");
-      if (heading && heading.focus) {
-        heading.focus();
-      }
+    var tier = figure.getAttribute("data-tier") || "terminal";
+    if (tier === "terminal") {
+      showTerminal(figure);
+      return;
     }
-    if (button) {
-      button.hidden = true;
+    if (!isAvailable()) {
+      /* No runtime, no button: the terminal panel is the honest fallback. */
+      showTerminal(figure, "Python cannot run in this browser right now — it needs a one-time download.");
+      return;
     }
-  }
 
-  function run(codeText, outputEl, terminalEl, button) {
-    if (!outputEl) {
-      return Promise.resolve("");
-    }
-    if (button) {
+    button.addEventListener("click", function () {
+      var packages = parseList(figure, "data-packages");
+      var files = parseList(figure, "data-files");
+      var first = !runtime;
+
       button.disabled = true;
-      button.textContent = "Loading Python…";
-    }
-    outputEl.hidden = false;
-    outputEl.textContent = "Starting Python in the browser (the first run downloads it)…";
+      button.textContent = first ? "Loading Python…" : "Running…";
+      setStatus(figure, first ? "Loading Python (about 10 MB, once)…" : "Running…");
 
-    return loadRuntime().then(
-      function (instance) {
-        var chunks = [];
-        var capture = function (text) {
-          chunks.push(text);
-        };
-        instance.setStdout({ batched: capture });
-        instance.setStderr({ batched: capture });
-        return instance.runPythonAsync(codeText).then(
-          function (result) {
-            var text = chunks.join("");
-            if (result !== undefined && result !== null && String(result) !== "undefined" && String(result) !== "None") {
-              text += String(result) + "\n";
-            }
-            outputEl.textContent = text.trim() ? text.replace(/\s+$/, "") : "(no output)";
-            if (button) {
-              button.disabled = false;
-              button.textContent = "Run";
-            }
-            return text;
-          },
-          function (error) {
-            /* The snippet raised. That is a real answer, not an outage: show the
-             * traceback and leave Run available for the next attempt. */
-            var printed = chunks.join("");
-            outputEl.textContent = (printed ? printed.replace(/\s+$/, "") + "\n" : "") + String(error && error.message ? error.message : error);
-            if (button) {
-              button.disabled = false;
-              button.textContent = "Run";
-            }
-            return printed;
-          }
-        );
-      },
-      function () {
-        /* The runtime itself did not arrive: this is the offline case. */
-        if (button) {
-          button.disabled = false;
-          button.textContent = "Run";
-        }
-        showTerminal(outputEl, terminalEl, button);
-        return "";
+      if (tier === "browser-pkg") {
+        setStatus(figure, "Loading the package, then running…");
       }
-    );
+
+      run(codeOf(figure), { packages: packages, files: files }).then(function (result) {
+        button.disabled = false;
+        button.textContent = "Run again";
+        setStatus(figure, "");
+
+        if (result.load_failed) {
+          showTerminal(
+            figure,
+            "The Python runtime could not be loaded — the page is offline, or the download was blocked. " +
+              "Run the command below in a terminal instead."
+          );
+          return;
+        }
+        if (result.ok) {
+          var text = result.stdout;
+          if (result.stderr) {
+            text += (text ? "\n" : "") + result.stderr;
+          }
+          showOutput(figure, text || "(no output)");
+          return;
+        }
+        /* A traceback is a teaching moment, so it is shown, not hidden. */
+        var pane = "This is what the error looks like:\n\n" + result.error;
+        if (result.stdout) {
+          pane = result.stdout + "\n" + pane;
+        }
+        showOutput(figure, pane);
+      });
+    });
+  }
+
+  /* Wire every rendered example on the page. Idempotent: a second call is a
+   * no-op, so a page that renders in stages cannot double-bind a button. */
+  function attachAll() {
+    if (wired) {
+      return;
+    }
+    wired = true;
+    var figures = document.querySelectorAll(".example");
+    for (var i = 0; i < figures.length; i += 1) {
+      wireCopy(figures[i]);
+      wireRun(figures[i]);
+    }
   }
 
   window.PyRun = {
-    attach: attach,
+    init: init,
+    isAvailable: isAvailable,
     run: run,
-    isAvailable: isAvailable
+    attachAll: attachAll
   };
 })();

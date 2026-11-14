@@ -643,6 +643,88 @@
     return figure;
   }
 
+  /* The command a reader can actually paste. For a Python example that is a
+   * heredoc, because no example.py exists in the repository. */
+  function terminalCommand(example) {
+    if (example.lang === "python") {
+      return "python - <<'PY'\n" + String(example.code || "").replace(/\s+$/, "") + "\nPY";
+    }
+    return String(example.code || "").trim();
+  }
+
+  /* One example figure. pyodide-loader.js wires the buttons from the data
+   * attributes; this function only renders, so the runner owns behaviour. */
+  function renderExample(container, example) {
+    var tier = example.run_tier || (example.runnable === true ? "browser" : "terminal");
+
+    var figure = el("figure", "code-figure example");
+    figure.setAttribute("data-tier", tier);
+    if (example.lang) {
+      figure.setAttribute("data-lang", example.lang);
+    }
+    if (Array.isArray(example.packages) && example.packages.length) {
+      figure.setAttribute("data-packages", JSON.stringify(example.packages));
+    }
+    if (Array.isArray(example.files) && example.files.length) {
+      figure.setAttribute("data-files", JSON.stringify(example.files));
+    }
+
+    if (example.caption) {
+      figure.appendChild(el("figcaption", "code-caption", example.caption));
+    }
+
+    var pre = el("pre", "code");
+    if (example.lang) {
+      pre.setAttribute("data-lang", example.lang);
+    }
+    pre.appendChild(el("code", null, example.code));
+    figure.appendChild(pre);
+
+    var actions = el("div", "example-actions");
+    if (tier !== "terminal") {
+      var runBtn = el("button", "btn btn-run", "Run");
+      runBtn.type = "button";
+      runBtn.setAttribute("aria-label", "Run this example in the browser");
+      actions.appendChild(runBtn);
+    }
+    var copyBtn = el("button", "btn btn-copy", "Copy code");
+    copyBtn.type = "button";
+    actions.appendChild(copyBtn);
+    figure.appendChild(actions);
+
+    var status = el("div", "example-status");
+    status.hidden = true;
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    figure.appendChild(status);
+
+    var output = el("pre", "code example-output");
+    output.hidden = true;
+    output.setAttribute("role", "status");
+    output.setAttribute("aria-live", "polite");
+    figure.appendChild(output);
+
+    var terminal = el("div", "terminal-panel");
+    terminal.hidden = tier !== "terminal";
+    terminal.appendChild(el("p", "terminal-title", "Run it in a terminal, from the repository root"));
+    var command = el("pre", "code terminal-command");
+    command.appendChild(el("code", null, terminalCommand(example)));
+    terminal.appendChild(command);
+
+    if (example.expected_output) {
+      terminal.appendChild(el("p", "terminal-title", "Expected output"));
+      var expected = el("pre", "code terminal-output");
+      expected.appendChild(el("code", null, example.expected_output));
+      terminal.appendChild(expected);
+    }
+    if (example.why_not) {
+      terminal.appendChild(el("p", "terminal-why", "Why not in the browser: " + example.why_not));
+    }
+    figure.appendChild(terminal);
+
+    container.appendChild(figure);
+  }
+
   function detailsBlock(summary, body) {
     var wrap = el("details", "solution");
     var head = el("summary", null, summary);
@@ -754,8 +836,12 @@
     if (examples && hasExamples) {
       examples.innerHTML = "";
       lesson.code_examples.forEach(function (example) {
-        window.PyRun.attach(examples, example);
+        renderExample(examples, example);
       });
+      /* One pass over the rendered figures; the runner owns the buttons. */
+      if (window.PyRun && typeof window.PyRun.attachAll === "function") {
+        window.PyRun.attachAll();
+      }
     }
     showSection("lesson-examples", hasExamples);
 
