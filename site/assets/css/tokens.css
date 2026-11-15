@@ -13,9 +13,9 @@
   --accent-strong: #047857;   /* text and filled buttons (AA at 16px) */
   --accent-hover: #059862;
   --accent-soft: #d9eee1;
-  --bar: #047857;          /* the green bar; #04AA6D is only 3.01:1 under white */
+  --bar: #282a35;          /* their charcoal bar; green is the brand mark and the active state */
   --bar-text: #ffffff;
-  --bar-muted: #d9eee1;    /* pale green: 4.51:1 on the bar */
+  --bar-muted: #c8cfda;    /* 9.09:1 on the charcoal bar */
   --accent-contrast: #ffffff;
   --skip-bg: #047857;
 
@@ -25,7 +25,8 @@
   --surface-2: #e7e9eb;
   --surface-raised: #ffffff;
   --text: #0f172a;
-  --muted: #5a6678;   /* 4.9:1 on #F1F1F1 as well as on white */
+  --muted: #64748b;   /* their slate: 4.76:1 on white, 4.21:1 on #F1F1F1 */
+  --muted-on-surface: #5a6678; /* 4.9:1 where the ground is grey, not white */
   --border: #dddddd;
   --border-strong: #c3c8cd;
   --border-control: #6f7a85;  /* 4.4:1 on white: a control's edge must be visible */
@@ -47,6 +48,7 @@
   --sev-low: #1f5f8b;
 
   /* --- states ------------------------------------------------------------ */
+  --mark: #fff4a3;   /* their khaki: an aside, not a warning */
   --ok: #047857;
   --ok-soft: #d9eee1;
   --bad: #a4133c;
@@ -55,7 +57,7 @@
   --divider: #6b7688;
 
   /* --- type: W3Schools' stack, one step up in size ----------------------- */
-  --font-sans: "Segoe UI", "Source Sans Pro", Verdana, Arial, sans-serif;
+  --font-sans: "Segoe UI", Verdana, Arial, sans-serif; /* their site first, their framework's fallback second */
   --font-mono: "Consolas", "Courier New", ui-monospace, monospace;
   --text-xs: 0.8125rem;   /* 13px */
   --text-sm: 0.875rem;    /* 14px */
@@ -66,7 +68,7 @@
   --text-2xl: 2.75rem;    /* 44px */
   --leading: 1.5;
   --leading-tight: 1.25;
-  --measure: 84ch;
+  --measure: 68ch; /* a lesson is read start to finish; their full width is for reference pages */
 
   /* --- space: a 4px scale, and nothing outside it ------------------------ */
   --space-1: 0.25rem;
@@ -103,7 +105,7 @@
   --accent-strong: #04aa6d;  /* same green in dark: their button, not a mint variant */
   --accent-hover: #059862;
   --accent-soft: #14352a;
-  --bar: #047857;
+  --bar: #1b1e26;
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
@@ -130,6 +132,7 @@
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
 
+  --mark: #4a4218;
   --ok: #34d399;
   --ok-soft: #14352a;
   --bad: #ff8fa3;

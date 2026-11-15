@@ -36,9 +36,9 @@
   --accent-strong: #047857;   /* text and filled buttons (AA at 16px) */
   --accent-hover: #059862;
   --accent-soft: #d9eee1;
-  --bar: #047857;          /* the green bar; #04AA6D is only 3.01:1 under white */
+  --bar: #282a35;          /* their charcoal bar; green is the brand mark and the active state */
   --bar-text: #ffffff;
-  --bar-muted: #d9eee1;    /* pale green: 4.51:1 on the bar */
+  --bar-muted: #c8cfda;    /* 9.09:1 on the charcoal bar */
   --accent-contrast: #ffffff;
   --skip-bg: #047857;
 
@@ -48,7 +48,8 @@
   --surface-2: #e7e9eb;
   --surface-raised: #ffffff;
   --text: #0f172a;
-  --muted: #5a6678;   /* 4.9:1 on #F1F1F1 as well as on white */
+  --muted: #64748b;   /* their slate: 4.76:1 on white, 4.21:1 on #F1F1F1 */
+  --muted-on-surface: #5a6678; /* 4.9:1 where the ground is grey, not white */
   --border: #dddddd;
   --border-strong: #c3c8cd;
   --border-control: #6f7a85;  /* 4.4:1 on white: a control's edge must be visible */
@@ -70,6 +71,7 @@
   --sev-low: #1f5f8b;
 
   /* --- states ------------------------------------------------------------ */
+  --mark: #fff4a3;   /* their khaki: an aside, not a warning */
   --ok: #047857;
   --ok-soft: #d9eee1;
   --bad: #a4133c;
@@ -78,7 +80,7 @@
   --divider: #6b7688;
 
   /* --- type: W3Schools' stack, one step up in size ----------------------- */
-  --font-sans: "Segoe UI", "Source Sans Pro", Verdana, Arial, sans-serif;
+  --font-sans: "Segoe UI", Verdana, Arial, sans-serif; /* their site first, their framework's fallback second */
   --font-mono: "Consolas", "Courier New", ui-monospace, monospace;
   --text-xs: 0.8125rem;   /* 13px */
   --text-sm: 0.875rem;    /* 14px */
@@ -89,7 +91,7 @@
   --text-2xl: 2.75rem;    /* 44px */
   --leading: 1.5;
   --leading-tight: 1.25;
-  --measure: 84ch;
+  --measure: 68ch; /* a lesson is read start to finish; their full width is for reference pages */
 
   /* --- space: a 4px scale, and nothing outside it ------------------------ */
   --space-1: 0.25rem;
@@ -126,7 +128,7 @@
   --accent-strong: #04aa6d;  /* same green in dark: their button, not a mint variant */
   --accent-hover: #059862;
   --accent-soft: #14352a;
-  --bar: #047857;
+  --bar: #1b1e26;
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
@@ -153,6 +155,7 @@
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
 
+  --mark: #4a4218;
   --ok: #34d399;
   --ok-soft: #14352a;
   --bad: #ff8fa3;
@@ -238,7 +241,17 @@ a:hover {
  * that bar is most of what makes the site read as green at a glance. */
 .site-header {
   background: var(--bar);
-  border-bottom: 4px solid #036b4e; /* a step darker than the bar, so the edge reads */
+  border-bottom: 1px solid var(--bar);
+}
+
+.site-header .brand::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--space-2);
+  border-radius: 2px;
+  background: var(--accent); /* the one green mark in the bar */
 }
 
 .site-header .brand {
@@ -350,9 +363,21 @@ code {
 }
 
 h4 {
-  font-size: 1rem;
+  font-weight: 400;
+  font-size: 1.25rem; /* 20px */
   margin: var(--space-4) 0 var(--space-2);
-  color: var(--muted);
+}
+
+h5 {
+  font-weight: 400;
+  font-size: 1.125rem; /* 18px */
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+h6 {
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+  margin: var(--space-3) 0 var(--space-1);
 }
 
 p,
@@ -651,20 +676,21 @@ figure {
 }
 
 .btn.btn-tryit {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
-  /* 19px at weight 700 is 14.25pt bold, which is WCAG's large text — the one
-   * reason white on the brand green's 3.01:1 is allowed. At 600 it is not. */
-  font-weight: 700;
-  font-size: 1.1875rem;
-  padding-inline: var(--space-6);
+  /* Their "Try it Yourself »" is a green text link with a chevron: no border,
+   * no fill. The single filled pill on a lesson is Run. */
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 1rem;
+  padding-inline: 0;
+  text-decoration: none;
 }
 
 .btn.btn-tryit:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: var(--accent-contrast);
+  background: transparent;
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 
@@ -1266,6 +1292,72 @@ details.solution[open] summary {
   .lesson-item .lesson-meta {
     margin-left: 0;
   }
+}
+
+
+/* ---------------------------------------------------------------- W3Schools */
+
+/* Their divider: a hairline, 20px of air either side. */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+/* Their table: a #ccc outer box, #ddd row rules, even rows on #f1f1f1. */
+.lesson-section table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.lesson-section th,
+.lesson-section td {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.lesson-section th:first-child,
+.lesson-section td:first-child {
+  padding-left: 16px;
+}
+
+.lesson-section tbody tr:nth-child(even) {
+  background: #f1f1f1;
+}
+
+/* Their .w3-ul: each row padded and ruled, the last one borderless. */
+.lesson-section ul li,
+.lesson-section ol li {
+  padding: 8px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.lesson-section ul li:last-child,
+.lesson-section ol li:last-child {
+  border-bottom: 0;
+}
+
+.lesson-section ul,
+.lesson-section ol {
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+/* Their marker colour, used for an aside rather than a warning. */
+mark,
+.aside-note {
+  background: var(--mark);
+  color: var(--text);
+  padding: 0 2px;
+}
+
+/* Their button lift, on the filled pill only. */
+.btn-run:hover,
+.btn-run:focus-visible {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 </style>

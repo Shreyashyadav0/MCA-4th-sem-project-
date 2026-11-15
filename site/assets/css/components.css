@@ -457,3 +457,69 @@ details.solution[open] summary {
     margin-left: 0;
   }
 }
+
+
+/* ---------------------------------------------------------------- W3Schools */
+
+/* Their divider: a hairline, 20px of air either side. */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+/* Their table: a #ccc outer box, #ddd row rules, even rows on #f1f1f1. */
+.lesson-section table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.lesson-section th,
+.lesson-section td {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.lesson-section th:first-child,
+.lesson-section td:first-child {
+  padding-left: 16px;
+}
+
+.lesson-section tbody tr:nth-child(even) {
+  background: #f1f1f1;
+}
+
+/* Their .w3-ul: each row padded and ruled, the last one borderless. */
+.lesson-section ul li,
+.lesson-section ol li {
+  padding: 8px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.lesson-section ul li:last-child,
+.lesson-section ol li:last-child {
+  border-bottom: 0;
+}
+
+.lesson-section ul,
+.lesson-section ol {
+  padding-left: 0;
+  list-style-position: inside;
+}
+
+/* Their marker colour, used for an aside rather than a warning. */
+mark,
+.aside-note {
+  background: var(--mark);
+  color: var(--text);
+  padding: 0 2px;
+}
+
+/* Their button lift, on the filled pill only. */
+.btn-run:hover,
+.btn-run:focus-visible {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

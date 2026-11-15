@@ -39,7 +39,17 @@ a:hover {
  * that bar is most of what makes the site read as green at a glance. */
 .site-header {
   background: var(--bar);
-  border-bottom: 4px solid #036b4e; /* a step darker than the bar, so the edge reads */
+  border-bottom: 1px solid var(--bar);
+}
+
+.site-header .brand::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--space-2);
+  border-radius: 2px;
+  background: var(--accent); /* the one green mark in the bar */
 }
 
 .site-header .brand {
@@ -151,9 +161,21 @@ code {
 }
 
 h4 {
-  font-size: 1rem;
+  font-weight: 400;
+  font-size: 1.25rem; /* 20px */
   margin: var(--space-4) 0 var(--space-2);
-  color: var(--muted);
+}
+
+h5 {
+  font-weight: 400;
+  font-size: 1.125rem; /* 18px */
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+h6 {
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+  margin: var(--space-3) 0 var(--space-1);
 }
 
 p,
@@ -452,20 +474,21 @@ figure {
 }
 
 .btn.btn-tryit {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
-  /* 19px at weight 700 is 14.25pt bold, which is WCAG's large text — the one
-   * reason white on the brand green's 3.01:1 is allowed. At 600 it is not. */
-  font-weight: 700;
-  font-size: 1.1875rem;
-  padding-inline: var(--space-6);
+  /* Their "Try it Yourself »" is a green text link with a chevron: no border,
+   * no fill. The single filled pill on a lesson is Run. */
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 1rem;
+  padding-inline: 0;
+  text-decoration: none;
 }
 
 .btn.btn-tryit:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-  color: var(--accent-contrast);
+  background: transparent;
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
 
