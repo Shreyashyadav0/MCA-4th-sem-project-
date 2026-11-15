@@ -768,3 +768,37 @@ the median gap to the next-longest is 12 characters, against a maximum of 78
 before). Two lessons still open on an abstract paragraph rather than a snippet
 (3.1, 3.5), and six lessons never address the reader in the second person. All
 three are recorded rather than claimed as done.
+
+## Design pass — adopting W3Schools' own system
+
+`site/DESIGN-PLAN.md` records the whole decision in one page: the values read
+from `w3schools.com/lib/w3schools31.css` and two colour studies, what we adopt,
+and the five things we deliberately refuse. In short:
+
+- **Palette**: brand green `#04AA6D`, hover `#059862`, dark surface `#282A35`,
+  code/panel grey `#E7E9EB`, header strip, pale green `#D9EEE1`, borders
+  `#DDDDDD`, text `#0F172A`, muted `#64748B`.
+- **Light code panels with black text** — the single most recognisable thing
+  about the site, and the opposite of what we had.
+- **Pill buttons** (25px), flat 5px cards, the three-dot editor strip, a green
+  left bar on the current lesson, headings at weight 400.
+
+**Refused, with reasons.** `#04AA6D` is 3.01:1 against white, so it carries only
+fills and large labels; every piece of 16px text uses `#047857` (5.48:1). The
+pill labels are 19px/600 (14.25pt bold) so the brand green qualifies as large
+text there — W3Schools uses 18px and their own button fails AA at that size.
+Body prose is 16px rather than their 15px, because our lessons run to 300 words.
+
+**Reviewed by three agents, then fixed.** They found 36 issues; the blocker,
+reported independently by all three, was mine: `a { color: var(--accent) }` put
+every prose link at 3.01:1, contradicting the plan one file away. Also fixed:
+the three dots painted over the caption text (the pseudo-element was 8px wide
+with 26px of shadow spill), the runner's output pane lost its accent bar to
+`pre.code`'s specificity, `.sidebar-toggle` stayed visible on desktop because
+`.btn` in a later sheet set `display:inline-flex`, the dark theme flipped Run to
+a mint that appears nowhere in their system, `--muted` sat at 4.21:1 on the
+sidebar, and the header wrapped to three rows at 375px.
+
+Measured after the fixes: prose link 5.48:1, current-lesson label 17.85:1,
+muted labels 5.16:1, Run pill 3.01:1 at 19px/600 (AA large), output bar 4px
+accent, h3 24px/400, no horizontal scroll at 375px.

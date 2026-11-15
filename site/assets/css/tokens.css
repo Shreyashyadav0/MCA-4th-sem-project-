@@ -21,7 +21,7 @@
   --surface-2: #e7e9eb;
   --surface-raised: #ffffff;
   --text: #0f172a;
-  --muted: #64748b;
+  --muted: #5a6678;   /* 4.9:1 on #F1F1F1 as well as on white */
   --border: #dddddd;
   --border-strong: #c3c8cd;
   --border-control: #6f7a85;  /* 4.4:1 on white: a control's edge must be visible */
@@ -31,7 +31,7 @@
   --code-text: #000000;
   --code-muted: #4a5560;
   --code-border: #d2d5d8;
-  --code-header: #f1f1f1;
+  --code-header: #e2e5e8; /* the strip must read as a strip */
   --code-dot-red: #ed594a;
   --code-dot-amber: #fdd800;
   --code-dot-green: #5ac05a;
@@ -56,13 +56,13 @@
   --text-xs: 0.8125rem;   /* 13px */
   --text-sm: 0.875rem;    /* 14px */
   --text-base: 1rem;      /* 16px */
-  --text-md: 1.25rem;     /* 20px */
-  --text-lg: 1.625rem;    /* 26px */
-  --text-xl: 2.125rem;    /* 34px */
+  --text-md: 1.5rem;      /* 24px */
+  --text-lg: 1.875rem;    /* 30px */
+  --text-xl: 2.25rem;     /* 36px */
   --text-2xl: 2.75rem;    /* 44px */
-  --leading: 1.55;
+  --leading: 1.5;
   --leading-tight: 1.25;
-  --measure: 72ch;
+  --measure: 84ch;
 
   /* --- space: a 4px scale, and nothing outside it ------------------------ */
   --space-1: 0.25rem;
@@ -96,10 +96,10 @@
 
 [data-theme="dark"] {
   --accent: #04aa6d;
-  --accent-strong: #34d399;
+  --accent-strong: #04aa6d;  /* same green in dark: their button, not a mint variant */
   --accent-hover: #059862;
   --accent-soft: #14352a;
-  --accent-contrast: #06251f;
+  --accent-contrast: #ffffff;
 
   --bg: #282a35;
   --surface: #1f2229;

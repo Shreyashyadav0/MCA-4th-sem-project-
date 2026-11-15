@@ -27,19 +27,21 @@
   border-bottom: 1px solid var(--code-border);
 }
 
-/* The three dots of their code editor: a colour cue, never the only one. */
+/* The three dots of their code editor. The pseudo-element is 40px wide so the
+ * label starts after the whole dot row rather than under it. */
 .code-caption::before {
   content: "";
-  width: 8px;
-  height: 8px;
-  margin-right: var(--space-1);
+  flex: 0 0 40px;
+  height: 12px;
+  margin-right: var(--space-2);
   border-radius: 50%;
   background: var(--code-dot-red);
-  box-shadow: 13px 0 0 var(--code-dot-amber), 26px 0 0 var(--code-dot-green);
+  box-shadow: 14px 0 0 var(--code-dot-amber), 28px 0 0 var(--code-dot-green);
+  background-clip: padding-box;
 }
 
 .code-caption {
-  padding-left: calc(var(--space-4) + 26px + var(--space-2));
+  align-items: center;
 }
 
 .code-caption::after {
@@ -83,11 +85,16 @@
   border-color: var(--border-strong);
 }
 
+/* W3Schools' signature: the green pill, 18px label. At 18px the 3.01:1 of
+ * the brand green clears AA for large text, which is exactly why they can use
+ * it and why our 16px body text cannot. */
 .btn-run {
-  background: var(--accent-strong);
+  background: var(--accent);
   color: var(--accent-contrast);
-  border-color: var(--accent-strong);
+  border-color: var(--accent);
   font-weight: 600;
+  font-size: 1.1875rem; /* 19px: 14.25pt bold clears the large-text line */
+  padding-inline: var(--space-6);
 }
 
 .btn-run:hover {
@@ -168,7 +175,7 @@
 }
 
 /* stdout, stderr and tracebacks: monospace, whitespace preserved. */
-.example-output {
+pre.code.example-output {
   margin-top: var(--space-2);
   max-height: 26rem;
   overflow: auto;
@@ -356,4 +363,30 @@ details.expected-output pre.code {
   .divider::before {
     inset: 8px 0;
   }
+}
+
+/* A code block inside a card has no frame of its own: the card is the frame. */
+.code-figure > pre.code {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+/* The runner's output keeps its accent bar even though pre.code is more specific. */
+.code-figure pre.code.example-output {
+  border-left: 4px solid var(--accent);
+  border-radius: 0;
+}
+
+/* A fenced block inside prose is still a code box on W3Schools, so it gets the
+ * panel and the green edge even though it has no caption of its own. */
+#lesson-concept pre.code,
+#lesson-tryit pre.code,
+#lesson-exercise pre.code {
+  border: 1px solid var(--code-border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  background: var(--code-bg);
+  color: var(--code-text);
 }

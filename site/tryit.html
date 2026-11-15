@@ -483,6 +483,7 @@
       $("tryit-reset").addEventListener("click", function () {
         $("tryit-code").value = original;
         $("tryit-output").textContent = "";
+        $("tryit-output").hidden = true;
         var tier = example.run_tier || (example.runnable === true ? "browser" : "terminal");
         if (tier === "terminal") {
           showTerminal(example);

@@ -24,7 +24,7 @@ body {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-strong); /* the brand green is 3.01:1: fills and bars only */
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
@@ -100,7 +100,7 @@ h2 {
 }
 
 h3 {
-  font-weight: 600;
+  font-weight: 400;
   font-size: var(--text-md);
   margin: var(--space-5) 0 var(--space-2);
 }
@@ -143,7 +143,7 @@ figure {
 }
 
 .breadcrumb a {
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 
 .crumb-sep {
@@ -366,7 +366,7 @@ figure {
   border-left-color: var(--accent);
   background: var(--bg);
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text); /* the bar carries the green; the label must stay readable */
 }
 
 .side-tick {
@@ -420,11 +420,20 @@ figure {
 }
 
 .btn.btn-tryit {
-  text-decoration: none;
+  background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-contrast);
   font-weight: 600;
+  font-size: 1.1875rem; /* 19px: 14.25pt bold clears the large-text line */
+  padding-inline: var(--space-6);
 }
+
+.btn.btn-tryit:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
 
 
 /* ------------------------------------------------------------ narrow */
@@ -508,5 +517,30 @@ figure {
   * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media (max-width: 40rem) {
+  /* One row: the brand truncates, the actions stay right, the header stops
+   * eating a sixth of the viewport. */
+  .site-header-inner {
+    padding-block: var(--space-2);
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+
+  .brand {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .brand span {
+    display: none;
+  }
+
+  .header-actions {
+    flex: 0 0 auto;
   }
 }
