@@ -70,7 +70,7 @@ window.LESSONS.push({
       "q": "Which command runs the test suite?",
       "options": [
         "python -m pytest -q tests",
-        "python reviewer.py tests",
+        "python reviewer.py tests, without -q",
         "pytest site/",
         "python -m unittest"
       ],

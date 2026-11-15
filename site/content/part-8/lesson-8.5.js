@@ -56,7 +56,7 @@ window.LESSONS.push({
       "q": "What does the targeted form return?",
       "options": [
         "An error if the id is unknown",
-        "Suppress all, plus the named ids",
+        "Suppress all, plus the named ids, which is what a bare marker does",
         "Suppress all, with an empty set",
         "Suppress nothing, plus the named ids"
       ],

@@ -44,7 +44,7 @@ window.LESSONS.push({
     {
       "q": "Which function reads a diff from disk?",
       "options": [
-        "`bundle_from_source`, which reads",
+        "`bundle_from_source`, which reads a file from disk",
         "`parse_diff`, which takes a path",
         "`DiffBundle`, which loads lazily",
         "`parse_diff_file`, wrapping `parse_diff`"

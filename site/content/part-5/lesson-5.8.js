@@ -48,7 +48,7 @@ window.LESSONS.push({
       "q": "What does the error message name?",
       "options": [
         "The file the diff came from",
-        "The line number where parsing stopped",
+        "The line number where parsing stopped, which is not in the file",
         "Both header forms the parser would accept",
         "The exception's class hierarchy"
       ],
@@ -59,7 +59,7 @@ window.LESSONS.push({
       "q": "Why does the API write `from exc` when raising?",
       "options": [
         "It keeps the parser error as the cause",
-        "It logs the same error a second time",
+        "It logs the same error a second time, doubling the warning",
         "It converts the exception to a 422",
         "It silences the traceback entirely"
       ],

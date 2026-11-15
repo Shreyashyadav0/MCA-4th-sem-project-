@@ -29,7 +29,7 @@ window.LESSONS.push({
         "The enums, at lines 46 and 60",
         "The helpers, from 125",
         "The result, from 151",
-        "The patterns, at line 42"
+        "The patterns, at line 42, where the regex is compiled"
       ],
       "answer": 0,
       "why": "`Severity` is the closed set, and `AnchorStatus` beside it is the other enum; both are declared before anything uses them."
@@ -39,7 +39,7 @@ window.LESSONS.push({
       "options": [
         "The verdict",
         "A sixth severity",
-        "The suggested fix",
+        "The suggested fix, which the renderer copies into the comment",
         "Where the finding landed relative to the diff"
       ],
       "answer": 3,

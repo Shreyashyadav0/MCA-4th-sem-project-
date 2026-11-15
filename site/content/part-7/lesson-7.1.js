@@ -48,7 +48,7 @@ window.LESSONS.push({
         "The path used to read the file",
         "A label recording where the text came from",
         "A switch between git and plain diffs",
-        "The name of the module that called it"
+        "The name of the module that called it, which the parser never records"
       ],
       "answer": 1,
       "why": "It travels with the bundle so a downstream message can say which input produced it; the parser never acts on it."
@@ -57,7 +57,7 @@ window.LESSONS.push({
       "q": "Which input does the parser tolerate rather than reject?",
       "options": [
         "An empty string",
-        "A diff with no file headers",
+        "A diff with no file headers, which raises rather than returning empty",
         "A hunk whose body is shorter than its header claims",
         "A file it cannot read"
       ],

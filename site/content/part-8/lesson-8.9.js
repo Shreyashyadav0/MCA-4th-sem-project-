@@ -35,7 +35,7 @@ window.LESSONS.push({
       "options": [
         "Only the regex itself",
         "The regex, the exemptions and the skip",
-        "Only the severity chosen for the rule",
+        "Only the severity chosen for the rule, which no test currently covers",
         "Only the OWASP citation"
       ],
       "answer": 1,

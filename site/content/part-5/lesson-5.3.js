@@ -45,7 +45,7 @@ window.LESSONS.push({
     {
       "q": "A removed line has `new_lineno=None`. Why?",
       "options": [
-        "Because the parser has not reached it yet",
+        "Because the parser has not reached it yet, so the number is still unset",
         "Because the line does not exist in the new file",
         "Because the line is context",
         "Because the new counter overflowed"

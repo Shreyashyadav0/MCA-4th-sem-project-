@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "When does the body of a generator function run?",
       "options": [
-        "When the function is called, all at once, like any other call",
+        "When the function is called, all at once, like any other call, not when it is decorated",
         "When the module is imported, before anything calls it",
         "When the generator object is finally garbage collected",
         "One step at a time, each time the consumer asks for the next value"

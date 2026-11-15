@@ -40,7 +40,7 @@ window.LESSONS.push({
         "A bare `a/` collapsing to an empty string",
         "The prefix being stripped twice",
         "Quoted paths losing their quotes",
-        "Windows-style paths being mangled"
+        "Windows-style paths being mangled by the prefix strip"
       ],
       "answer": 0,
       "why": "`normalize_path('a/')` returns `a/` because of the guard. Stripping twice cannot happen anyway: the strip is one `if`, not a loop."

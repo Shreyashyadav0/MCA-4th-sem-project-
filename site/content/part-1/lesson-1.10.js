@@ -40,7 +40,7 @@ window.LESSONS.push({
         "It comes back as a list",
         "It stays a tuple",
         "It raises TypeError",
-        "It becomes a string"
+        "It becomes a string, because the field is typed as one"
       ],
       "answer": 0,
       "why": "JSON has arrays, not tuples, so `json.dumps((1, 2))` writes `[1, 2]` and loading gives a list — a silent shape change."

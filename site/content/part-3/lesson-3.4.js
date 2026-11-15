@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
       "options": [
-        "The extra value is ignored",
+        "pytest splits the tuple and runs it twice",
         "pytest splits the tuple",
         "It passes",
         "Collection fails: the tuple length does not match the names"

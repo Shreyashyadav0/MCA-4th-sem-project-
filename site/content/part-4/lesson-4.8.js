@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "Where does the file declare what the API accepts?",
       "options": [
-        "In the route block, beside each handler",
+        "In the route block, beside each handler, above the decorator",
         "In the models at the top, before any route",
         "In `/openapi.json` at runtime",
         "In the module docstring"
@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What is `_verify_signature` the only example of in this file?",
       "options": [
         "A route handler",
-        "A Pydantic validator",
+        "A Pydantic validator on the request model",
         "A cryptographic check",
         "A test helper"
       ],

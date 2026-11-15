@@ -47,7 +47,7 @@ window.LESSONS.push({
     {
       "q": "What does importing the module give you?",
       "options": [
-        "A review of the current directory",
+        "A review of the current directory, walking every file it finds",
         "A live model-provider connection",
         "A database handle",
         "The whole registry, nothing running"

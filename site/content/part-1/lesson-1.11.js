@@ -49,7 +49,7 @@ window.LESSONS.push({
     {
       "q": "Why does the CLI read a .diff file instead of running `git diff`?",
       "options": [
-        "Because piping a diff through a shell would lose its exit code",
+        "Because piping a diff through a shell would lose its exit code, which a file read does not",
         "Because diffs cannot be piped between two processes",
         "So the review never depends on a git binary or a checkout",
         "So it works in a CI runner with no repository and no git binary"

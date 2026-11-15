@@ -29,7 +29,7 @@ window.LESSONS.push({
         "test_cli.py",
         "tests_cli.py",
         "cli_test.py",
-        "test_api.py"
+        "test_api.py, in the same folder as the CLI tests"
       ],
       "answer": 1,
       "why": "Discovery matches `test_*.py` and `*_test.py`; `tests_cli.py` matches neither and is invisible, not failing."
@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "Why does a failing `assert` print the values involved?",
       "options": [
         "Because pytest rewrites assert statements at import time",
-        "Because Python does that by default",
+        "Because Python does that by default when it imports a package",
         "Because the test passes a message",
         "Because of the `-q` flag"
       ],

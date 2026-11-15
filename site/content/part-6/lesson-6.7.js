@@ -32,9 +32,9 @@ window.LESSONS.push({
     {
       "q": "Why is `as_row()` a method rather than a dict built at each call site?",
       "options": [
-        "Because Pydantic requires it",
-        "Because dicts cannot hold five keys",
-        "So the CLI and the Markdown table cannot disagree about column names",
+        "Because a dict cannot hold five keys in a fixed order",
+        "Because a dict cannot hold five keys and keep their order",
+        "So the column names cannot disagree",
         "So the values can be cached"
       ],
       "answer": 2,

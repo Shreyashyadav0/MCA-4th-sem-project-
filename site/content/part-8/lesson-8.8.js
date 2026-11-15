@@ -36,7 +36,7 @@ window.LESSONS.push({
         "Because registration order is visible",
         "Because a list searches much faster",
         "Because sets cannot hold dataclasses",
-        "Because duplicate ids are impossible"
+        "Because duplicate ids are impossible, since ids are checked at import"
       ],
       "answer": 0,
       "why": "The report and the tests both read position, so the order has to be stable and intentional."

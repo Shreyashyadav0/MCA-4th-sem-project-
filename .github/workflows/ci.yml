@@ -64,6 +64,13 @@ jobs:
           PIP_USER: "0"
         run: python scripts/verify_offline.py
 
+      - name: Gate the lesson ranges
+        run: python site/tools/check_ranges.py
+
+      - name: Gate the quiz length tell
+        # Exits non-zero while any question's correct option is the unique longest.
+        run: python site/tools/check_quiz.py
+
       - name: Validate the learning site
         # The gate every site wave must pass: lesson schema, ids, quizzes, the
         # manifest/page list agreement and a fresh embedded-source bundle.

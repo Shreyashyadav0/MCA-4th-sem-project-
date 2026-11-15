@@ -46,7 +46,7 @@ window.LESSONS.push({
       "q": "What does `close_hunk()` reset?",
       "options": [
         "Only the binary flag",
-        "The whole builder, including both paths",
+        "The whole builder, including both the old path and the new one",
         "The collected lines and the counters for the hunk just finished",
         "The list of finished files"
       ],

@@ -45,7 +45,7 @@ window.LESSONS.push({
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
         "So the error arrives before the value is stored",
-        "Because Pydantic is faster when it validates early",
+        "Because Pydantic is faster when it validates early in the call",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"
       ],
@@ -56,7 +56,7 @@ window.LESSONS.push({
       "q": "What does `extra=\"forbid\"` on `Finding` actually reject?",
       "options": [
         "A missing required field",
-        "A string with spaces around it",
+        "A string with spaces around it, which is stripped before use",
         "A value of the wrong type",
         "A field the model does not declare"
       ],

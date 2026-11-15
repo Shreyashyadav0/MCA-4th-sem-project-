@@ -35,7 +35,7 @@ window.LESSONS.push({
       "options": [
         "The issue and the suggested fix",
         "The file, the line and the grade",
-        "The rule id and its short title",
+        "The rule id and its short title, which the hit does not repeat",
         "The category and the citation"
       ],
       "answer": 1,

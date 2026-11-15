@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Fix the request and resend it",
         "Re-authenticate",
-        "Give up: the request will never work",
+        "Give up: the request will never work, so no retry is worth making",
         "Retry later: the server could not do it now"
       ],
       "answer": 3,

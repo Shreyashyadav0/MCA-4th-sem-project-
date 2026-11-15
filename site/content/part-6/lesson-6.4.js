@@ -57,7 +57,7 @@ window.LESSONS.push({
         "The field fails validation",
         "The reader must rewrite it before acting",
         "The severity is downgraded",
-        "The finding can no longer be anchored"
+        "The finding can no longer be anchored to a line in the diff"
       ],
       "answer": 1,
       "why": "The fix field is what a consumer renders as a suggestion; a diagnosis full of code has to be translated back into a change by hand."

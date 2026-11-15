@@ -44,7 +44,7 @@ window.LESSONS.push({
     {
       "q": "Why does `scan_text` truncate the line?",
       "options": [
-        "So the finding fits inside a comment",
+        "So the finding fits inside a comment on one line of the pull request",
         "So a pathological line cannot stall it",
         "So the line number stays correct",
         "So the exemption pattern can match"

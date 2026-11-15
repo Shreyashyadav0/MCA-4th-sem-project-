@@ -47,7 +47,7 @@ window.LESSONS.push({
       "options": [
         "Line 1 was added and line 1 was deleted",
         "The hunk is empty and can be skipped",
-        "The counts are missing, so it is invalid",
+        "The counts are missing, so it is invalid, and the parser refuses it",
         "One line of the old became one of the new"
       ],
       "answer": 3,

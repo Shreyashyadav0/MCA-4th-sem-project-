@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "How does `x_github_event` end up reading the `X-GitHub-Event` header?",
       "options": [
         "FastAPI maps underscores onto hyphens for you",
-        "An alias argument spells the header name out",
+        "An alias argument spells the header name out, so the mapping is explicit",
         "The handler reads it off the raw request",
         "GitHub sends both spellings in the request"
       ],

@@ -38,7 +38,7 @@ window.LESSONS.push({
     {
       "q": "You configure neither a Sarvam key nor a local endpoint. What happens?",
       "options": [
-        "The review fails with an error telling you to configure a key",
+        "The review fails with an error telling you to configure a key before it starts",
         "The rule engine runs and the response says mock in its note lines",
         "It waits for a key and then gives up after a timeout",
         "It silently returns an empty result with no note at all"

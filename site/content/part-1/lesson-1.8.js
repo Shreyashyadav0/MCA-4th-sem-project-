@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What does `@functools.wraps(function)` change?",
       "options": [
         "It speeds up the wrapped call by caching its arguments",
-        "It removes the wrapper and returns the original function",
+        "It removes the wrapper and returns the original function, undoing the decoration",
         "It makes the decorated function run asynchronously",
         "It copies __name__, __doc__ and annotations onto the wrapper"
       ],

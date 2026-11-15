@@ -34,7 +34,7 @@ window.LESSONS.push({
     {
       "q": "What does `bundle_from_source` produce?",
       "options": [
-        "A diff with the file marked modified",
+        "A diff with the file marked modified, which still has a hunk",
         "A parsed file with no hunks",
         "A one-file diff in which every line is added",
         "A bundle with zero files"
@@ -47,7 +47,7 @@ window.LESSONS.push({
       "options": [
         "Every rule and renderer already speaks the diff vocabulary",
         "Because diffs are cheaper to store",
-        "Because the parser cannot read files",
+        "Because the parser cannot read files and needs the text instead",
         "Because GitHub requires a diff"
       ],
       "answer": 0,
@@ -58,7 +58,7 @@ window.LESSONS.push({
       "options": [
         "It downloads it from GitHub",
         "Yes, it opens the path and reads it",
-        "It reads the path only if it exists",
+        "It reads the path only if the file already exists on disk",
         "No — `source` is the content and `path` is only the label"
       ],
       "answer": 3,

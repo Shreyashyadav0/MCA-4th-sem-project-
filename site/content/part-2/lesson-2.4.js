@@ -46,7 +46,7 @@ window.LESSONS.push({
       "options": [
         "`model_validate({**model.model_dump(), ...})`",
         "`model_copy(update={...})` and nothing else",
-        "`copy.deepcopy` and then assign to the field",
+        "`copy.deepcopy` and then assign to the field, which copies without validating",
         "Unfreeze the config for that one field"
       ],
       "answer": 0,

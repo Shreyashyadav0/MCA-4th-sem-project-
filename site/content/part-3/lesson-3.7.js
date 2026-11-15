@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Coverage is expensive",
         "Because the suite is too small",
-        "Because pytest cannot measure it",
+        "Because pytest cannot measure a test that was never collected at all",
         "Because lines executed do not prove assertions were right"
       ],
       "answer": 3,

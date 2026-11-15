@@ -34,7 +34,7 @@ window.LESSONS.push({
     {
       "q": "When is a finding `file_only`?",
       "options": [
-        "The file is absent from the diff",
+        "The file is absent from the diff, so nothing can be anchored to it",
         "The file is in the diff but the line is not an added line",
         "The line is in an added span",
         "The finding has no line number"

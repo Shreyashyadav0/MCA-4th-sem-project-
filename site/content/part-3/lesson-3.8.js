@@ -28,7 +28,7 @@ window.LESSONS.push({
         "Only `requests.get`",
         "The DNS resolver only",
         "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
-        "Nothing; it runs with the network off"
+        "Nothing; it runs with the network off and never tries to reach out"
       ],
       "answer": 2,
       "why": "Three seams, because a library can dial out by any of them — patching one leaves the others open."
@@ -36,7 +36,7 @@ window.LESSONS.push({
     {
       "q": "Why are loopback and AF_UNIX allowed through?",
       "options": [
-        "Because tests need localhost",
+        "Because tests need localhost to bind a port for the client",
         "They are not allowed",
         "Because they are faster",
         "Because asyncio's event loop builds a self-pipe with a socket"

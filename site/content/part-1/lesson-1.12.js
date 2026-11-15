@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "`app/main.py` types the provider field as `Literal[\"auto\", \"local\", \"sarvam\", \"mock\"]` rather than `str`. What does that buy?",
       "options": [
-        "It runs faster, because the value is validated only once",
+        "It runs faster, because the value is validated only once, which is the usual argument",
         "A checker rejects any other string before the request is served",
         "It allows more values than a plain string field would",
         "It makes the field optional in the request body"

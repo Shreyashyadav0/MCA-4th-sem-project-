@@ -29,7 +29,7 @@ window.LESSONS.push({
         "A `Binary files … differ` line, no body",
         "A hunk with one placeholder line",
         "The file's bytes, base64 encoded",
-        "A `@@` header carrying zero counts"
+        "A `@@` header carrying zero counts, which marks a deletion"
       ],
       "answer": 0,
       "why": "There is nothing textual to hunk, so git states the fact in one line and stops. A parser that expects a hunk here is the bug this flag prevents."

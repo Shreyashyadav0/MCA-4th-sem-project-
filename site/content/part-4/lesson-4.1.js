@@ -29,7 +29,7 @@ window.LESSONS.push({
         "Inside the JSON body, as a field",
         "In the request headers",
         "Outside the body, on the response itself",
-        "Nowhere — the body says everything"
+        "Nowhere — the body says everything, which is the usual reading"
       ],
       "answer": 2,
       "why": "The body of `/` has no status field at all: 200 is a property of the response, which is why a client checks it before parsing anything."
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "The server keeps nothing between requests. What follows?",
       "options": [
-        "Two identical requests can give different answers",
+        "Two identical requests can give different answers, which the method alone does not forbid",
         "The server cannot return JSON",
         "The client must send a session cookie",
         "Every request must carry everything needed to answer it"

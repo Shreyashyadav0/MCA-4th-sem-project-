@@ -56,7 +56,7 @@ window.LESSONS.push({
       "options": [
         "Because it is faster",
         "Because `after` does not exist for models",
-        "Because computed fields are not validated",
+        "Because computed fields are not validated when the model is built",
         "Because it must reshape the raw input before any field is validated"
       ],
       "answer": 3,

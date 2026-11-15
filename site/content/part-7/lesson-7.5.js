@@ -59,7 +59,7 @@ window.LESSONS.push({
         "Because git never writes two prefixes",
         "Because of the `len(path) > 2` guard",
         "Because the strip is a single `if`, not a loop",
-        "Because the regex anchors at the start"
+        "Because the regex anchors at the start of the string, not the line"
       ],
       "answer": 2,
       "why": "One conditional means one strip; the length guard is about the degenerate `a/` case, not about repetition."

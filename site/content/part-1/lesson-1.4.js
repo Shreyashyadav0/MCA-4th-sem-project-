@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Once, when the object is built",
         "Every time the attribute is read",
-        "Never, until you call a method",
+        "Never, until you call a method or read the attribute",
         "When the class is defined"
       ],
       "answer": 1,

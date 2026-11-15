@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What does a line beginning with a single space mean in a diff?",
       "options": [
         "It was added to the new file",
-        "It was removed from the old file",
+        "It was removed from the old file, so only the new file has it",
         "It is unchanged, in both versions",
         "It marks the end of one hunk"
       ],

@@ -55,7 +55,7 @@ window.LESSONS.push({
       "q": "Which severity mix makes `verdict_for` return `block`?",
       "options": [
         "Only CRITICAL, never HIGH",
-        "Two or more MEDIUM findings",
+        "Two or more MEDIUM findings, which is a block in some tools",
         "A single LOW finding",
         "Any CRITICAL or HIGH finding"
       ],

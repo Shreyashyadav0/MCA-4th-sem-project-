@@ -37,7 +37,7 @@ window.LESSONS.push({
         "`DiffBundle`, which holds both",
         "`FileSummary`, which holds the counts",
         "`FileDiff`, which holds hunks and their lines",
-        "`DiffReviewResult`, which holds the review"
+        "`DiffReviewResult`, which holds the review and its postings"
       ],
       "answer": 2,
       "why": "The lines live in `FileDiff`'s hunks; the summary carries only the numbers derived from them."

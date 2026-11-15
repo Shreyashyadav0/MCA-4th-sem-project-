@@ -46,7 +46,7 @@ window.LESSONS.push({
         "Drops fields whose value is None",
         "Drops empty strings",
         "Drops missing fields",
-        "Raises if a field is None"
+        "Raises if a field is None, which is not what a default does"
       ],
       "answer": 0,
       "why": "It removes the nulls only — an empty list and an empty string survive, which is why the flag is for optional fields rather than for trimming a payload."

@@ -37,7 +37,7 @@ window.LESSONS.push({
         "One, containing the old path only",
         "None — the header carries the change",
         "One, containing the new path only",
-        "Two, one for each side of the move"
+        "Two, one for each side of the move: old path and new path"
       ],
       "answer": 1,
       "why": "A pure rename changes no content, so there is nothing to hunk; the `rename from` / `rename to` lines are the entire record."

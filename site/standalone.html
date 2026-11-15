@@ -4836,7 +4836,15 @@ details.expected-output pre.code code {
     "content/part-8/lesson-8.7.js",
     "content/part-8/lesson-8.8.js",
     "content/part-8/lesson-8.9.js",
-    "content/part-8/lesson-8.10.js"
+    "content/part-8/lesson-8.10.js",
+    "content/part-9/lesson-9.1.js",
+    "content/part-9/lesson-9.2.js",
+    "content/part-9/lesson-9.3.js",
+    "content/part-9/lesson-9.4.js",
+    "content/part-9/lesson-9.5.js",
+    "content/part-9/lesson-9.6.js",
+    "content/part-9/lesson-9.7.js",
+    "content/part-9/lesson-9.8.js"
   ];
 })();
 
@@ -4944,7 +4952,7 @@ window.LESSONS.push({
       "q": "Which command runs the test suite?",
       "options": [
         "python -m pytest -q tests",
-        "python reviewer.py tests",
+        "python reviewer.py tests, without -q",
         "pytest site/",
         "python -m unittest"
       ],
@@ -5264,7 +5272,7 @@ window.LESSONS.push({
     {
       "q": "You configure neither a Sarvam key nor a local endpoint. What happens?",
       "options": [
-        "The review fails with an error telling you to configure a key",
+        "The review fails with an error telling you to configure a key before it starts",
         "The rule engine runs and the response says mock in its note lines",
         "It waits for a key and then gives up after a timeout",
         "It silently returns an empty result with no note at all"
@@ -5735,7 +5743,7 @@ window.LESSONS.push({
       "options": [
         "Once, when the object is built",
         "Every time the attribute is read",
-        "Never, until you call a method",
+        "Never, until you call a method or read the attribute",
         "When the class is defined"
       ],
       "answer": 1,
@@ -5951,7 +5959,7 @@ window.LESSONS.push({
     {
       "q": "You run `python tests/test_rules.py` and see no test output. Why?",
       "options": [
-        "The tests are broken and the environment needs reinstalling",
+        "The tests are broken and the environment needs reinstalling from the lock",
         "pytest is missing from the environment you are running in",
         "Running the file executes it as __main__: the test functions are defined, not called",
         "The file was never saved after the last edit was made"
@@ -6151,7 +6159,7 @@ window.LESSONS.push({
       "q": "What does `@functools.wraps(function)` change?",
       "options": [
         "It speeds up the wrapped call by caching its arguments",
-        "It removes the wrapper and returns the original function",
+        "It removes the wrapper and returns the original function, undoing the decoration",
         "It makes the decorated function run asynchronously",
         "It copies __name__, __doc__ and annotations onto the wrapper"
       ],
@@ -6239,7 +6247,7 @@ window.LESSONS.push({
     {
       "q": "When does the body of a generator function run?",
       "options": [
-        "When the function is called, all at once, like any other call",
+        "When the function is called, all at once, like any other call, not when it is decorated",
         "When the module is imported, before anything calls it",
         "When the generator object is finally garbage collected",
         "One step at a time, each time the consumer asks for the next value"
@@ -6358,7 +6366,7 @@ window.LESSONS.push({
         "It comes back as a list",
         "It stays a tuple",
         "It raises TypeError",
-        "It becomes a string"
+        "It becomes a string, because the field is typed as one"
       ],
       "answer": 0,
       "why": "JSON has arrays, not tuples, so `json.dumps((1, 2))` writes `[1, 2]` and loading gives a list — a silent shape change."
@@ -6472,7 +6480,7 @@ window.LESSONS.push({
     {
       "q": "Why does the CLI read a .diff file instead of running `git diff`?",
       "options": [
-        "Because piping a diff through a shell would lose its exit code",
+        "Because piping a diff through a shell would lose its exit code, which a file read does not",
         "Because diffs cannot be piped between two processes",
         "So the review never depends on a git binary or a checkout",
         "So it works in a CI runner with no repository and no git binary"
@@ -6566,7 +6574,7 @@ window.LESSONS.push({
     {
       "q": "`app/main.py` types the provider field as `Literal[\"auto\", \"local\", \"sarvam\", \"mock\"]` rather than `str`. What does that buy?",
       "options": [
-        "It runs faster, because the value is validated only once",
+        "It runs faster, because the value is validated only once, which is the usual argument",
         "A checker rejects any other string before the request is served",
         "It allows more values than a plain string field would",
         "It makes the field optional in the request body"
@@ -6683,7 +6691,7 @@ window.LESSONS.push({
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
         "So the error arrives before the value is stored",
-        "Because Pydantic is faster when it validates early",
+        "Because Pydantic is faster when it validates early in the call",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"
       ],
@@ -6694,7 +6702,7 @@ window.LESSONS.push({
       "q": "What does `extra=\"forbid\"` on `Finding` actually reject?",
       "options": [
         "A missing required field",
-        "A string with spaces around it",
+        "A string with spaces around it, which is stripped before use",
         "A value of the wrong type",
         "A field the model does not declare"
       ],
@@ -6806,7 +6814,7 @@ window.LESSONS.push({
       "options": [
         "Because Pydantic cannot do ints",
         "Because a line may be a range like \"42-45\"",
-        "Because the database stores strings",
+        "Because the database stores strings, so the type is lost on the way in",
         "To make sorting faster"
       ],
       "answer": 1,
@@ -6894,7 +6902,7 @@ window.LESSONS.push({
       "q": "`Field(min_length=1)` on a field — does that make it optional?",
       "options": [
         "Yes, with an empty default",
-        "Only when the model is frozen",
+        "Only when the model is frozen, which is a separate setting",
         "Yes, if the type is str",
         "No: the field is still required"
       ],
@@ -6906,7 +6914,7 @@ window.LESSONS.push({
       "options": [
         "When the rule only constrains the field's type",
         "When the rule needs more than one field or more than one line of logic",
-        "Always — a validator is clearer than a constraint",
+        "Always — a validator is clearer than a constraint, so prefer it",
         "When the field happens to be a string type"
       ],
       "answer": 1,
@@ -7012,7 +7020,7 @@ window.LESSONS.push({
       "options": [
         "`model_validate({**model.model_dump(), ...})`",
         "`model_copy(update={...})` and nothing else",
-        "`copy.deepcopy` and then assign to the field",
+        "`copy.deepcopy` and then assign to the field, which copies without validating",
         "Unfreeze the config for that one field"
       ],
       "answer": 0,
@@ -7137,7 +7145,7 @@ window.LESSONS.push({
       "options": [
         "Because it is faster",
         "Because `after` does not exist for models",
-        "Because computed fields are not validated",
+        "Because computed fields are not validated when the model is built",
         "Because it must reshape the raw input before any field is validated"
       ],
       "answer": 3,
@@ -7234,13 +7242,13 @@ window.LESSONS.push({
     {
       "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
-        "Because it is the documented spelling for a fresh list",
-        "Because a bare `= []` default is shared by every instance",
-        "Because a bare default is not allowed for a list field",
-        "Because it is the documented spelling, even though Pydantic copies a bare default per instance"
+        "Because a bare default is rejected for a mutable list field",
+        "Because a bare `= []` default is shared by every instance that is built",
+        "Because a bare default is rejected for a mutable list field",
+        "Because it is the documented spelling for a fresh list"
       ],
       "answer": 3,
-      "why": "Pydantic deep-copies the default, so both work; `default_factory` says out loud that a fresh object is built, and it is what the style guide recommends."
+      "why": "`Field(default_factory=list)` is the documented spelling, and it also avoids the sharing that a bare `= []` would cause in a plain dataclass — though Pydantic deep-copies a bare default per instance anyway."
     },
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",
@@ -7334,7 +7342,7 @@ window.LESSONS.push({
       "q": "Why does the repository sort by `severity.rank` instead of the string?",
       "options": [
         "Strings cannot be sorted",
-        "Because severity is not a string",
+        "Because severity is not a string and cannot be compared to one",
         "Because rank is faster",
         "Because rank encodes the order CRITICAL > HIGH > MEDIUM > LOW"
       ],
@@ -7461,7 +7469,7 @@ window.LESSONS.push({
         "Drops fields whose value is None",
         "Drops empty strings",
         "Drops missing fields",
-        "Raises if a field is None"
+        "Raises if a field is None, which is not what a default does"
       ],
       "answer": 0,
       "why": "It removes the nulls only — an empty list and an empty string survive, which is why the flag is for optional fields rather than for trimming a payload."
@@ -7671,7 +7679,7 @@ window.LESSONS.push({
     {
       "q": "What decides dataclass or BaseModel in this repository?",
       "options": [
-        "That dataclasses ignore annotations entirely",
+        "That dataclasses ignore annotations entirely, which they do not",
         "The number of fields",
         "Whether the data arrives from outside the program",
         "Whether it needs to be frozen"
@@ -7696,7 +7704,7 @@ window.LESSONS.push({
         "`__eq__`",
         "`model_dump` and `model_validate`",
         "`__repr__`",
-        "`__init__`"
+        "`__init__`, which the dataclass generates for you"
       ],
       "answer": 1,
       "why": "Serialisation and validation are the two things the framework adds; `__eq__` and `__repr__` are generated by both."
@@ -7808,7 +7816,7 @@ window.LESSONS.push({
       "options": [
         "One tests a function's contract, the other tests the pieces together",
         "One is faster",
-        "One uses pytest and the other does not",
+        "One uses pytest and the other does not use a test runner at all",
         "There is none"
       ],
       "answer": 0,
@@ -7891,7 +7899,7 @@ window.LESSONS.push({
         "test_cli.py",
         "tests_cli.py",
         "cli_test.py",
-        "test_api.py"
+        "test_api.py, in the same folder as the CLI tests"
       ],
       "answer": 1,
       "why": "Discovery matches `test_*.py` and `*_test.py`; `tests_cli.py` matches neither and is invisible, not failing."
@@ -7900,7 +7908,7 @@ window.LESSONS.push({
       "q": "Why does a failing `assert` print the values involved?",
       "options": [
         "Because pytest rewrites assert statements at import time",
-        "Because Python does that by default",
+        "Because Python does that by default when it imports a package",
         "Because the test passes a message",
         "Because of the `-q` flag"
       ],
@@ -8108,7 +8116,7 @@ window.LESSONS.push({
     {
       "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
       "options": [
-        "The extra value is ignored",
+        "pytest splits the tuple and runs it twice",
         "pytest splits the tuple",
         "It passes",
         "Collection fails: the tuple length does not match the names"
@@ -8226,7 +8234,7 @@ window.LESSONS.push({
         "A `Path` to a per-test directory pytest removes afterwards",
         "A string",
         "The system temp directory, shared",
-        "A fixture you must clean up yourself"
+        "A fixture you must clean up yourself, with no automatic teardown"
       ],
       "answer": 0,
       "why": "Per-test and self-cleaning, which is why a test can write a file without leaving one behind."
@@ -8434,7 +8442,7 @@ window.LESSONS.push({
       "options": [
         "Coverage is expensive",
         "Because the suite is too small",
-        "Because pytest cannot measure it",
+        "Because pytest cannot measure a test that was never collected at all",
         "Because lines executed do not prove assertions were right"
       ],
       "answer": 3,
@@ -8516,7 +8524,7 @@ window.LESSONS.push({
         "Only `requests.get`",
         "The DNS resolver only",
         "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
-        "Nothing; it runs with the network off"
+        "Nothing; it runs with the network off and never tries to reach out"
       ],
       "answer": 2,
       "why": "Three seams, because a library can dial out by any of them — patching one leaves the others open."
@@ -8524,7 +8532,7 @@ window.LESSONS.push({
     {
       "q": "Why are loopback and AF_UNIX allowed through?",
       "options": [
-        "Because tests need localhost",
+        "Because tests need localhost to bind a port for the client",
         "They are not allowed",
         "Because they are faster",
         "Because asyncio's event loop builds a self-pipe with a socket"
@@ -8624,7 +8632,7 @@ window.LESSONS.push({
         "Inside the JSON body, as a field",
         "In the request headers",
         "Outside the body, on the response itself",
-        "Nowhere — the body says everything"
+        "Nowhere — the body says everything, which is the usual reading"
       ],
       "answer": 2,
       "why": "The body of `/` has no status field at all: 200 is a property of the response, which is why a client checks it before parsing anything."
@@ -8643,7 +8651,7 @@ window.LESSONS.push({
     {
       "q": "The server keeps nothing between requests. What follows?",
       "options": [
-        "Two identical requests can give different answers",
+        "Two identical requests can give different answers, which the method alone does not forbid",
         "The server cannot return JSON",
         "The client must send a session cookie",
         "Every request must carry everything needed to answer it"
@@ -8733,7 +8741,7 @@ window.LESSONS.push({
         "How the endpoint is grouped in the docs",
         "The URL path the endpoint answers on",
         "The status code the endpoint returns",
-        "Whether the endpoint requires a login"
+        "Whether the endpoint requires a login before it answers"
       ],
       "answer": 0,
       "why": "Tags are documentation: `/docs` groups operations by them, and nothing about the request or the response depends on the value."
@@ -8741,7 +8749,7 @@ window.LESSONS.push({
     {
       "q": "Why is the `/review` decorator fifteen lines long?",
       "options": [
-        "FastAPI requires one parameter per line",
+        "FastAPI requires one parameter per line, so a long signature is normal",
         "The handler carries a long docstring",
         "The decorator was reformatted by hand",
         "It carries a responses block with an example"
@@ -8752,7 +8760,7 @@ window.LESSONS.push({
     {
       "q": "`POST /rules` answers 405. Why?",
       "options": [
-        "No route is registered for that path",
+        "No route is registered for that path, so the client gets a 404",
         "The path exists, but only GET is allowed",
         "The body did not match the model",
         "The rule registry came back empty"
@@ -8863,7 +8871,7 @@ window.LESSONS.push({
         "To make every declared field required",
         "So an unknown key is an error, not a shrug",
         "To make parsing measurably faster",
-        "To allow either diff or code, not both"
+        "To allow either diff or code, not both in the same request"
       ],
       "answer": 1,
       "why": "Silently ignoring `nope` would let a client believe it sent something meaningful; forbidding turns it into a named error."
@@ -9091,7 +9099,7 @@ window.LESSONS.push({
       "options": [
         "Fix the request and resend it",
         "Re-authenticate",
-        "Give up: the request will never work",
+        "Give up: the request will never work, so no retry is worth making",
         "Retry later: the server could not do it now"
       ],
       "answer": 3,
@@ -9181,7 +9189,7 @@ window.LESSONS.push({
       "q": "How does `x_github_event` end up reading the `X-GitHub-Event` header?",
       "options": [
         "FastAPI maps underscores onto hyphens for you",
-        "An alias argument spells the header name out",
+        "An alias argument spells the header name out, so the mapping is explicit",
         "The handler reads it off the raw request",
         "GitHub sends both spellings in the request"
       ],
@@ -9295,7 +9303,7 @@ window.LESSONS.push({
       "options": [
         "Starts a uvicorn server on a random port",
         "Sends a real HTTP request over loopback",
-        "Calls the handler function directly, skipping routing",
+        "Calls the handler function directly, skipping routing, which is what a unit test does",
         "Drives the ASGI application in-process, with no socket"
       ],
       "answer": 3,
@@ -9307,7 +9315,7 @@ window.LESSONS.push({
         "It makes the whole suite run faster",
         "A test needing a port would break the offline promise",
         "It removes the need for any assertions",
-        "It lets the tests run without Python installed"
+        "It lets the tests run without Python installed, which is not the reason"
       ],
       "answer": 1,
       "why": "The suite's zero-network promise is only true if the tests never open a socket; in-process requests make that structural."
@@ -9401,7 +9409,7 @@ window.LESSONS.push({
     {
       "q": "Where does the file declare what the API accepts?",
       "options": [
-        "In the route block, beside each handler",
+        "In the route block, beside each handler, above the decorator",
         "In the models at the top, before any route",
         "In `/openapi.json` at runtime",
         "In the module docstring"
@@ -9413,7 +9421,7 @@ window.LESSONS.push({
       "q": "What is `_verify_signature` the only example of in this file?",
       "options": [
         "A route handler",
-        "A Pydantic validator",
+        "A Pydantic validator on the request model",
         "A cryptographic check",
         "A test helper"
       ],
@@ -9520,7 +9528,7 @@ window.LESSONS.push({
       "q": "What does a line beginning with a single space mean in a diff?",
       "options": [
         "It was added to the new file",
-        "It was removed from the old file",
+        "It was removed from the old file, so only the new file has it",
         "It is unchanged, in both versions",
         "It marks the end of one hunk"
       ],
@@ -9649,7 +9657,7 @@ window.LESSONS.push({
       "options": [
         "Line 1 was added and line 1 was deleted",
         "The hunk is empty and can be skipped",
-        "The counts are missing, so it is invalid",
+        "The counts are missing, so it is invalid, and the parser refuses it",
         "One line of the old became one of the new"
       ],
       "answer": 3,
@@ -9763,7 +9771,7 @@ window.LESSONS.push({
     {
       "q": "A removed line has `new_lineno=None`. Why?",
       "options": [
-        "Because the parser has not reached it yet",
+        "Because the parser has not reached it yet, so the number is still unset",
         "Because the line does not exist in the new file",
         "Because the line is context",
         "Because the new counter overflowed"
@@ -9876,7 +9884,7 @@ window.LESSONS.push({
         "One, containing the old path only",
         "None — the header carries the change",
         "One, containing the new path only",
-        "Two, one for each side of the move"
+        "Two, one for each side of the move: old path and new path"
       ],
       "answer": 1,
       "why": "A pure rename changes no content, so there is nothing to hunk; the `rename from` / `rename to` lines are the entire record."
@@ -9995,7 +10003,7 @@ window.LESSONS.push({
         "A bare `a/` collapsing to an empty string",
         "The prefix being stripped twice",
         "Quoted paths losing their quotes",
-        "Windows-style paths being mangled"
+        "Windows-style paths being mangled by the prefix strip"
       ],
       "answer": 0,
       "why": "`normalize_path('a/')` returns `a/` because of the guard. Stripping twice cannot happen anyway: the strip is one `if`, not a loop."
@@ -10091,7 +10099,7 @@ window.LESSONS.push({
         "A `Binary files … differ` line, no body",
         "A hunk with one placeholder line",
         "The file's bytes, base64 encoded",
-        "A `@@` header carrying zero counts"
+        "A `@@` header carrying zero counts, which marks a deletion"
       ],
       "answer": 0,
       "why": "There is nothing textual to hunk, so git states the fact in one line and stops. A parser that expects a hunk here is the bug this flag prevents."
@@ -10214,7 +10222,7 @@ window.LESSONS.push({
     {
       "q": "Which function reads a diff from disk?",
       "options": [
-        "`bundle_from_source`, which reads",
+        "`bundle_from_source`, which reads a file from disk",
         "`parse_diff`, which takes a path",
         "`DiffBundle`, which loads lazily",
         "`parse_diff_file`, wrapping `parse_diff`"
@@ -10349,7 +10357,7 @@ window.LESSONS.push({
       "q": "What does the error message name?",
       "options": [
         "The file the diff came from",
-        "The line number where parsing stopped",
+        "The line number where parsing stopped, which is not in the file",
         "Both header forms the parser would accept",
         "The exception's class hierarchy"
       ],
@@ -10360,7 +10368,7 @@ window.LESSONS.push({
       "q": "Why does the API write `from exc` when raising?",
       "options": [
         "It keeps the parser error as the cause",
-        "It logs the same error a second time",
+        "It logs the same error a second time, doubling the warning",
         "It converts the exception to a 422",
         "It silences the traceback entirely"
       ],
@@ -10478,7 +10486,7 @@ window.LESSONS.push({
     {
       "q": "Which field makes a finding anchorable to a diff?",
       "options": [
-        "`suggested_fix`, which is the replacement",
+        "`suggested_fix`, which is the replacement code the rule proposes",
         "`issue`, which names the problem",
         "`line`, which is what the anchorer compares against changed spans",
         "`severity`, which orders the output"
@@ -10707,7 +10715,7 @@ window.LESSONS.push({
       "q": "Which severity mix makes `verdict_for` return `block`?",
       "options": [
         "Only CRITICAL, never HIGH",
-        "Two or more MEDIUM findings",
+        "Two or more MEDIUM findings, which is a block in some tools",
         "A single LOW finding",
         "Any CRITICAL or HIGH finding"
       ],
@@ -10823,7 +10831,7 @@ window.LESSONS.push({
         "The field fails validation",
         "The reader must rewrite it before acting",
         "The severity is downgraded",
-        "The finding can no longer be anchored"
+        "The finding can no longer be anchored to a line in the diff"
       ],
       "answer": 1,
       "why": "The fix field is what a consumer renders as a suggestion; a diagnosis full of code has to be translated back into a change by hand."
@@ -10912,7 +10920,7 @@ window.LESSONS.push({
     {
       "q": "What does `extra=\"forbid\"` protect?",
       "options": [
-        "The severity ladder from new values",
+        "The severity ladder from new values that the model has not seen",
         "The database schema",
         "The JSON encoder from cycles",
         "The contract: a finding cannot grow a field no consumer knows"
@@ -10934,7 +10942,7 @@ window.LESSONS.push({
     {
       "q": "Why is `strict=True` not used on this model?",
       "options": [
-        "Because frozen and strict cannot be combined",
+        "Because frozen and strict cannot be combined on the same model",
         "Because strict mode disables validators",
         "Because inputs arrive as JSON and from a model, where coercion helps",
         "Because strict mode is slower"
@@ -11140,9 +11148,9 @@ window.LESSONS.push({
     {
       "q": "Why is `as_row()` a method rather than a dict built at each call site?",
       "options": [
-        "Because Pydantic requires it",
-        "Because dicts cannot hold five keys",
-        "So the CLI and the Markdown table cannot disagree about column names",
+        "Because a dict cannot hold five keys in a fixed order",
+        "Because a dict cannot hold five keys and keep their order",
+        "So the column names cannot disagree",
         "So the values can be cached"
       ],
       "answer": 2,
@@ -11251,7 +11259,7 @@ window.LESSONS.push({
         "The enums, at lines 46 and 60",
         "The helpers, from 125",
         "The result, from 151",
-        "The patterns, at line 42"
+        "The patterns, at line 42, where the regex is compiled"
       ],
       "answer": 0,
       "why": "`Severity` is the closed set, and `AnchorStatus` beside it is the other enum; both are declared before anything uses them."
@@ -11261,7 +11269,7 @@ window.LESSONS.push({
       "options": [
         "The verdict",
         "A sixth severity",
-        "The suggested fix",
+        "The suggested fix, which the renderer copies into the comment",
         "Where the finding landed relative to the diff"
       ],
       "answer": 3,
@@ -11383,7 +11391,7 @@ window.LESSONS.push({
         "The path used to read the file",
         "A label recording where the text came from",
         "A switch between git and plain diffs",
-        "The name of the module that called it"
+        "The name of the module that called it, which the parser never records"
       ],
       "answer": 1,
       "why": "It travels with the bundle so a downstream message can say which input produced it; the parser never acts on it."
@@ -11392,7 +11400,7 @@ window.LESSONS.push({
       "q": "Which input does the parser tolerate rather than reject?",
       "options": [
         "An empty string",
-        "A diff with no file headers",
+        "A diff with no file headers, which raises rather than returning empty",
         "A hunk whose body is shorter than its header claims",
         "A file it cannot read"
       ],
@@ -11497,7 +11505,7 @@ window.LESSONS.push({
       "q": "What does `close_hunk()` reset?",
       "options": [
         "Only the binary flag",
-        "The whole builder, including both paths",
+        "The whole builder, including both the old path and the new one",
         "The collected lines and the counters for the hunk just finished",
         "The list of finished files"
       ],
@@ -11604,7 +11612,7 @@ window.LESSONS.push({
         "`DiffBundle`, which holds both",
         "`FileSummary`, which holds the counts",
         "`FileDiff`, which holds hunks and their lines",
-        "`DiffReviewResult`, which holds the review"
+        "`DiffReviewResult`, which holds the review and its postings"
       ],
       "answer": 2,
       "why": "The lines live in `FileDiff`'s hunks; the summary carries only the numbers derived from them."
@@ -11735,7 +11743,7 @@ window.LESSONS.push({
       "options": [
         "8, the last line touched",
         "2, the number of spans",
-        "7, the highest line number",
+        "7, the highest line number anywhere in the hunk",
         "4, the number of added lines"
       ],
       "answer": 3,
@@ -11863,7 +11871,7 @@ window.LESSONS.push({
         "Because git never writes two prefixes",
         "Because of the `len(path) > 2` guard",
         "Because the strip is a single `if`, not a loop",
-        "Because the regex anchors at the start"
+        "Because the regex anchors at the start of the string, not the line"
       ],
       "answer": 2,
       "why": "One conditional means one strip; the length guard is about the degenerate `a/` case, not about repetition."
@@ -11954,7 +11962,7 @@ window.LESSONS.push({
     {
       "q": "When is a finding `file_only`?",
       "options": [
-        "The file is absent from the diff",
+        "The file is absent from the diff, so nothing can be anchored to it",
         "The file is in the diff but the line is not an added line",
         "The line is in an added span",
         "The finding has no line number"
@@ -12070,7 +12078,7 @@ window.LESSONS.push({
     {
       "q": "What does `bundle_from_source` produce?",
       "options": [
-        "A diff with the file marked modified",
+        "A diff with the file marked modified, which still has a hunk",
         "A parsed file with no hunks",
         "A one-file diff in which every line is added",
         "A bundle with zero files"
@@ -12083,7 +12091,7 @@ window.LESSONS.push({
       "options": [
         "Every rule and renderer already speaks the diff vocabulary",
         "Because diffs are cheaper to store",
-        "Because the parser cannot read files",
+        "Because the parser cannot read files and needs the text instead",
         "Because GitHub requires a diff"
       ],
       "answer": 0,
@@ -12094,7 +12102,7 @@ window.LESSONS.push({
       "options": [
         "It downloads it from GitHub",
         "Yes, it opens the path and reads it",
-        "It reads the path only if it exists",
+        "It reads the path only if the file already exists on disk",
         "No — `source` is the content and `path` is only the label"
       ],
       "answer": 3,
@@ -12300,7 +12308,7 @@ window.LESSONS.push({
       "options": [
         "The issue and the suggested fix",
         "The file, the line and the grade",
-        "The rule id and its short title",
+        "The rule id and its short title, which the hit does not repeat",
         "The category and the citation"
       ],
       "answer": 1,
@@ -12659,7 +12667,7 @@ window.LESSONS.push({
     {
       "q": "Why does `scan_text` truncate the line?",
       "options": [
-        "So the finding fits inside a comment",
+        "So the finding fits inside a comment on one line of the pull request",
         "So a pathological line cannot stall it",
         "So the line number stays correct",
         "So the exemption pattern can match"
@@ -12786,7 +12794,7 @@ window.LESSONS.push({
       "q": "What does the targeted form return?",
       "options": [
         "An error if the id is unknown",
-        "Suppress all, plus the named ids",
+        "Suppress all, plus the named ids, which is what a bare marker does",
         "Suppress all, with an empty set",
         "Suppress nothing, plus the named ids"
       ],
@@ -13006,7 +13014,7 @@ window.LESSONS.push({
       "options": [
         "So it can be quoted and read in JSON",
         "So it can be translated later",
-        "So it can be sorted alphabetically",
+        "So it can be sorted alphabetically in the report's citation column",
         "Because enums cannot hold a colon"
       ],
       "answer": 0,
@@ -13018,7 +13026,7 @@ window.LESSONS.push({
         "A06, vulnerable and outdated components",
         "A04, insecure design",
         "A02, cryptographic failures",
-        "A10, server-side request forgery"
+        "A10, server-side request forgery, which one rule does cite"
       ],
       "answer": 0,
       "why": "A dependency version is not visible on an added line, so no line-local rule can claim that entry; A04 is cited by eleven rules."
@@ -13111,7 +13119,7 @@ window.LESSONS.push({
         "Because registration order is visible",
         "Because a list searches much faster",
         "Because sets cannot hold dataclasses",
-        "Because duplicate ids are impossible"
+        "Because duplicate ids are impossible, since ids are checked at import"
       ],
       "answer": 0,
       "why": "The report and the tests both read position, so the order has to be stable and intentional."
@@ -13225,7 +13233,7 @@ window.LESSONS.push({
       "options": [
         "Only the regex itself",
         "The regex, the exemptions and the skip",
-        "Only the severity chosen for the rule",
+        "Only the severity chosen for the rule, which no test currently covers",
         "Only the OWASP citation"
       ],
       "answer": 1,
@@ -13352,7 +13360,7 @@ window.LESSONS.push({
     {
       "q": "What does importing the module give you?",
       "options": [
-        "A review of the current directory",
+        "A review of the current directory, walking every file it finds",
         "A live model-provider connection",
         "A database handle",
         "The whole registry, nothing running"
@@ -13415,6 +13423,885 @@ window.LESSONS.push({
     "guided read — a walk through a file in dependency order",
     "rebuild exercise — reimplementing a module against its tests",
     "entry point — the function a caller uses to run the rules"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.1.js */
+/* 9.1 — Settings: one object, one place the environment is read
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.1",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "Settings: one object, one place the environment is read",
+  "order": 901,
+  "duration_min": 20,
+  "concept_md": "### One class reads the environment\n\n`app/config.py` defines a single `Settings` class. It subclasses `BaseSettings`, so every annotated field is filled from an environment variable of the same name, case-insensitively, and from a `.env` file when one exists.\n\nNothing else in the codebase calls `os.environ`. That is the design: one place reads the environment, and every other module asks for a `Settings` object.\n\n### Why one place matters\n\nA second reader means a second default. Two modules reading `LMSTUDIO_BASE_URL` independently can disagree about what absence means — one treating it as \"use the default\", the other as \"disabled\". With one class, absence has exactly one meaning per field, written beside the field.\n\n### `extra=\"ignore\"`\n\nThe config sets `extra=\"ignore\"`, so an unknown variable in `.env` does not raise. That is deliberate for a file a reader edits by hand: a stray line should not stop the application.\n\n### Every field has a default\n\nThe class docstring says so, and it is testable: constructing `Settings()` in an empty environment succeeds. A required field would make the tool refuse to start on a fresh checkout, which is the opposite of offline-first.",
+  "code_examples": [
+    {
+      "id": "9.1-ex-0",
+      "lang": "console",
+      "caption": "Every field, and that a bare Settings() succeeds",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\ns = Settings()\nprint(\"fields:\", len(Settings.model_fields))\nprint(\"mode:\", s.review_mode, \"| timeout:\", s.request_timeout_s)\nprint(\"db:\", s.database_path)\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "fields: 15\nmode: auto | timeout: 20.0\ndb: data/reviewer.db",
+      "why_not": "the browser runner does not embed app/config.py, and it needs pydantic-settings; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "How many modules read the environment directly?",
+      "options": [
+        "Only app/config.py itself",
+        "Two: config and the CLI",
+        "Three: config, CLI, engine",
+        "Every module needing a value"
+      ],
+      "answer": 0,
+      "why": "`Settings` is the only reader; everything else takes a settings object, so absence has one meaning per field."
+    },
+    {
+      "q": "What does `extra=\"ignore\"` do to an unknown key?",
+      "options": [
+        "Skips it without raising",
+        "Raises on start, naming it",
+        "Stores it in a catch-all",
+        "Warns once, then ignores"
+      ],
+      "answer": 0,
+      "why": "A hand-edited `.env` should not stop the application, so an unknown name is skipped rather than fatal."
+    },
+    {
+      "q": "Why does every field carry a default?",
+      "options": [
+        "So a fresh checkout starts",
+        "So tests skip validation",
+        "So the class subclasses well",
+        "So Pydantic infers types"
+      ],
+      "answer": 0,
+      "why": "A required field would make the tool refuse to start, contradicting the offline-first promise."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the name and default of every field.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\n\nfor name, f in Settings.model_fields.items():\n    print(\"%-24s %r\" % (name, f.default))\n```",
+    "explanation": "The defaults are the documented behaviour when nothing is set, which is lesson 9.4's subject."
+  },
+  "exercise": {
+    "prompt": "Which field controls the HTTP timeout, and what is its lower bound?",
+    "hint": "Look for a float with a `gt=` constraint.",
+    "solution": "```python\nfrom app.config import Settings\n\nf = Settings.model_fields[\"request_timeout_s\"]\nprint(f.default, [str(m) for m in f.metadata])\n```\n\n`20.0`, and the constraint is `gt=0` — zero or negative is refused.",
+    "explanation": "The bound sits in the field, so an invalid value fails at construction rather than at request time."
+  },
+  "common_mistakes": [
+    "Reading `os.environ` in a module instead of taking a `Settings` object.",
+    "Assuming an unknown `.env` key raises; `extra=\"ignore\"` swallows it.",
+    "Adding a required field, which breaks the fresh-checkout start."
+  ],
+  "project_links": [
+    {
+      "label": "The Settings class and its config",
+      "path": "app/config.py",
+      "lines": "20-28"
+    },
+    {
+      "label": "The timeout field and its bound",
+      "path": "app/config.py",
+      "lines": "61"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/config.py — the settings",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    },
+    {
+      "label": ".env.example — every variable",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/.env.example"
+    }
+  ],
+  "glossary_terms": [
+    "settings — the one object the environment is read into",
+    "base settings — the class that maps variables to fields",
+    "default — what a field holds when nothing is set"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.2.js */
+/* 9.2 — The LMSTUDIO_* variables and what each changes
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.2",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "The LMSTUDIO_* variables and what each changes",
+  "order": 902,
+  "duration_min": 20,
+  "concept_md": "### Four variables, one local server\n\n`LMSTUDIO_BASE_URL`, `LMSTUDIO_MODEL`, `LMSTUDIO_API_KEY` and `LMSTUDIO_TIMEOUT` describe a chat-completions server on your own machine. LM Studio speaks the OpenAI-compatible protocol, so the adapter that talks to a hosted endpoint talks to it.\n\n### What each one does\n\n`LMSTUDIO_BASE_URL` is the address, typically `http://localhost:1234/v1`. It is optional: when empty, the local provider is not selected. `LMSTUDIO_MODEL` names the model the server should load. `LMSTUDIO_API_KEY` is usually a placeholder, because a local server does not authenticate — but the field exists so the adapter has one shape. `LMSTUDIO_TIMEOUT` bounds the request and is larger than the hosted default, because a laptop model is slower.\n\n### Absence is a mode, not an error\n\nAn empty `LMSTUDIO_BASE_URL` does not raise. The selector sees no local endpoint and moves on, which is what lets the tool start on a machine that never installed a model.\n\n### The trap\n\nSetting the URL and forgetting the model gives a request the server rejects. Both are needed for a local run; the URL alone is not a configuration.",
+  "code_examples": [
+    {
+      "id": "9.2-ex-0",
+      "lang": "console",
+      "caption": "The four fields and their defaults",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\nfor name in (\"lmstudio_base_url\", \"lmstudio_model\", \"lmstudio_api_key\", \"lmstudio_timeout\"):\n    f = Settings.model_fields[name]\n    print(\"%-20s %r\" % (name, f.default))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "lmstudio_base_url    None\nlmstudio_model       'qwen2.5-coder-7b-instruct'\nlmstudio_api_key     'lm-studio'\nlmstudio_timeout     120.0",
+      "why_not": "the browser runner does not embed app/config.py, and it needs pydantic-settings; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What happens when `LMSTUDIO_BASE_URL` is empty?",
+      "options": [
+        "Local is simply not selected",
+        "The application will not start",
+        "The Sarvam key is used instead",
+        "The timeout falls back to zero"
+      ],
+      "answer": 0,
+      "why": "Absence is a mode: the selector sees no endpoint and moves on, which keeps a fresh checkout startable."
+    },
+    {
+      "q": "Why does a local server still have an API-key field?",
+      "options": [
+        "So the adapter has one shape",
+        "Because LM Studio requires auth",
+        "So the key can be rotated",
+        "Because Pydantic demands a secret"
+      ],
+      "answer": 0,
+      "why": "A local server does not authenticate, but keeping the field means the adapter needs no special case."
+    },
+    {
+      "q": "What is missing if the URL is set but the model is not?",
+      "options": [
+        "The model name to load",
+        "The port to listen on",
+        "The key the server wants",
+        "The timeout for the call"
+      ],
+      "answer": 0,
+      "why": "The server needs to know which model to run; the URL alone is not a configuration."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the local timeout and compare it with the hosted one.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\n\nprint(\"local :\", Settings.model_fields[\"lmstudio_timeout\"].default)\nprint(\"hosted:\", Settings.model_fields[\"request_timeout_s\"].default)\n```",
+    "explanation": "The local timeout is larger, because a model on a laptop is slower than a hosted endpoint."
+  },
+  "exercise": {
+    "prompt": "Which two LMSTUDIO fields must both be set for a local run to work?",
+    "hint": "One is the address, one names the model.",
+    "solution": "```text\nLMSTUDIO_BASE_URL and LMSTUDIO_MODEL.\n\nThe URL alone leaves the server without a model to load; the model alone leaves\nthe adapter without an address to call.\n```",
+    "explanation": "Both are needed, and neither is required for the tool to start — that is the difference between a mode and an error."
+  },
+  "common_mistakes": [
+    "Setting the base URL and forgetting the model name.",
+    "Expecting an empty base URL to raise; it is a mode switch.",
+    "Assuming a local server needs a real API key."
+  ],
+  "project_links": [
+    {
+      "label": "The four local fields",
+      "path": "app/config.py",
+      "lines": "62-82"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/config.py — the settings",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    },
+    {
+      "label": "docker-compose.yml — the local passthrough",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docker-compose.yml"
+    }
+  ],
+  "glossary_terms": [
+    "lm studio — a local server speaking the OpenAI protocol",
+    "base url — the address the adapter calls",
+    "model id — the name the server loads"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.3.js */
+/* 9.3 — Secrets: three keys that must never be printed
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.3",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "Secrets: three keys that must never be printed",
+  "order": 903,
+  "duration_min": 25,
+  "concept_md": "### Three keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN` and `GITHUB_WEBHOOK_SECRET`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
+  "code_examples": [
+    {
+      "id": "9.3-ex-0",
+      "lang": "console",
+      "caption": "A secret is absent from the representation",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\ns = Settings(sarvam_api_key=\"sk-live-do-not-print\")\nprint(\"leaks in repr:\", \"sk-live\" in repr(s))\nprint(\"field is set:\", s.sarvam_api_key is not None)\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "leaks in repr: False\nfield is set: True",
+      "why_not": "the browser runner does not embed app/config.py, and it needs pydantic-settings; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What keeps a secret out of a traceback?",
+      "options": [
+        "`repr=False` on the field",
+        "Encrypting it at rest",
+        "Keeping it in a file only",
+        "A validator that redacts"
+      ],
+      "answer": 0,
+      "why": "The value is removed from the object's representation, so a printed object or a settings dump cannot show it."
+    },
+    {
+      "q": "What does the webhook secret produce after comparison?",
+      "options": [
+        "A boolean result",
+        "The signature, echoed",
+        "A hash of both values",
+        "The secret, asterisked"
+      ],
+      "answer": 0,
+      "why": "The comparison result is what the caller needs; returning anything derived from the secret would widen the surface."
+    },
+    {
+      "q": "Which secret is outside this code's protection?",
+      "options": [
+        "One pasted in a shell",
+        "One in an env variable",
+        "One loaded from a .env",
+        "One held in Settings"
+      ],
+      "answer": 0,
+      "why": "Shell history, screenshots and chat logs are outside the program, which is why the example file ships empty."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show that a set secret does not appear in the settings repr.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\n\ns = Settings(github_token=\"ghp_secret_value\")\nprint(\"contains token:\", \"ghp_secret_value\" in repr(s))\n```",
+    "explanation": "It prints `False`, which is the guarantee the field declaration buys."
+  },
+  "exercise": {
+    "prompt": "Which three fields are declared with `repr=False`? Check rather than assume.",
+    "hint": "Read the field metadata for each secret.",
+    "solution": "```python\nfrom app.config import Settings\n\nfor name, f in Settings.model_fields.items():\n    if f.repr is False:\n        print(name)\n```",
+    "explanation": "The list is the answer, derived from the class rather than from the documentation."
+  },
+  "common_mistakes": [
+    "Logging a settings object that contains a secret without `repr=False`.",
+    "Returning the webhook secret in an error message to help debugging.",
+    "Committing a real key into `.env` because it is gitignored locally."
+  ],
+  "project_links": [
+    {
+      "label": "The Sarvam key field",
+      "path": "app/config.py",
+      "lines": "30-32"
+    },
+    {
+      "label": "The GitHub token field",
+      "path": "app/config.py",
+      "lines": "34-36"
+    },
+    {
+      "label": "The webhook secret field",
+      "path": "app/config.py",
+      "lines": "52-56"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/config.py — the settings",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    },
+    {
+      "label": ".env.example — empty by design",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/.env.example"
+    }
+  ],
+  "glossary_terms": [
+    "secret — a value that must not appear in output",
+    "repr — the text a printed object shows",
+    "redaction — removing a value from what is shown"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.4.js */
+/* 9.4 — Precedence, defaults and timeouts: what happens when nothing is set
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.4",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "Precedence, defaults and timeouts: what happens when nothing is set",
+  "order": 904,
+  "duration_min": 25,
+  "concept_md": "### Nothing set is a valid state\n\nRun the tool with an empty environment and it starts in `mock` mode with persistence on and no credentials. That is not a fallback bolted on late; it is what every default in `Settings` is chosen for.\n\n### The precedence\n\nA value comes from the process environment first, then from `.env`, then from the field default. Environment beats file because a shell variable is the more deliberate act — you typed it for this run.\n\n### Timeouts\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative. `lmstudio_timeout` is larger, because a local model on a laptop is slower than a hosted endpoint. Both are floats, so a caller can tune without a code change.\n\n### Why the defaults are conservative\n\nPersistence on, authentication off, review mode `auto`. Each is the choice that keeps a demo answerable: a database that exists means history works, open management endpoints mean no key is needed to look at the result, and `auto` means the selector decides rather than the reader.\n\n### What the defaults are not\n\nThey are not a security posture. Authentication off is right for a demo and wrong for a deployment, and `api_auth_enabled` exists for exactly that reason.",
+  "code_examples": [
+    {
+      "id": "9.4-ex-0",
+      "lang": "console",
+      "caption": "What nothing set actually gives you",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\ns = Settings()\nfor name in (\"review_mode\", \"api_auth_enabled\", \"request_timeout_s\", \"lmstudio_timeout\"):\n    print(\"%-20s %r\" % (name, getattr(s, name)))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "review_mode          'auto'\napi_auth_enabled     False\nrequest_timeout_s    20.0\nlmstudio_timeout     120.0",
+      "why_not": "the browser runner does not embed app/config.py, and it needs pydantic-settings; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which source wins when both are set?",
+      "options": [
+        "The process environment",
+        "The .env file",
+        "The field default",
+        "Whichever one loaded first"
+      ],
+      "answer": 0,
+      "why": "A shell variable is the more deliberate act for one run, so it beats the file."
+    },
+    {
+      "q": "What does `request_timeout_s` refuse?",
+      "options": [
+        "Zero and negative values",
+        "Values above sixty seconds",
+        "Non-integer values only",
+        "Nothing; it is unbounded"
+      ],
+      "answer": 0,
+      "why": "The field carries `gt=0`, so an unusable timeout fails at construction rather than at request time."
+    },
+    {
+      "q": "Is authentication on by default?",
+      "options": [
+        "No, it is off for the demo",
+        "Yes, with a seeded key",
+        "Only when a database exists",
+        "Only in live review mode"
+      ],
+      "answer": 0,
+      "why": "Open management endpoints keep the demo answerable without a key; `api_auth_enabled` exists for deployments."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the four defaults that make an empty environment usable.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\n\ns = Settings()\nprint(s.review_mode, s.api_auth_enabled, s.request_timeout_s, s.database_path)\n```",
+    "explanation": "`auto`, `False`, `20.0` and a relative SQLite path — the four that keep a demo answerable."
+  },
+  "exercise": {
+    "prompt": "Which default would you change first for a deployment, and which field changes it?",
+    "hint": "Think about what is open that should not be.",
+    "solution": "```python\nfrom app.config import Settings\n\nprint(Settings.model_fields[\"api_auth_enabled\"].default)\n```\n\n`False` — set `API_AUTH_ENABLED=true` and seed an admin key before exposing the management endpoints.",
+    "explanation": "The default is right for a demo and wrong for a deployment, which is why the switch exists rather than a hardcoded choice."
+  },
+  "common_mistakes": [
+    "Assuming `.env` overrides a shell variable; the environment wins.",
+    "Setting a zero timeout to disable it, which the field refuses.",
+    "Exposing the management endpoints with authentication still off."
+  ],
+  "project_links": [
+    {
+      "label": "The auth switch and its default",
+      "path": "app/config.py",
+      "lines": "91-98"
+    },
+    {
+      "label": "The database path default",
+      "path": "app/config.py",
+      "lines": "83-90"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/config.py — the settings",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    },
+    {
+      "label": ".env.example — every variable",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/.env.example"
+    }
+  ],
+  "glossary_terms": [
+    "precedence — which source wins when two are set",
+    "default — the value used when nothing is set",
+    "timeout — the bound on one HTTP request"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.5.js */
+/* 9.5 — The zero-network proof
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.5",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "The zero-network proof",
+  "order": 905,
+  "duration_min": 30,
+  "concept_md": "### A claim needs a test\n\n\"Works offline\" is easy to say and easy to break. `scripts/verify_offline.py` proves it: it patches the socket layer so any outbound connection raises, then runs the suite. If a test secretly calls the network, it fails.\n\n### How the block works\n\n`block_network()` replaces the connect functions on `socket.socket` and `socket.create_connection` with a refusal that records what was attempted. Loopback is exempt — `localhost`, `127.0.0.1` and `::1` are allowed, because a local model server and an in-process test client both need it.\n\n### Why loopback is exempt\n\nBecause \"offline\" means \"no internet\", not \"no sockets\". A test that binds an ephemeral port to check a webhook signature is still offline. Refusing loopback would make the proof impossible to run rather than stronger.\n\n### What it does not prove\n\nThat the code makes no HTTP call at all — only that it makes none when the suite runs. A code path no test reaches could still call out, which is why the coverage of the suite is part of the argument.",
+  "code_examples": [
+    {
+      "id": "9.5-ex-0",
+      "lang": "console",
+      "caption": "The loopback set, and what counts as local",
+      "code": "python - <<'PY'\nfrom scripts.verify_offline import LOOPBACK_HOSTS\n\nprint(sorted(LOOPBACK_HOSTS))\nfor host in (\"\", \"localhost\", \"127.0.0.1\", \"example.com\"):\n    print(\"%-12s loopback=%s\" % (host or \"(empty)\", host in LOOPBACK_HOSTS))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "['', '127.0.0.1', '::1', 'localhost', 'localhost.localdomain']\n(empty)      loopback=True\nlocalhost    loopback=True\n127.0.0.1    loopback=True\nexample.com  loopback=False",
+      "why_not": "the browser runner does not embed app/config.py, and it needs pydantic-settings; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the proof patch?",
+      "options": [
+        "The socket connect functions",
+        "The HTTP client library",
+        "The DNS resolver alone",
+        "The pytest collection stage here"
+      ],
+      "answer": 0,
+      "why": "Patching connect at the socket layer catches every client, rather than one library's calls."
+    },
+    {
+      "q": "Why is loopback exempt?",
+      "options": [
+        "Offline means no internet, not no sockets",
+        "Because tests need a real server",
+        "Because pytest binds a local port",
+        "Because the patch cannot ever see it at all"
+      ],
+      "answer": 0,
+      "why": "A local model and an in-process test client both use loopback, and neither is a network call."
+    },
+    {
+      "q": "What does the proof not establish?",
+      "options": [
+        "That unreached code never calls out",
+        "That the suite passes offline",
+        "That loopback still works fine for tests",
+        "That a call would be recorded"
+      ],
+      "answer": 0,
+      "why": "It only proves the paths the suite exercises; an untested branch could still reach the network."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show which hosts the blocker refuses and which it allows.",
+    "starter": "",
+    "solution": "```python\nfrom scripts.verify_offline import LOOPBACK_HOSTS\n\nfor host in (\"example.com\", \"localhost\"):\n    print(host, \"allowed\" if host in LOOPBACK_HOSTS else \"blocked\")\n```",
+    "explanation": "A public name is blocked and a loopback name is allowed, which is the whole policy in two lines."
+  },
+  "exercise": {
+    "prompt": "Which five host spellings are treated as loopback? Read the set rather than guessing.",
+    "hint": "The empty string counts as local.",
+    "solution": "```python\nfrom scripts.verify_offline import LOOPBACK_HOSTS\n\nprint(len(LOOPBACK_HOSTS), sorted(LOOPBACK_HOSTS))\n```",
+    "explanation": "Five, including the empty string — an empty host means a local bind rather than a remote address."
+  },
+  "common_mistakes": [
+    "Assuming the proof covers code the suite never runs.",
+    "Blocking loopback, which makes the local provider untestable.",
+    "Reading 'offline' as 'no sockets at all'."
+  ],
+  "project_links": [
+    {
+      "label": "The loopback set",
+      "path": "scripts/verify_offline.py",
+      "lines": "45"
+    },
+    {
+      "label": "The refusal that records the attempt",
+      "path": "scripts/verify_offline.py",
+      "lines": "54-65"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "scripts/verify_offline.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/scripts/verify_offline.py"
+    },
+    {
+      "label": "Makefile — the verify target",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/Makefile"
+    }
+  ],
+  "glossary_terms": [
+    "loopback — an address that never leaves the machine",
+    "monkeypatch — replacing a function for the duration of a run",
+    "zero-network — no connection outside the machine"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.6.js */
+/* 9.6 — Pinned dependencies: ranges versus a lock
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.6",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "Pinned dependencies: ranges versus a lock",
+  "order": 906,
+  "duration_min": 25,
+  "concept_md": "### Two files, two jobs\n\n`requirements.txt` carries ranges — `fastapi>=0.110,<1` — and is what a human reads to know what the project needs. `requirements.lock` carries exact pins, one per line with `==`, and is what CI installs.\n\n### Why both\n\nA range says what is compatible; a pin says what was tested. Installing from ranges means today's install can differ from yesterday's, which is how a suite that passed on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
+  "code_examples": [
+    {
+      "id": "9.6-ex-0",
+      "lang": "console",
+      "caption": "Count the pins, and show the first range",
+      "code": "import pathlib\n\nlock = pathlib.Path(\"requirements.lock\").read_text().splitlines()\npins = [l for l in lock if \"==\" in l and not l.strip().startswith(\"#\")]\nprint(\"pins:\", len(pins))\nprint(\"first range:\", pathlib.Path(\"requirements.txt\").read_text().splitlines()[0])",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "/bin/sh: 1: import: not found\n/bin/sh: 3: Syntax error: \"(\" unexpected"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the lock file record?",
+      "options": [
+        "Exactly what was tested",
+        "What would be compatible",
+        "The project's direct needs",
+        "The Python version only"
+      ],
+      "answer": 0,
+      "why": "A pin says what ran; a range says what is allowed, and the two answer different questions."
+    },
+    {
+      "q": "How is a version in the lock changed?",
+      "options": [
+        "Regenerate it from the range",
+        "Edit the version by hand",
+        "Delete the line and reinstall",
+        "Add a second pin beside it"
+      ],
+      "answer": 0,
+      "why": "A hand-edited lock lies about what was tested, so the range changes first and the lock is regenerated."
+    },
+    {
+      "q": "What does the pin count describe?",
+      "options": [
+        "The lock at this commit",
+        "A target the project aims for",
+        "The number of direct needs",
+        "The Python standard library"
+      ],
+      "answer": 0,
+      "why": "It is a fact about the file, which is why the guide computes it instead of carrying a typed number."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print how many pins the lock holds and how many direct requirements exist.",
+    "starter": "",
+    "solution": "```console\n$ grep -c '==' requirements.lock\n$ grep -vc '^#' requirements.txt\n```",
+    "explanation": "The lock is larger than the requirement list, because it includes every transitive package."
+  },
+  "exercise": {
+    "prompt": "How many pins are in the lock, and how many lines does requirements.txt hold? Compare them.",
+    "hint": "Count the `==` lines in the lock.",
+    "solution": "```console\n$ grep -c '==' requirements.lock\n37\n$ wc -l < requirements.txt\n```",
+    "explanation": "The lock is far longer: it pins transitive packages the requirement file never names."
+  },
+  "common_mistakes": [
+    "Editing a version in the lock instead of the range.",
+    "Installing from ranges in CI, so the run is not reproducible.",
+    "Treating the pin count as a quality target."
+  ],
+  "project_links": [
+    {
+      "label": "The ranges a human reads",
+      "path": "requirements.txt",
+      "lines": "1-6"
+    },
+    {
+      "label": "The pins CI installs",
+      "path": "requirements.lock",
+      "lines": "1-8"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "requirements.lock — the pins",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/requirements.lock"
+    },
+    {
+      "label": "docs/REPRODUCIBILITY.md",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/REPRODUCIBILITY.md"
+    }
+  ],
+  "glossary_terms": [
+    "pin — an exact version recorded in the lock",
+    "range — a compatible span a human reads",
+    "lock file — the record of what was installed"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.7.js */
+/* 9.7 — Docker: the pinned environment as an image
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.7",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "Docker: the pinned environment as an image",
+  "order": 907,
+  "duration_min": 30,
+  "concept_md": "### Two stages\n\nThe `Dockerfile` builds in one stage and runs in another. The builder installs from the lock into a virtual environment; the runtime copies that environment and nothing else. The compiler toolchain never reaches the final image.\n\n### What the runtime stage guarantees\n\nIt runs as `USER 10001:10001` — not root — and starts `uvicorn app.main:app` on port 8000. A container that runs as root turns any file-write bug into a host-write bug, which is why the non-root user is in the image rather than in a deployment note.\n\n### The compose file and the local model\n\n`docker-compose.yml` defines one service, `app`. Its comments document the LM Studio passthrough: on Desktop, `host.docker.internal` resolves and `LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1` works. On Linux it does not resolve by default, so the file shows the `host.docker.internal:host-gateway` mapping that makes the same value work.\n\n### Why the passthrough is documented rather than automated\n\nBecause it cannot be automated portably. A mapping that works on Desktop and a mapping that works on Linux are different, and guessing wrong produces a container that cannot reach a model with no error that explains why.",
+  "code_examples": [
+    {
+      "id": "9.7-ex-0",
+      "lang": "console",
+      "caption": "The two stages, the user and the command",
+      "code": "grep -n \"^FROM\\|^USER\\|^CMD\" Dockerfile",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "22:FROM python:3.12-slim AS builder\n46:FROM python:3.12-slim AS runtime\n79:USER 10001:10001\n90:CMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the runtime stage copy?",
+      "options": [
+        "The built environment only",
+        "The whole build context",
+        "The compiler toolchain too",
+        "The source, not the env"
+      ],
+      "answer": 0,
+      "why": "The builder's virtual environment is copied and the toolchain is left behind, which keeps the image small."
+    },
+    {
+      "q": "Why does the image set a non-root user?",
+      "options": [
+        "A write bug stays in the container",
+        "Root is slower at startup",
+        "Docker requires a numeric uid",
+        "The lock installs as that same uid"
+      ],
+      "answer": 0,
+      "why": "Running as root turns a file-write bug into a host-write bug, so the user belongs in the image."
+    },
+    {
+      "q": "Why is the LM Studio mapping documented, not automated?",
+      "options": [
+        "Desktop and Linux need different maps",
+        "Compose cannot set environment",
+        "The mapping needs a paid Docker tier plan",
+        "LM Studio refuses all containers"
+      ],
+      "answer": 0,
+      "why": "A mapping that works on one host does not work on the other, and a wrong guess fails without explaining."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the base image, the user and the command the runtime stage uses.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '^FROM\\|^USER\\|^CMD' Dockerfile\n```",
+    "explanation": "Two `FROM` lines, one `USER`, one `CMD` — the whole runtime contract in four lines."
+  },
+  "exercise": {
+    "prompt": "How many build stages does the Dockerfile have, and which line starts the second?",
+    "hint": "Count the `FROM` instructions.",
+    "solution": "```console\n$ grep -c '^FROM' Dockerfile\n2\n$ grep -n 'AS runtime' Dockerfile\n```",
+    "explanation": "Two stages: a builder and a runtime, so the toolchain never reaches the final image."
+  },
+  "common_mistakes": [
+    "Copying the whole build context into the runtime stage.",
+    "Running the container as root because it is simpler.",
+    "Assuming `host.docker.internal` resolves on Linux by default."
+  ],
+  "project_links": [
+    {
+      "label": "The builder stage",
+      "path": "Dockerfile",
+      "lines": "22"
+    },
+    {
+      "label": "The runtime stage",
+      "path": "Dockerfile",
+      "lines": "46"
+    },
+    {
+      "label": "The non-root user and the command",
+      "path": "Dockerfile",
+      "lines": "79-90"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "Dockerfile — two stages",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/Dockerfile"
+    },
+    {
+      "label": "docker-compose.yml — the local passthrough",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docker-compose.yml"
+    }
+  ],
+  "glossary_terms": [
+    "stage — one FROM block in a multi-stage build",
+    "runtime image — the final image that ships",
+    "passthrough — reaching a host service from a container"
+  ]
+});
+
+</script>
+<script>
+/* content/part-9/lesson-9.8.js */
+/* 9.8 — make verify, then a guided read and rebuild
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "9.8",
+  "part": 9,
+  "part_title": "Configuration and offline-first",
+  "title": "make verify, then a guided read and rebuild",
+  "order": 908,
+  "duration_min": 30,
+  "concept_md": "### One command\n\n`make verify` runs `bash scripts/verify.sh`, which installs from the lock, runs the suite with outbound connections blocked, and validates the learning site. It is the acceptance test: if it prints a green summary, the tree is as good as it claims.\n\n### What it protects\n\nThree things at once — that the suite passes, that it passes with no network, and that the site's lessons are still coherent. Running them separately is how one of the three silently rots.\n\n### Reading `app/config.py` in order\n\nFour blocks: the class and its `model_config`, the credential fields, the local-model fields, and the persistence and auth fields. Every field has a default, every secret has `repr=False`, and the descriptions carry the reasoning that would otherwise live in a wiki.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_offline.py` asks you to reimplement the settings object and the network blocker against a small suite. Start with `Settings` and its defaults; then the loopback set; then the blocker. The tests name the behaviour, not the line.\n\n### What the guided read should leave you with\n\nThat configuration is data, not code — one class, every field defaulted, secrets unprintable, and one command that proves the whole thing runs without a network.",
+  "code_examples": [
+    {
+      "id": "9.8-ex-0",
+      "lang": "console",
+      "caption": "The verify target and what it runs",
+      "code": "grep -n \"^verify\" -A 2 Makefile",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "20:verify:\n21-\tbash scripts/verify.sh\n22-"
+    },
+    {
+      "id": "9.8-ex-1",
+      "lang": "console",
+      "caption": "The rebuild suite, which skips until you write the module",
+      "code": "python -m pytest -q rebuild/tests/test_rebuild_offline.py 2>&1 | tail -2 | sed -E 's/ in [0-9.]+s$//'",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "sssss                                                                    [100%]\n5 skipped"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does `make verify` run?",
+      "options": [
+        "bash scripts/verify.sh",
+        "pytest on the tests directory",
+        "The Docker build and push",
+        "The site validator alone"
+      ],
+      "answer": 0,
+      "why": "It delegates to one script, so the three checks cannot be run separately and drift apart."
+    },
+    {
+      "q": "Which three things does it protect at once?",
+      "options": [
+        "Suite, offline, site coherence",
+        "Lint, types, and test coverage",
+        "Build, image, and deployment",
+        "Config, secrets, and auth"
+      ],
+      "answer": 0,
+      "why": "Running them separately is how one of the three silently rots while the others stay green."
+    },
+    {
+      "q": "What does the guided read conclude?",
+      "options": [
+        "Configuration is data, not code",
+        "Config must be read at import",
+        "Secrets belong in the repo",
+        "Timeouts should be hardcoded in code"
+      ],
+      "answer": 0,
+      "why": "One class, every field defaulted, secrets unprintable, and one command that proves it offline."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the four blocks of `app/config.py` by their line ranges.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '^class \\|^    [a-z_]*: ' app/config.py | head -20\n```",
+    "explanation": "The class first, then credentials, local model, and persistence — the order the guided read follows."
+  },
+  "exercise": {
+    "prompt": "Which line does the `verify` target start on, and what command does it run?",
+    "hint": "Read the Makefile rather than the README.",
+    "solution": "```console\n$ grep -n '^verify' -A 1 Makefile\n20:verify:\n21-\tbash scripts/verify.sh\n```",
+    "explanation": "Line 20, and it delegates to the script so the three checks stay together."
+  },
+  "common_mistakes": [
+    "Running the suite and the validator separately, so one rots.",
+    "Reimplementing the blocker without the loopback exemption.",
+    "Treating the rebuild suite's skips as passes."
+  ],
+  "project_links": [
+    {
+      "label": "The verify target",
+      "path": "Makefile",
+      "lines": "20-21"
+    },
+    {
+      "label": "The rebuild suite",
+      "path": "rebuild/tests/test_rebuild_offline.py",
+      "lines": "1-30"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "Makefile — the targets",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/Makefile"
+    },
+    {
+      "label": "rebuild/README.md — the rebuild exercises",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/rebuild/README.md"
+    }
+  ],
+  "glossary_terms": [
+    "acceptance test — the one command that proves the tree",
+    "guided read — a walk through a file in dependency order",
+    "rebuild exercise — reimplementing a module against its tests"
   ]
 });
 

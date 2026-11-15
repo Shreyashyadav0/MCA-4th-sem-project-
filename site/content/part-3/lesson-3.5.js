@@ -51,7 +51,7 @@ window.LESSONS.push({
         "A `Path` to a per-test directory pytest removes afterwards",
         "A string",
         "The system temp directory, shared",
-        "A fixture you must clean up yourself"
+        "A fixture you must clean up yourself, with no automatic teardown"
       ],
       "answer": 0,
       "why": "Per-test and self-cleaning, which is why a test can write a file without leaving one behind."

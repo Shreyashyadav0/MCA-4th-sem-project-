@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "One tests a function's contract, the other tests the pieces together",
         "One is faster",
-        "One uses pytest and the other does not",
+        "One uses pytest and the other does not use a test runner at all",
         "There is none"
       ],
       "answer": 0,

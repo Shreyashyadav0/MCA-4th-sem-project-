@@ -32,7 +32,7 @@ window.LESSONS.push({
     {
       "q": "What does `extra=\"forbid\"` protect?",
       "options": [
-        "The severity ladder from new values",
+        "The severity ladder from new values that the model has not seen",
         "The database schema",
         "The JSON encoder from cycles",
         "The contract: a finding cannot grow a field no consumer knows"
@@ -54,7 +54,7 @@ window.LESSONS.push({
     {
       "q": "Why is `strict=True` not used on this model?",
       "options": [
-        "Because frozen and strict cannot be combined",
+        "Because frozen and strict cannot be combined on the same model",
         "Because strict mode disables validators",
         "Because inputs arrive as JSON and from a model, where coercion helps",
         "Because strict mode is slower"

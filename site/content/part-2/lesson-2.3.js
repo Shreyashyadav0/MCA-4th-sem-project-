@@ -34,7 +34,7 @@ window.LESSONS.push({
       "q": "`Field(min_length=1)` on a field — does that make it optional?",
       "options": [
         "Yes, with an empty default",
-        "Only when the model is frozen",
+        "Only when the model is frozen, which is a separate setting",
         "Yes, if the type is str",
         "No: the field is still required"
       ],
@@ -46,7 +46,7 @@ window.LESSONS.push({
       "options": [
         "When the rule only constrains the field's type",
         "When the rule needs more than one field or more than one line of logic",
-        "Always — a validator is clearer than a constraint",
+        "Always — a validator is clearer than a constraint, so prefer it",
         "When the field happens to be a string type"
       ],
       "answer": 1,

@@ -28,7 +28,7 @@ window.LESSONS.push({
       "options": [
         "Starts a uvicorn server on a random port",
         "Sends a real HTTP request over loopback",
-        "Calls the handler function directly, skipping routing",
+        "Calls the handler function directly, skipping routing, which is what a unit test does",
         "Drives the ASGI application in-process, with no socket"
       ],
       "answer": 3,
@@ -40,7 +40,7 @@ window.LESSONS.push({
         "It makes the whole suite run faster",
         "A test needing a port would break the offline promise",
         "It removes the need for any assertions",
-        "It lets the tests run without Python installed"
+        "It lets the tests run without Python installed, which is not the reason"
       ],
       "answer": 1,
       "why": "The suite's zero-network promise is only true if the tests never open a socket; in-process requests make that structural."

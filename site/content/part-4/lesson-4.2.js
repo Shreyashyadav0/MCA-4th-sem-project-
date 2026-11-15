@@ -29,7 +29,7 @@ window.LESSONS.push({
         "How the endpoint is grouped in the docs",
         "The URL path the endpoint answers on",
         "The status code the endpoint returns",
-        "Whether the endpoint requires a login"
+        "Whether the endpoint requires a login before it answers"
       ],
       "answer": 0,
       "why": "Tags are documentation: `/docs` groups operations by them, and nothing about the request or the response depends on the value."
@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why is the `/review` decorator fifteen lines long?",
       "options": [
-        "FastAPI requires one parameter per line",
+        "FastAPI requires one parameter per line, so a long signature is normal",
         "The handler carries a long docstring",
         "The decorator was reformatted by hand",
         "It carries a responses block with an example"
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "`POST /rules` answers 405. Why?",
       "options": [
-        "No route is registered for that path",
+        "No route is registered for that path, so the client gets a 404",
         "The path exists, but only GET is allowed",
         "The body did not match the model",
         "The rule registry came back empty"

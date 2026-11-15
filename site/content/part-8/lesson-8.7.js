@@ -46,7 +46,7 @@ window.LESSONS.push({
       "options": [
         "So it can be quoted and read in JSON",
         "So it can be translated later",
-        "So it can be sorted alphabetically",
+        "So it can be sorted alphabetically in the report's citation column",
         "Because enums cannot hold a colon"
       ],
       "answer": 0,
@@ -58,7 +58,7 @@ window.LESSONS.push({
         "A06, vulnerable and outdated components",
         "A04, insecure design",
         "A02, cryptographic failures",
-        "A10, server-side request forgery"
+        "A10, server-side request forgery, which one rule does cite"
       ],
       "answer": 0,
       "why": "A dependency version is not visible on an added line, so no line-local rule can claim that entry; A04 is cited by eleven rules."

@@ -47,7 +47,7 @@ window.LESSONS.push({
       "options": [
         "8, the last line touched",
         "2, the number of spans",
-        "7, the highest line number",
+        "7, the highest line number anywhere in the hunk",
         "4, the number of added lines"
       ],
       "answer": 3,

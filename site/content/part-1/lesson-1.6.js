@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "You run `python tests/test_rules.py` and see no test output. Why?",
       "options": [
-        "The tests are broken and the environment needs reinstalling",
+        "The tests are broken and the environment needs reinstalling from the lock",
         "pytest is missing from the environment you are running in",
         "Running the file executes it as __main__: the test functions are defined, not called",
         "The file was never saved after the last edit was made"

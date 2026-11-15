@@ -50,7 +50,7 @@ window.LESSONS.push({
         "To make every declared field required",
         "So an unknown key is an error, not a shrug",
         "To make parsing measurably faster",
-        "To allow either diff or code, not both"
+        "To allow either diff or code, not both in the same request"
       ],
       "answer": 1,
       "why": "Silently ignoring `nope` would let a client believe it sent something meaningful; forbidding turns it into a named error."

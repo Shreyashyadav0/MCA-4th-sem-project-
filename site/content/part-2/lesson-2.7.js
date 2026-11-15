@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "Why does the repository sort by `severity.rank` instead of the string?",
       "options": [
         "Strings cannot be sorted",
-        "Because severity is not a string",
+        "Because severity is not a string and cannot be compared to one",
         "Because rank is faster",
         "Because rank encodes the order CRITICAL > HIGH > MEDIUM > LOW"
       ],

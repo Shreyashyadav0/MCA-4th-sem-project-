@@ -53,7 +53,7 @@ window.LESSONS.push({
       "options": [
         "Because Pydantic cannot do ints",
         "Because a line may be a range like \"42-45\"",
-        "Because the database stores strings",
+        "Because the database stores strings, so the type is lost on the way in",
         "To make sorting faster"
       ],
       "answer": 1,
