@@ -614,7 +614,8 @@ a consistently mis-ordered site, and the gate is now run by CI and by
 
 1. Lesson 0.2 called `docs/learning/` "the source of truth", but `HANDOFF.md`
    says it is the ledger that wins, and `docs/learning/README.md:161` still
-   quotes a stale `597 passed`. The lesson and the site README now name
+   quotes a stale pass count from the frozen baseline. The lesson and the site
+   README now name
    `HANDOFF.md` as the ledger and describe `docs/learning/` as the curriculum.
 2. Lesson 1.7 used `@contextlib.contextmanager` and `yield` four lessons before
    either is taught, with no pointer forward. It now says so explicitly.
