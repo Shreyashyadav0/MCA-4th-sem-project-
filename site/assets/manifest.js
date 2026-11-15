@@ -61,6 +61,14 @@
     "content/part-4/lesson-4.5.js",
     "content/part-4/lesson-4.6.js",
     "content/part-4/lesson-4.7.js",
-    "content/part-4/lesson-4.8.js"
+    "content/part-4/lesson-4.8.js",
+    "content/part-5/lesson-5.1.js",
+    "content/part-5/lesson-5.2.js",
+    "content/part-5/lesson-5.3.js",
+    "content/part-5/lesson-5.4.js",
+    "content/part-5/lesson-5.5.js",
+    "content/part-5/lesson-5.6.js",
+    "content/part-5/lesson-5.7.js",
+    "content/part-5/lesson-5.8.js"
   ];
 })();

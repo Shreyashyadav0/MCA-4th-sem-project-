@@ -17,6 +17,7 @@ is the bug.
 | 2b | 2026-11-15 | `b3924dc` | 0 added, 15 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 3 | 2026-11-15 | `f0c83f7` | 24 added, 12 changed | 18 (`2.1`–`2.10`, `3.1`–`3.8`) | `OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,…,3.8` |
 | 4a | 2026-11-15 | `615602d` | 8 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
+| 4b | 2026-11-15 | `451c822` | 9 added, 4 changed | 8 (`5.1`–`5.8`) | `OK lessons=50 parts_covered=6 manifest_entries=50 ids=0.1,…,5.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -840,3 +841,43 @@ manifest_entries=42`, exit 0. Banned numbers under `site/` → empty. `grep -rn
 'passed' site/content/part-4/` → empty. The suite is still green; this wave touches no code under
 `app/`, `tests/` or `benchmarks/`, so this entry quotes no test number. Manifest and all three pages
 list the same eight paths in lesson order.
+
+## Wave 4b — Part 5, "Unified diffs"
+
+Eight lessons, `5.1`–`5.8`, filling the part `contracts.js` already declared at
+eight. The site is at 50 lessons across six parts.
+
+This part teaches the diff **format**: the four line kinds and the header block
+(5.1), the `@@` counters and the omitted-count-means-one rule (5.2), the two
+running counters that turn a `+` into a new-file line number (5.3), the four
+change kinds and why a pure rename has no hunk (5.4), `/dev/null` and
+`normalize_path` (5.5), the `binary` flag that keeps "no findings" apart from "not
+examined" (5.6), `parse_diff` / `parse_diff_file` / `DiffBundle` (5.7), and
+`DiffParseError` becoming a 422 (5.8).
+
+**Four examples run in the browser.** The wave brief said Pyodide has no pydantic
+and that every example would therefore be terminal. The brief is wrong: Wave 1.5
+above records pydantic 2.10.6 as present, lesson 0.1 already runs `parse_diff` on
+the sample in the runner, and `embed_sources.py` embeds `app/parser.py`. So 5.2,
+5.3, 5.4 and 5.7 are `run_tier: "browser"` with `packages: ["pydantic"]` and the
+four embedded files — they actually run.
+
+The other five stay terminal for real reasons: three are shell commands (`head`,
+`sed`, `grep`) and the runner has no shell; 5.8's first raises, and the runner
+reports stdout rather than tracebacks; its second needs fastapi, which the runner
+does not have. Every `why_not` names the actual blocker. Every output was produced by running the command shown —
+the two-file parse, the prose failure, the empty-input failure, the single-line
+hunk counters, and the 422 body.
+
+**Two deviations from the brief, both in favour of the tree.** The brief said
+`_HUNK_RE` spans `62-65`; it spans `62-66`, the closing bracket included. And the
+brief's `parse_diff` example prints `added_spans` only; the lessons also show the
+line kinds, which are `added` / `removed` / `context` — not `+` / `-` / space,
+which is the *text* form, and the distinction caught a wrong try-it during the
+build.
+
+**Gate.** `validate_lessons.py` → `OK lessons=50 parts_covered=6
+manifest_entries=50`, exit 0. Manifest and all three pages carry the same eight
+paths in order. Banned numbers under `site/` empty; `grep -rn 'passed'
+site/content/part-5/` empty; `embed_sources --check` OK; suite still green. This
+wave touches no code.
