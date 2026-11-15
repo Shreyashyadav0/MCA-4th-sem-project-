@@ -8,10 +8,9 @@
  * which are filled with that same accent, so a background-coloured halo sits
  * outside it and guarantees one of the two bands contrasts. */
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
-  border-radius: var(--radius);
-  box-shadow: 0 0 0 6px var(--bg);
+  box-shadow: 0 0 0 6px var(--focus-halo);
 }
 
 .visually-hidden {
@@ -30,7 +29,7 @@
 .skip-link {
   position: absolute;
   left: var(--space-4);
-  top: calc(-1 * var(--space-6));
+  transform: translateY(-200%);
   padding: var(--space-2) var(--space-3);
   background: var(--accent);
   color: var(--accent-contrast);
@@ -101,6 +100,11 @@
 
   .pane-right {
     overflow: visible;
+  }
+
+  .code-figure {
+    overflow: visible; /* a long line must not be clipped on paper */
+    box-shadow: none;
   }
 
   .pane-right .example-output {

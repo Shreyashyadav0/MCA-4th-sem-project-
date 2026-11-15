@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "dataclass vs BaseModel — when each wins",
   "order": 210,
   "duration_min": 25,
-  "concept_md": "### The line this repository draws\n\n| Shape | Type | Why |\n|---|---|---|\n| `Finding` | `BaseModel` | built from untrusted input — a rule's dict or a model's JSON |\n| `ReviewResult` | `BaseModel` | assembled from findings and serialised for the API |\n| `MatchResult` | `@dataclass(frozen=True)` | internal, computed from trusted values |\n| `InlineComment` | `@dataclass(frozen=True)` | internal, built by the renderer from a finding |\n\nThe rule is trust, not taste. Data that enters from outside gets validated; data the program computes from already-validated values does not.\n\n### What each gives you\n\nA dataclass gives `__init__`, `__repr__`, `__eq__`, immutability with `frozen=True`, and nothing else — no validation, no serialiser, no JSON schema. It is in the standard library and it is fast.\n\nA `BaseModel` gives validation, coercion, a serialiser, a schema, and error paths. It costs an import, a validator pass per instance, and a dependency.\n\n### Why not always validate\n\nValidation is work, and on a hot path it is work you already did. `MatchResult` is built once per sample from values that were validated when they entered; validating it again would buy nothing and slow the benchmark down.\n\n### Why not always a dataclass\n\nA frozen dataclass cannot tell you that a field is the wrong type. The first place that notices is whatever reads it, and by then the traceback names the reader.",
+  "concept_md": "### The line this repository draws\n\n| Shape | Type | Why |\n|---|---|---|\n| `Finding` | `BaseModel` | built from untrusted input — a rule's dict or a model's JSON |\n| `ReviewResult` | `BaseModel` | assembled from findings and serialised for the API |\n| `MatchResult` | `@dataclass(frozen=True)` | internal, computed from trusted values; frozen for immutability, and not hashable because one field is a dict |\n| `InlineComment` | `@dataclass(frozen=True)` | internal, built by the renderer from a finding |\n\nThe rule is trust, not taste. Data that enters from outside gets validated; data the program computes from already-validated values does not.\n\n### What each gives you\n\nA dataclass gives `__init__`, `__repr__`, `__eq__`, immutability with `frozen=True`, and nothing else — no validation, no serialiser, no JSON schema. It is in the standard library and it is fast.\n\nA `BaseModel` gives validation, coercion, a serialiser, a schema, and error paths. It costs an import, a validator pass per instance, and a dependency.\n\n### Why not always validate\n\nValidation is work, and on a hot path it is work you already did. `MatchResult` is built once per sample from values that were validated when they entered; validating it again would buy nothing and slow the benchmark down.\n\n### Why not always a dataclass\n\nA frozen dataclass cannot tell you that a field is the wrong type. The first place that notices is whatever reads it, and by then the traceback names the reader.",
   "code_examples": [
     {
       "id": "2.10-ex-0",
@@ -33,22 +33,22 @@ window.LESSONS.push({
       "q": "What decides dataclass or BaseModel in this repository?",
       "options": [
         "Performance",
-        "Whether the data arrives from outside the program",
         "The number of fields",
+        "Whether the data arrives from outside the program",
         "Whether it needs to be frozen"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "`Finding` is built from a rule's dict or a model's JSON; `MatchResult` is computed from values already validated, so it needs no gate."
     },
     {
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
-        "That dataclasses are broken",
         "That annotations are not enforced at runtime without a validator",
-        "That the field is optional",
-        "That frozen changes types"
+        "That frozen dataclasses cannot be compared for equality",
+        "That a dataclass is always faster than a BaseModel",
+        "That annotations are not enforced at runtime without a validator"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "A dataclass records the annotation and never checks it; `BaseModel` is what turns the annotation into a check."
     },
     {
@@ -65,7 +65,7 @@ window.LESSONS.push({
   ],
   "try_it": {
     "prompt": "Classify `InlineComment` from `app/github_client.py`: dataclass or BaseModel? Read the declaration and say why.",
-    "starter": "",
+    "starter": "import inspect\n\nfrom app.github_client import InlineComment\n\nprint(\"dataclass:\", hasattr(InlineComment, \"__dataclass_fields__\"))\nprint(\"pydantic:\", hasattr(InlineComment, \"model_validate\"))\n",
     "solution": "```text\nInlineComment is a @dataclass(frozen=True). It is built by the renderer from a Finding that\nhas already been validated, and it is never parsed from outside, so validation would be work\nalready done. Freezing it makes it safe to pass around and cheap to compare.\n```",
     "explanation": "The same reasoning as `MatchResult`: internal, computed, trusted. The frozen dataclass is the shape for data that is finished."
   },

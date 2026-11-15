@@ -44,23 +44,23 @@ window.LESSONS.push({
     {
       "q": "A frozen model cannot be changed. How do you produce a valid variant?",
       "options": [
-        "`copy.deepcopy` and then assign to the field",
-        "`model_copy(update={...})` and nothing else",
         "`model_validate({**model.model_dump(), ...})`, so the change is checked",
+        "`model_copy(update={...})` and nothing else",
+        "`copy.deepcopy` and then assign to the field",
         "Unfreeze the config for that one field"
       ],
-      "answer": 2,
+      "answer": 0,
       "why": "`model_copy(update=...)` skips validation, so it can build an instance whose field is the wrong type; re-validating is what keeps the invariant true."
     },
     {
       "q": "What does `str_strip_whitespace=True` change?",
       "options": [
         "It removes all spaces inside strings",
-        "It trims leading and trailing spaces before validation",
         "It converts strings to lowercase",
+        "It trims leading and trailing spaces before validation",
         "It makes strings optional"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Trimming happens before validation, so `min_length=1` cannot be satisfied by a string of spaces."
     }
   ],

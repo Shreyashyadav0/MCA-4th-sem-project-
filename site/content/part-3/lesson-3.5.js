@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "monkeypatch and tmp_path",
   "order": 305,
   "duration_min": 25,
-  "concept_md": "### Two fixtures that replace setup code\n\n`monkeypatch` changes an attribute or an environment variable for the duration of one test and puts it back afterwards. `tmp_path` gives you a fresh directory that is deleted after the test. Between them they remove most of the reason to write a setup file.\n\n```python\nmonkeypatch.setenv(\"GITHUB_TOKEN\", \"ghp_test_token_value\")\nmonkeypatch.setattr(github_client, \"_build_github_client\", lambda token: client)\n```\n\nThose two lines are the real seam this repository tests through: a fake client installed where the real one would be built, and a token in the environment so the code path believes it is configured.\n\n### `setenv` and `delenv`\n\n`setenv` sets and restores; `delenv(..., raising=False)` removes one and restores it. The `raising=False` matters: without it, deleting a variable that is not set is an error, and a test that passes on a developer's machine fails in CI.\n\n### `setattr` on a module\n\nPatching the module attribute (`github_client._build_github_client`) rather than the imported name is what makes the seam testable: the code under test looks the name up at call time.\n\n### `tmp_path` is a Path\n\nIt is a real directory, unique per test, cleaned up afterwards. Write a diff, read it back, assert on the parse — no fixture file in the repository, no cleanup code.",
+  "concept_md": "### Two fixtures that replace setup code\n\n`monkeypatch` changes an attribute or an environment variable for the duration of one test and puts it back afterwards. `tmp_path` gives you a fresh directory that is deleted after the test. Between them they remove most of the reason to write a setup file.\n\n```python\nmonkeypatch.setenv(\"GITHUB_TOKEN\", \"ghp_test_token_value\")\nmonkeypatch.setattr(github_client, \"_build_github_client\", lambda token: client)\n```\n\nThose two lines are the real seam this repository tests through: a fake client installed where the real one would be built, and a token in the environment so the code path believes it is configured.\n\n### `setenv` and `delenv`\n\n`setenv` sets and restores; `delenv(..., raising=False)` removes one and restores it. The `raising=False` matters: without it, deleting a variable that is not set is an error, and a test that passes on a developer's machine fails in CI.\n\n### `setattr` on a module\n\nPatching the module attribute (`github_client._build_github_client`) rather than the imported name is what makes the seam testable: the code under test looks the name up at call time.\n\n### `tmp_path` is a Path\n\nIt is a real directory, unique per test, and removed under pytest's three-run retention. Write a diff, read it back, assert on the parse — no fixture file in the repository, no cleanup code.",
   "code_examples": [
     {
       "lang": "console",
@@ -27,20 +27,20 @@ window.LESSONS.push({
       "q": "What does `monkeypatch.setenv` guarantee?",
       "options": [
         "The variable stays set for the session",
-        "It is set for this test and restored afterwards",
+        "It fails if the variable exists",
         "It writes a .env file",
-        "It fails if the variable exists"
+        "It is set for this test and restored afterwards"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "The restore is the point: a test cannot leak configuration into the next one."
     },
     {
       "q": "Why `delenv(\"X\", raising=False)`?",
       "options": [
-        "It is shorter",
+        "Because deleting an unset variable raises an error",
         "Because deleting an unset variable raises unless you say otherwise",
-        "It makes the test faster",
-        "It sets X to None"
+        "Because it makes the test measurably faster to run",
+        "Because it sets the variable to an empty string"
       ],
       "answer": 1,
       "why": "Without it, a test that passes where the variable happens to be set fails in a clean environment."
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "What is `tmp_path`?",
       "options": [
-        "A string",
         "A `Path` to a per-test directory pytest removes afterwards",
+        "A string",
         "The system temp directory, shared",
         "A fixture you must clean up yourself"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "Per-test and self-cleaning, which is why a test can write a file without leaving one behind."
     }
   ],

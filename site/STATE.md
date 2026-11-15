@@ -657,14 +657,14 @@ Eighteen new lessons: `2.1`–`2.10` (Pydantic v2 at the boundary) and `3.1`–`
 `assets/css/`, linked in order from all three pages:
 
 ```
-tokens.css      50 lines   every colour, type and space value; both themes; print tokens
-layout.css     560 lines   reset, shell, header, sidebar, lesson column, pager, drawer
-components.css 438 lines   parts list, search, prose, practice, quiz, badges, tables
-code.css       292 lines   code blocks, output pane, terminal panel, split editor
-print.css      180 lines   print rules + the a11y utilities (focus, skip link, sr-only, motion)
+tokens.css      162 lines   every colour, type and space value; both themes; print tokens
+layout.css      506 lines   reset, shell, header, sidebar, lesson column, pager, drawer
+components.css  456 lines   parts list, search, prose, practice, quiz, badges, tables
+code.css        336 lines   code blocks, output pane, terminal panel, split editor
+print.css       192 lines   print rules + the a11y utilities (focus, skip link, sr-only, motion)
 ```
 
-`style.css` is now a five-line shim that `@import`s the five, so an old link still
+`style.css` is now an eight-line shim that `@import`s the five, so an old link still
 works. All 148 selectors from the old file survive — the split moved rules, it did
 not rewrite them — and the restyle is a new token palette plus targeted component
 rules:

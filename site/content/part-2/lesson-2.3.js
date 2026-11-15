@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Field constraints",
   "order": 203,
   "duration_min": 25,
-  "concept_md": "### Constraints beat validators for simple rules\n\n```python\nfile: str = Field(min_length=1, description=\"Path relative to the project root\")\n```\n\n`min_length`, `max_length`, `ge`, `le`, `pattern` and `gt` are declared on the field and checked by the same machinery that checks the type. They are shorter than a validator, they appear in the JSON schema, and they cannot be forgotten.\n\nReach for a validator (lesson 2.5) only when the rule needs more than one field, or more than one line of logic.\n\n### What the error looks like\n\n```text\nfile\n  String should have at least 1 character [type=string_too_short, ...]\n```\n\nThe first line is the field path, the second the reason. That shape is what makes a Pydantic failure readable in a log, and what `e.errors()` gives you as data.\n\n### A constraint is not a default\n\n`Field(min_length=1)` alone leaves the field **required** — you have constrained it, not made it optional. Adding `= \"\"` would make it optional and then immediately fail its own constraint, which is why this repository never does that.\n\n### Where they earn their place here\n\n`Finding.file` and `Finding.issue` both carry `min_length=1`: an empty path or an empty sentence is not a finding, and the check costs nothing. The `line` field cannot use a constraint at all — its rule is \"a number or an ascending range\" — so it gets a validator instead. Knowing which tool fits is most of the skill.",
+  "concept_md": "### Constraints beat validators for simple rules\n\n```python\nfile: str = Field(min_length=1, description=\"Path relative to the project root\")\n```\n\n`min_length`, `max_length`, `ge`, `le`, `pattern` and `gt` are declared on the field and checked by the same machinery that checks the type. They are shorter than a validator, they appear in the JSON schema, and they cannot be forgotten.\n\nReach for a validator (lesson 2.5) only when the rule needs more than one field, or more than one line of logic.\n\n### What the error looks like\n\n```text\nfile\n  String should have at least 1 character [type=string_too_short, ...]\n```\n\nThe first line is the field path, the second the reason. That shape is what makes a Pydantic failure readable in a log, and what `e.errors()` gives you as data.\n\n### A constraint is not a default\n\n`Field(min_length=1)` alone leaves the field **required** — you have constrained it, not made it optional. Adding `= \"\"` would make it optional, and the empty default would *not* be checked: Pydantic validates a default only with `validate_default=True`. That is how a constrained field ends up holding a value its own constraint rejects.\n\n### Where they earn their place here\n\n`Finding.file` and `Finding.issue` both carry `min_length=1`: an empty path or an empty sentence is not a finding, and the check costs nothing. The `line` field cannot use a constraint at all — its rule is \"a number or an ascending range\" — so it gets a validator instead. Knowing which tool fits is most of the skill.",
   "code_examples": [
     {
       "id": "2.3-ex-0",
@@ -34,20 +34,20 @@ window.LESSONS.push({
       "q": "`Field(min_length=1)` on a field — does that make it optional?",
       "options": [
         "Yes, with an empty default",
-        "No: the field is still required, and must also be long enough",
+        "Only when the model is frozen",
         "Yes, if the type is str",
-        "Only when the model is frozen"
+        "No: the field is still required, and must also be long enough"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "A constraint narrows what is acceptable; a default is what makes a field optional. Confusing the two produces a field that is optional and always invalid."
     },
     {
       "q": "When should you write a validator instead of a constraint?",
       "options": [
-        "Always — validators are clearer",
+        "When the rule needs more than one field or more than one line",
         "When the rule needs more than one field or more than one line of logic",
-        "When the field is a string",
-        "When the model is nested"
+        "Always — a validator is clearer than a constraint",
+        "When the field happens to be a string type"
       ],
       "answer": 1,
       "why": "`min_length` cannot express \"a number or an ascending range\"; that rule needs code, which is exactly what `Finding.line` uses."
@@ -55,12 +55,12 @@ window.LESSONS.push({
     {
       "q": "What does `error.errors()[0][\"loc\"]` give you?",
       "options": [
-        "The line of source that failed",
         "The path to the failing field, as a tuple",
+        "The line of source that failed",
         "The exception class",
         "The model name"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "`loc` is the field path — `('findings', 1, 'line')` for a nested failure — which is what lets a caller point at the right item."
     }
   ],
@@ -96,7 +96,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "constraint — a rule declared on a field and checked with the type",
-    "pattern — a regular expression the string must match in full",
+    "pattern — a regex the string must match; anchor with `^...$` for a full match",
     "loc — the path to a failing field, as a tuple"
   ]
 });

@@ -33,11 +33,11 @@ window.LESSONS.push({
       "q": "Why does the repository sort by `severity.rank` instead of the string?",
       "options": [
         "Strings cannot be sorted",
-        "Because rank encodes the order CRITICAL > HIGH > MEDIUM > LOW",
+        "Because severity is not a string",
         "Because rank is faster",
-        "Because severity is not a string"
+        "Because rank encodes the order CRITICAL > HIGH > MEDIUM > LOW"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Alphabetical order would put CRITICAL before LOW by accident of spelling; rank states the intended order explicitly."
     },
     {
@@ -54,12 +54,12 @@ window.LESSONS.push({
     {
       "q": "`Severity.CRITICAL == \"CRITICAL\"` is True because…",
       "options": [
-        "Pydantic converts it at comparison time",
         "`Severity` is a `str`-valued Enum",
+        "Pydantic converts it at comparison time",
         "The enum overrides `__eq__`",
         "It is actually False"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "A str-valued Enum member *is* a string, which is why it serialises as one and compares equal to one."
     }
   ],

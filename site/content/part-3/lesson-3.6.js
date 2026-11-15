@@ -37,23 +37,23 @@ window.LESSONS.push({
     {
       "q": "What does an `xpass` mean?",
       "options": [
-        "A test that failed twice",
         "A test marked `xfail` that passed — usually a stale marker",
+        "A test that failed twice",
         "A skipped test",
         "A test that errored"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "`xpass` is the signal that a known failure has been fixed and the marker should be removed."
     },
     {
       "q": "Why is `xfail` the wrong marker for the LM Studio test?",
       "options": [
         "Because xfail is deprecated",
-        "Because nothing is broken — the environment lacks a prerequisite",
         "Because it runs too slowly",
+        "Because nothing is broken — the environment lacks a prerequisite",
         "Because it is not parametrised"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "`xfail` records a defect; this is a missing prerequisite, which `skipif` states exactly."
     }
   ],
@@ -81,9 +81,9 @@ window.LESSONS.push({
       "lines": "1055-1075"
     },
     {
-      "label": "What the skip means for the count",
+      "label": "How a skip differs from a failure",
       "path": "TESTING.md",
-      "lines": "157-210"
+      "lines": "181-210"
     }
   ],
   "learn_more": [

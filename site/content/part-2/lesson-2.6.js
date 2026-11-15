@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Nested models and list[Model]",
   "order": 206,
   "duration_min": 25,
-  "concept_md": "### A model inside a model\n\n```python\nclass ReviewResult(BaseModel):\n    mode: str\n    target: str\n    findings: list[Finding] = Field(default_factory=list)\n```\n\n`list[Finding]` means every element is validated as a `Finding`, and the error path tells you which one: `('findings', 1, 'line')` is the second finding's line field. That path is the difference between \"something in the payload is wrong\" and \"the second finding has a bad line\".\n\n### The error cascades\n\nTen findings, one bad line, one entry — with a path. Pydantic does not stop at the first problem, so a payload with three mistakes reports three entries, each pointing at its own place.\n\n### Why the list needs a factory\n\n`= Field(default_factory=list)` gives each instance its own empty list. `= []` would share one list between every instance — the mutable-default trap, closed by the framework.\n\n### What the repository nests\n\n`ReviewResult` holds `list[Finding]` and `list[str]` for the notes. `AnchoredFinding` wraps a `Finding` with the anchor metadata, because anchoring is review metadata rather than part of the finding contract — a distinction that shows up as one extra level in the payload, not one extra field on the finding.\n\n### Reading the path\n\n```python\nfor entry in error.errors():\n    print(\" -> \".join(str(part) for part in entry[\"loc\"]))\n```\n\n`findings -> 1 -> line` reads as an instruction: go to findings, take index 1, look at line.",
+  "concept_md": "### A model inside a model\n\n```python\nclass ReviewResult(BaseModel):\n    mode: str\n    target: str\n    findings: list[Finding] = Field(default_factory=list)\n```\n\n`list[Finding]` means every element is validated as a `Finding`, and the error path tells you which one: `('findings', 1, 'line')` is the second finding's line field. That path is the difference between \"something in the payload is wrong\" and \"the second finding has a bad line\".\n\n### The error cascades\n\nTen findings, one bad line, one entry — with a path. Pydantic does not stop at the first problem, so a payload with three mistakes reports three entries, each pointing at its own place.\n\n### Why the list needs a factory\n\n`= Field(default_factory=list)` gives each instance its own empty list. Pydantic v2 deep-copies a mutable default per instance anyway, so `= []` is safe here — but `default_factory` is the documented spelling, and it is the one this repository uses.\n\n### What the repository nests\n\n`ReviewResult` holds `list[Finding]` and `list[str]` for the notes. `AnchoredFinding` wraps a `Finding` with the anchor metadata, because anchoring is review metadata rather than part of the finding contract — a distinction that shows up as one extra level in the payload, not one extra field on the finding.\n\n### Reading the path\n\n```python\nfor entry in error.errors():\n    print(\" -> \".join(str(part) for part in entry[\"loc\"]))\n```\n\n`findings -> 1 -> line` reads as an instruction: go to findings, take index 1, look at line.",
   "code_examples": [
     {
       "id": "2.6-ex-0",
@@ -33,23 +33,23 @@ window.LESSONS.push({
       "q": "`findings: list[Finding]` — what does the annotation validate?",
       "options": [
         "Only that the value is a list",
-        "That it is a list and that every element is a Finding",
         "That the list is not empty",
+        "That it is a list and that every element is a Finding",
         "Nothing until the list is read"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The element type is part of the annotation, so each item is validated as a model and the error names its index."
     },
     {
-      "q": "Why `Field(default_factory=list)` rather than `= []`?",
+      "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
-        "It is shorter",
-        "It gives each instance its own list instead of sharing one",
-        "It makes the field required",
-        "It allows None"
+        "Because it is the documented spelling for a fresh list",
+        "Because a bare `= []` default is shared by every instance",
+        "Because a bare default is not allowed for a list field",
+        "Because it is the documented spelling, even though Pydantic copies a bare default per instance"
       ],
-      "answer": 1,
-      "why": "A bare `[]` default is evaluated once and shared, so two reviews would append to the same list."
+      "answer": 3,
+      "why": "Pydantic deep-copies the default, so both work; `default_factory` says out loud that a fresh object is built, and it is what the style guide recommends."
     },
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",
@@ -72,11 +72,11 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Write the shape of a review payload: a model with a mode, a target and a list of findings, then show what a bad second finding reports.",
     "hint": "Copy the shape of `ReviewResult`, and give the second finding a line of `nope`.",
-    "solution": "from pydantic import BaseModel, Field\n\n\nclass Finding(BaseModel):\n    file: str\n    line: str\n\n\nclass Review(BaseModel):\n    mode: str\n    target: str\n    findings: list[Finding] = Field(default_factory=list)\n\n\ntry:\n    Review.model_validate({\"mode\": \"mock\", \"target\": \"a.py\", \"findings\": [\n        {\"file\": \"a.py\", \"line\": \"3\"},\n        {\"file\": \"b.py\", \"line\": \"nope\"},\n    ]})\nexcept Exception as error:\n    print(error.errors()[0][\"loc\"])\n",
-    "explanation": "It prints `('findings', 1, 'line')` — the same path shape the repository's own model produces."
+    "solution": "from pydantic import BaseModel, Field, field_validator\n\n\nclass Finding(BaseModel):\n    file: str\n    line: str\n\n    @field_validator(\"line\")\n    @classmethod\n    def _check_line(cls, value: str) -> str:\n        if not value.isdigit():\n            raise ValueError(f\"not a line number: {value!r}\")\n        return value\n\n\nclass Review(BaseModel):\n    mode: str\n    target: str\n    findings: list[Finding] = Field(default_factory=list)\n\n\ntry:\n    Review.model_validate({\"mode\": \"mock\", \"target\": \"a.py\", \"findings\": [\n        {\"file\": \"a.py\", \"line\": \"3\"},\n        {\"file\": \"b.py\", \"line\": \"nope\"},\n    ]})\nexcept Exception as error:\n    print(error.errors()[0][\"loc\"])\n",
+    "explanation": "It prints `('findings', 1, 'line')` — the same path shape the repository's own model produces. The validator is what makes the second finding fail: without it, `\"nope\"` is a perfectly good str."
   },
   "common_mistakes": [
-    "Sharing one list between instances with a bare `= []` default.",
+    "Assuming a bare `= []` default is shared between Pydantic instances — it is deep-copied, unlike a plain function default.",
     "Catching `ValidationError` and printing only `str(error)`, losing the paths that say which element failed.",
     "Flattening a nested payload by hand before validating, so the index that would have pointed at the bad item is gone."
   ],

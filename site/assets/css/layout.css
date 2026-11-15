@@ -476,23 +476,6 @@ figure {
     opacity: 0.55;
   }
 
-  .split {
-    grid-template-columns: 1fr;
-    grid-template-rows: var(--split) 24px minmax(0, 1fr);
-    height: auto;
-  }
-
-  .pane {
-    min-height: 16rem;
-  }
-
-  .divider {
-    cursor: row-resize;
-  }
-
-  .divider::before {
-    inset: 8px 0;
-  }
 }
 
 

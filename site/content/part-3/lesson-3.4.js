@@ -17,7 +17,7 @@ window.LESSONS.push({
       "code": "python -m pytest -q \"tests/test_cli.py::test_malformed_post_target_exits_2\"",
       "runnable": false,
       "run_tier": "terminal",
-      "why_not": "it runs the suite, which needs the checkout and pytest.",
+      "why_not": "it runs one parametrised test, which still needs the checkout and pytest; the browser has neither.",
       "expected_output": "7 passed in 1.41s\n\n# seven cases, one test function: one per malformed target",
       "id": "3.4-ex-0"
     }
@@ -27,41 +27,41 @@ window.LESSONS.push({
       "q": "One `@pytest.mark.parametrize` with five values produces how many tests?",
       "options": [
         "One",
-        "Five",
         "One per assertion",
+        "Five",
         "None until it fails"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Each value becomes its own collected test with its own id, which is why a failure names the input."
     },
     {
       "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
       "options": [
         "The extra value is ignored",
-        "Collection fails: the tuple length does not match the names",
+        "pytest splits the tuple",
         "It passes",
-        "pytest splits the tuple"
+        "Collection fails: the tuple length does not match the names"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "The arity is checked at collection, which is the good failure — before any test runs."
     },
     {
-      "q": "What does `pytest.param(value, marks=pytest.mark.xfail)` do for one case?",
+      "q": "Where do the ids in `test_...[LOW]` come from?",
       "options": [
-        "Skips it silently",
-        "Marks that case as a known failure while the others must pass",
-        "Runs it twice",
-        "Removes it from collection"
+        "pytest numbers them in run order",
+        "The parameter values, by default",
+        "The test function's docstring",
+        "You must always supply `ids=`"
       ],
       "answer": 1,
-      "why": "`xfail` records a known-broken input without letting it hide a real regression in the other cases."
+      "why": "Each case is named after its value unless you pass `ids=`, which is what makes a failure read as an input rather than as an index."
     }
   ],
   "try_it": {
     "prompt": "Parametrise a test over three severities and check the ids in the report.",
     "starter": "import pytest\n\n\n@pytest.mark.parametrize(\"severity\", [\"LOW\", \"MEDIUM\", \"CRITICAL\"])\ndef test_severity_is_upper(severity):\n    assert severity == severity.upper()\n",
-    "solution": "import pytest\n\n\n@pytest.mark.parametrize(\"severity\", [\"LOW\", \"MEDIUM\", \"CRITICAL\"])\ndef test_severity_is_upper(severity):\n    assert severity == severity.upper()\n\n\n@pytest.mark.parametrize(\"severity\", [\"LOW\", \"medium\"])\ndef test_lowercase_is_rejected(severity):\n    assert severity != severity.upper() or severity == \"LOW\"\n",
-    "explanation": "The report names each case `test_severity_is_upper[LOW]` and so on, so a failure points at the value rather than the function."
+    "solution": "import pytest\n\n\n@pytest.mark.parametrize(\"severity\", [\"LOW\", \"MEDIUM\", \"CRITICAL\"])\ndef test_severity_is_upper(severity):\n    assert severity == severity.upper()\n\n\n@pytest.mark.parametrize(\"severity\", [\"low\", \"medium\"])\ndef test_lowercase_is_rejected(severity):\n    assert severity != severity.upper()\n",
+    "explanation": "The first test passes on all three values; the second passes on both lowercase ones because they really are not uppercase. Two tests, five cases, and the report names each value."
   },
   "exercise": {
     "prompt": "Write a parametrised test over four malformed line values for `Finding`, and say what each case proves.",

@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "assert, discovery and naming",
   "order": 302,
   "duration_min": 15,
-  "concept_md": "### Discovery is a naming convention\n\npytest finds a test when three things are true: the file matches `test_*.py` (or `*_test.py`), the function name starts with `test_`, and the function is at module level or in a `Test*` class with no `__init__`. Break any one and the test is invisible — not failing, invisible, which is worse.\n\n### `assert` is the whole API\n\n```python\nassert code == 2\nassert \"OWNER/REPO#NUM\" in captured.err\n```\n\npytest rewrites `assert` at import time, so a failure prints the expression, the values and what differed. No `assertEqual`, no message argument needed for the common case.\n\n### The three silent stoppers\n\nA test file named `tests_cli.py` (no underscore before `cli`), a function called `check_target` instead of `test_target`, and a `Test*` class with an `__init__`. Each one is a test that exists and never runs.\n\n### What discovery does not do\n\nIt does not import every file and look for assertions. It matches names, imports the\nmodules that match, and collects the functions it finds. A file that fails to import is\nreported as an error, not as a test — which is why a syntax error in a test module shows\nup as one collection error rather than six hundred failures.\n\n### Asserting on the right thing\n\nAssert on the contract, not on the implementation. `assert code == 2` survives a refactor; `assert \"usage:\" in captured.err` survives a wording change only if the wording is part of the promise. This repository asserts exit codes and the presence of a message, and rarely a whole string.",
+  "concept_md": "### Discovery is a naming convention\n\npytest finds a test when three things are true: the file matches `test_*.py` (or `*_test.py`), the function name starts with `test_`, and the function is at module level or in a `Test*` class with no `__init__`. Break any one and the test is invisible — not failing, invisible, which is worse.\n\n### `assert` is the whole API\n\n```python\nassert code == 2\nassert \"OWNER/REPO#NUM\" in captured.err\n```\n\npytest rewrites `assert` at import time, so a failure prints the expression, the values and what differed. No `assertEqual`, no message argument needed for the common case.\n\n### The three silent stoppers\n\nA test file named `tests_cli.py` — the prefix is `tests_`, not `test_` — a function called `check_target` instead of `test_target`, and a `Test*` class with an `__init__`. Each one is a test that exists and never runs.\n\n### What discovery does not do\n\nIt does not import every file and look for assertions. It matches names, imports the\nmodules that match, and collects the functions it finds. A file that fails to import is\nreported as an error, not as a test — which is why a syntax error in a test module shows\nup as one collection error rather than six hundred failures.\n\n### Asserting on the right thing\n\nAssert on the contract, not on the implementation. `assert code == 2` survives a refactor; `assert \"usage:\" in captured.err` survives a wording change only if the wording is part of the promise. This repository asserts exit codes and the presence of a message, and rarely a whole string.",
   "code_examples": [
     {
       "lang": "console",
@@ -27,11 +27,11 @@ window.LESSONS.push({
       "q": "Which file name will pytest NOT collect?",
       "options": [
         "test_cli.py",
-        "cli_test.py",
         "tests_cli.py",
+        "cli_test.py",
         "test_api.py"
       ],
-      "answer": 2,
+      "answer": 1,
       "why": "Discovery matches `test_*.py` and `*_test.py`; `tests_cli.py` matches neither and is invisible, not failing."
     },
     {
@@ -81,9 +81,9 @@ window.LESSONS.push({
       "lines": "62-80"
     },
     {
-      "label": "How the suite is laid out, layer by layer",
+      "label": "The layers the suite covers",
       "path": "TESTING.md",
-      "lines": "27-70"
+      "lines": "71-110"
     }
   ],
   "learn_more": [

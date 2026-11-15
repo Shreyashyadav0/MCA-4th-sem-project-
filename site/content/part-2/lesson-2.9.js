@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "ValidationError and tolerant parsing",
   "order": 209,
   "duration_min": 25,
-  "concept_md": "### A model's reply is not a model\n\nWhen a provider returns JSON, nothing guarantees the shape. The repository's rule is simple: try to parse, and if it fails, return nothing rather than raising. A malformed reply is a reason to fall back, not a reason to fail the review.\n\n### The shape of the failure\n\n`ValidationError.errors()` is a list of dicts, each with `loc`, `msg`, `type` and `input`. That is data, not a string — you can filter it, count it, and log the paths without parsing prose.\n\n```python\nexcept ValidationError as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n```\n\n### `model_validate_json` versus `model_validate`\n\n`model_validate_json(raw)` parses the string and validates in one step, which is what a provider's reply needs. It raises `ValidationError` for a bad shape and `json.JSONDecodeError` for text that is not JSON at all — two different failures, and a tolerant parser catches both.\n\n### Returning None is a decision, not a shrug\n\n`try_parse(raw) -> Finding | None` puts the choice at one call site: the caller decides what a `None` means — skip the item, or count it as a failed parse and note it. That is exactly how the provider path keeps a bad reply from becoming a bad comment.",
+  "concept_md": "### A model's reply is not a model\n\nWhen a provider returns JSON, nothing guarantees the shape. The repository's rule is simple: try to parse, and if it fails, return nothing rather than raising. A malformed reply is a reason to fall back, not a reason to fail the review.\n\n### The shape of the failure\n\n`ValidationError.errors()` is a list of dicts, each with `loc`, `msg`, `type` and `input`. That is data, not a string — you can filter it, count it, and log the paths without parsing prose.\n\n```python\nexcept ValidationError as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n```\n\n### `model_validate_json` versus `model_validate`\n\n`model_validate_json(raw)` parses the string and validates in one step, which is what a provider's reply needs. Prose that is not JSON raises the same `ValidationError`, with the entry type `json_invalid` — one exception type for both a bad shape and bad syntax, which is why a tolerant parser catches one thing and checks the `type` if it cares which happened.\n\n### Returning None is a decision, not a shrug\n\n`try_parse(raw) -> Finding | None` puts the choice at one call site: the caller decides what a `None` means — skip the item, or count it as a failed parse and note it. The repository's own provider does the harder version: its parser raises, the adapter catches, retries the repair once, and returns an empty list with a WARNING — so a bad reply costs a note, never a bad comment.",
   "code_examples": [
     {
       "id": "2.9-ex-0",
@@ -32,34 +32,34 @@ window.LESSONS.push({
     {
       "q": "A provider returns prose instead of JSON. What does `model_validate_json` raise?",
       "options": [
-        "ValidationError",
-        "json.JSONDecodeError",
-        "ValueError from Pydantic",
+        "`ValidationError`, with the entry type `json_invalid`",
+        "`json.JSONDecodeError`",
+        "`ValueError` from the JSON module",
         "Nothing, it returns None"
       ],
-      "answer": 1,
-      "why": "Bad JSON fails at the JSON layer before validation; a tolerant parser has to catch both that and `ValidationError`."
+      "answer": 0,
+      "why": "Pydantic wraps the parse failure into its own error, so one `except ValidationError` covers bad syntax and bad shape alike."
     },
     {
       "q": "Why return `None` instead of raising from a parse helper?",
       "options": [
-        "Because exceptions are slow",
+        "So the caller decides what a failed parse means",
+        "Because exceptions cost more than a returned None does",
         "So the caller decides what a failed parse means — skip it, count it, or fall back",
-        "Because Pydantic cannot raise",
-        "To hide the error"
+        "So the error is hidden from whoever reads the log"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The decision belongs to the caller: a failed item in a list is skippable, while a failed whole reply means falling back to the rule engine."
     },
     {
       "q": "What is in one entry of `error.errors()`?",
       "options": [
         "A traceback line",
-        "`loc`, `msg`, `type` and `input` — data you can filter",
+        "Only a message string",
         "The model's JSON schema",
-        "Only a message string"
+        "`loc`, `msg`, `type` and `input` — data you can filter"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Entries are dicts, which is what makes \"count the extra-key failures\" a one-liner instead of string parsing."
     }
   ],
@@ -67,24 +67,24 @@ window.LESSONS.push({
     "prompt": "Add a second field to the bad payload so two errors appear, and print both paths.",
     "starter": "from app.models import Finding\n\ntry:\n    Finding.model_validate_json('{\"file\": \"a.py\"}')\nexcept Exception as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n",
     "solution": "from app.models import Finding\n\ntry:\n    Finding.model_validate_json('{\"file\": \"a.py\", \"line\": \"nope\", \"severity\": \"LOW\"}')\nexcept Exception as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n",
-    "explanation": "It prints the line validator's failure and the two missing fields — one entry per problem, each with its own path."
+    "explanation": "It prints the line validator's failure and the two missing fields — one entry per problem, each with its own path. Note both failure modes are `ValidationError`: Pydantic converts a JSON syntax error into an entry of type `json_invalid`."
   },
   "exercise": {
     "prompt": "Write `try_parse(raw: str) -> Finding | None` and use it on three inputs: valid JSON, JSON of the wrong shape, and plain prose.",
-    "hint": "Catch broadly — the two failure modes are different exception types.",
+    "hint": "One `except ValidationError` covers both failure modes; check `type` if you need to tell them apart.",
     "solution": "from app.models import Finding\n\n\ndef try_parse(raw: str) -> Finding | None:\n    try:\n        return Finding.model_validate_json(raw)\n    except Exception:\n        return None\n\n\nprint(try_parse('{\"file\": \"a.py\", \"line\": \"3\", \"severity\": \"LOW\", \"issue\": \"x\", \"suggested_fix\": \"y\"}'))\nprint(try_parse('{\"file\": \"a.py\"}'))\nprint(try_parse(\"I could not review that.\"))\n",
     "explanation": "A `Finding` then two `None`s. Catching `Exception` here is deliberate: the caller's contract is \"a finding or nothing\", and both failure modes map to nothing."
   },
   "common_mistakes": [
-    "Catching only `ValidationError`, so prose from a model escapes as an unhandled `JSONDecodeError`.",
+    "Catching only `json.JSONDecodeError`, which Pydantic never raises from `model_validate_json` — the failure arrives as a `ValidationError`.",
     "Logging `str(error)` instead of the `loc` paths, which is the part you can act on.",
     "Raising from a parse helper and forcing every caller to handle two exception types."
   ],
   "project_links": [
     {
-      "label": "The provider's parse path, and the fallback it triggers",
+      "label": "The parse that raises, and the catch that degrades",
       "path": "app/openai_compat_provider.py",
-      "lines": "1-40"
+      "lines": "540-580"
     },
     {
       "label": "Finding, the model being parsed",

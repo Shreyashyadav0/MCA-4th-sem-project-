@@ -364,6 +364,7 @@ details.solution[open] summary {
 }
 
 .quiz-question {
+  min-width: 0; /* a long option token must wrap, not widen the column */
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-4) var(--space-5);
@@ -411,6 +412,16 @@ details.solution[open] summary {
 }
 
 /* The mark is a word, not only a colour. */
+.quiz-question.is-right {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+
+.quiz-question.is-wrong {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+}
+
 .quiz-question.is-right .quiz-legend::after {
   content: " ✓";
   color: var(--sev-low);
@@ -437,3 +448,9 @@ details.solution[open] summary {
   border-radius: var(--radius);
   background: var(--surface);
 }
+
+.quiz-option-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+

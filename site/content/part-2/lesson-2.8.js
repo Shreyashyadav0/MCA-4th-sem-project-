@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Serialization: model_dump and mode='json'",
   "order": 208,
   "duration_min": 20,
-  "concept_md": "### Two dumps, one difference that matters\n\n```python\nresult.model_dump()              # {\"severity\": <Severity.LOW: 1>}\nresult.model_dump(mode=\"json\")   # {\"severity\": \"LOW\"}\n```\n\nThe first is Python-shaped: enums stay enums, tuples stay tuples. The second is JSON-shaped: enums become their values, dates become strings, and the result survives `json.dumps`.\n\n### Why the HTTP layer wants json mode\n\nA response model is serialised by FastAPI, which does the JSON conversion for you. The place the distinction bites is anywhere you build the payload yourself — a webhook body, a cached blob, a test fixture. `json.dumps(result.model_dump())` on a model with an enum raises `TypeError`; with `mode=\"json\"` it does not.\n\n### Three useful switches\n\n- `exclude_none=True` drops every field whose value is `None` — the difference between a payload with ten nulls and one with the three fields that matter.\n- `by_alias=True` uses the alias instead of the field name, for APIs that expect camelCase.\n- `exclude={\"findings\"}` drops one field without a second model.\n\n### Computed fields come along\n\n`ReviewResult.verdict` is a `@computed_field` — derived, never settable, and serialised into the JSON. That is why the model needs its `mode=\"before\"` validator to strip `verdict` when reading its own output: the dump contains a key the model never declared.",
+  "concept_md": "### Two dumps, one difference that matters\n\n```python\nresult.model_dump()              # {\"severity\": <Severity.LOW: 'LOW'>}\nresult.model_dump(mode=\"json\")   # {\"severity\": \"LOW\"}\n```\n\nThe first is Python-shaped: enums stay enums, tuples stay tuples. The second is JSON-shaped: enums become their values, dates become strings, and the result survives `json.dumps`.\n\n### Why the HTTP layer wants json mode\n\nA response model is serialised by FastAPI, which does the JSON conversion for you. The place the distinction bites is anywhere you build the payload yourself — a webhook body, a cached blob, a test fixture. `json.dumps(result.model_dump())` on a model with an enum raises `TypeError`; with `mode=\"json\"` it does not.\n\n### Three useful switches\n\n- `exclude_none=True` drops every field whose value is `None` — the difference between a payload with ten nulls and one with the three fields that matter.\n- `by_alias=True` uses the alias instead of the field name, for APIs that expect camelCase.\n- `exclude={\"findings\"}` drops one field without a second model.\n\n### Computed fields come along\n\n`ReviewResult.verdict` is a `@computed_field` — derived, never settable, and serialised into the JSON. That is why the model needs its `mode=\"before\"` validator to strip `verdict` when reading its own output: the dump contains a key the model never declared.",
   "code_examples": [
     {
       "id": "2.8-ex-0",
@@ -32,10 +32,10 @@ window.LESSONS.push({
     {
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
-        "It makes the dump faster",
         "It converts values to JSON-safe primitives, so enums become strings",
-        "It validates the model again",
-        "It sorts the keys"
+        "It converts values to JSON-safe primitives, so enums become strings",
+        "It makes the dump faster by skipping validation",
+        "It sorts the keys so two dumps compare equal"
       ],
       "answer": 1,
       "why": "Python mode keeps enum members; JSON mode converts them, which is what makes the result survive `json.dumps`."
@@ -49,17 +49,17 @@ window.LESSONS.push({
         "Raises if a field is None"
       ],
       "answer": 0,
-      "why": "It removes the nulls, which is the difference between a payload with ten nulls and one with the fields that carry information."
+      "why": "It removes the nulls only — an empty list and an empty string survive, which is why the flag is for optional fields rather than for trimming a payload."
     },
     {
       "q": "Why does `ReviewResult` need a `mode=\"before\"` validator to drop `verdict`?",
       "options": [
-        "Because verdict is required",
+        "Because a computed field is in the dump and the model never declared it",
+        "Because the dump contains a key whose value is None",
         "Because the dump contains a computed field the model never declared, and `extra=\"forbid\"` would reject it",
-        "Because verdict is a string",
-        "Because FastAPI adds it"
+        "Because `extra=\"forbid\"` rejects every field not set explicitly"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The model can read its own JSON only if the computed key is removed before the unknown-key check runs."
     }
   ],

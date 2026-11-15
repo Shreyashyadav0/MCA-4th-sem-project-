@@ -33,34 +33,34 @@ window.LESSONS.push({
     {
       "q": "What does a plain dict give you that a BaseModel does not?",
       "options": [
-        "Type checking on every read",
         "Nothing — it accepts any key and any value",
+        "Type checking on every read",
         "A default for missing keys",
         "JSON serialisation for free"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "A dict is a container, not a contract: the key you misspelled stays a valid key, and the failure moves to whichever line reads it."
     },
     {
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
-        "Because Pydantic is faster that way",
+        "So the failure names the field while the writer is on the stack",
+        "Because Pydantic is faster when it validates early",
         "So the failure names the field while the code that built it is still on the stack",
-        "Because Python requires it",
-        "To make the tests shorter"
+        "Because Python requires it for every model field"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Validating at the door keeps the traceback pointing at the writer; validating at use points at a reader that is usually innocent."
     },
     {
       "q": "What does `extra=\"forbid\"` on `Finding` actually reject?",
       "options": [
         "A missing required field",
-        "A field the model does not declare",
+        "A string with spaces around it",
         "A value of the wrong type",
-        "A string with spaces around it"
+        "A field the model does not declare"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "It rejects unknown keys — which is what stops a future model's extra output from leaking into a pull-request comment."
     }
   ],

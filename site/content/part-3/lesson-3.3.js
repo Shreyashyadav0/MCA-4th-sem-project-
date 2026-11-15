@@ -26,42 +26,42 @@ window.LESSONS.push({
     {
       "q": "A test names `client` as a parameter. Where does the value come from?",
       "options": [
-        "A global variable",
         "A fixture with that name, which pytest calls and injects",
+        "A global variable",
         "An import in the test file",
         "conftest.py, always"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "The parameter name is the lookup key; the fixture supplies the value and owns the teardown."
     },
     {
       "q": "When should a fixture `yield` instead of `return`?",
       "options": [
         "When it is expensive",
-        "When it has cleanup to do after the test",
         "When it returns a Path",
+        "When it has cleanup to do after the test",
         "Always"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Everything after the yield is teardown, which is why a fixture that opens a file or a connection yields."
     },
     {
       "q": "What is the risk of a `session`-scoped fixture holding a mutable value?",
       "options": [
         "It is slower",
-        "State leaks between tests, so order starts to matter",
+        "It cannot be parametrised",
         "pytest refuses to run it",
-        "It cannot be parametrised"
+        "State leaks between tests, so order starts to matter"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "One shared object across the session means one test's changes are the next test's starting point."
     }
   ],
   "try_it": {
-    "prompt": "Write a fixture that writes a small diff to `tmp_path` and yields the path. Use it in one test.",
-    "starter": "import pytest\n\n\n@pytest.fixture()\ndef diff_file(tmp_path):\n    path = tmp_path / \"sample.diff\"\n    path.write_text(\"@@ -1 +1 @@\\n-old\\n+new\\n\", encoding=\"utf-8\")\n    return path\n",
-    "solution": "import pytest\n\n\n@pytest.fixture()\ndef diff_file(tmp_path):\n    path = tmp_path / \"sample.diff\"\n    path.write_text(\"@@ -1 +1 @@\\n-old\\n+new\\n\", encoding=\"utf-8\")\n    yield path\n\n\ndef test_diff_has_a_hunk(diff_file):\n    assert diff_file.read_text(encoding=\"utf-8\").startswith(\"@@\")\n",
-    "explanation": "`tmp_path` is a per-test directory pytest cleans up, so the file never outlives the test. Yielding adds nothing here — there is no cleanup — which is why `return` is equally correct in this exact case."
+    "prompt": "Write a fixture that returns a small dict, use it in one test, then rewrite it with `yield` so it prints a teardown line after the test. (`tmp_path`, the other useful built-in, arrives in 3.5.)",
+    "starter": "import pytest\n\n\n@pytest.fixture()\ndef diff():\n    return \"@@ -1 +1 @@\\n-old\\n+new\\n\"\n",
+    "solution": "import pytest\n\n\n@pytest.fixture()\ndef diff():\n    print(\"setup\")\n    yield \"@@ -1 +1 @@\\n-old\\n+new\\n\"\n    print(\"teardown\")\n\n\ndef test_diff_has_a_hunk(diff):\n    assert diff.startswith(\"@@\")\n",
+    "explanation": "The test sees the diff; the report shows `setup` before it and `teardown` after. That ordering is the whole difference between `return` and `yield` in a fixture."
   },
   "exercise": {
     "prompt": "Read a real fixture in `tests/test_auth.py` and say what it sets up, what scope it has, and why that scope is right.",
@@ -81,9 +81,9 @@ window.LESSONS.push({
       "lines": "50-75"
     },
     {
-      "label": "A function-scoped fixture used by several tests",
+      "label": "A function-scoped fixture used by many tests",
       "path": "tests/test_db.py",
-      "lines": "30-50"
+      "lines": "36-50"
     }
   ],
   "learn_more": [

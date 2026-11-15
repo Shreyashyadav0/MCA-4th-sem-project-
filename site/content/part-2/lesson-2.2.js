@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "BaseModel, fields and coercion",
   "order": 202,
   "duration_min": 25,
-  "concept_md": "### A field is a name, a type and a default\n\n```python\nclass Note(BaseModel):\n    text: str                  # required\n    tag: str = \"general\"       # optional, with a default\n```\n\nRequired means required: omit `text` and construction fails. A default makes the field optional, and the default is evaluated per instance, so a `list` default is safe here in a way it is not in a plain function signature.\n\n### Coercion is real, and it has limits\n\nPydantic converts a value when the conversion is unambiguous. `\"1\"` becomes `1` for an `int` field; `\"abc\"` does not, and raises. `\"3.0\"` becomes `3`. `None` never becomes `0`.\n\nThat leniency is why the repository types `Finding.line` as `str` rather than `int`: a line can be `\"42\"` or the range `\"42-45\"`, and coercion to an int would quietly destroy the second.\n\n### Dumping back out\n\n`model_dump()` returns a dict; `model_dump(mode=\"json\")` returns JSON-safe primitives; `model_dump_json()` returns a string. The difference matters at the HTTP layer, where a `Severity` enum has to become `\"CRITICAL\"` rather than `<Severity.CRITICAL: 3>`.\n\n### Defaults that build themselves\n\n`Field(default_factory=list)` is the safe spelling for a mutable default. `ReviewResult.findings` uses it, so two results never share one list — the same trap as the mutable default argument, closed by the framework.",
+  "concept_md": "### A field is a name, a type and a default\n\n```python\nclass Note(BaseModel):\n    text: str                  # required\n    tag: str = \"general\"       # optional, with a default\n```\n\nRequired means required: omit `text` and construction fails. A default makes the field optional, and the default is evaluated per instance, so a `list` default is safe here in a way it is not in a plain function signature.\n\n### Coercion is real, and it has limits\n\nPydantic converts a value when the conversion is unambiguous. `\"1\"` becomes `1` for an `int` field; `\"abc\"` does not, and raises. `\"3.0\"` becomes `3`. `None` never becomes `0`.\n\nThat leniency is why the repository types `Finding.line` as `str` rather than `int`: a line can be `\"42\"` or the range `\"42-45\"`, and coercion to an int would quietly destroy the second.\n\n### Dumping back out\n\n`model_dump()` returns a dict; `model_dump(mode=\"json\")` returns JSON-safe primitives; `model_dump_json()` returns a string. The difference matters at the HTTP layer, where a `Severity` enum has to become `\"CRITICAL\"` rather than `<Severity.CRITICAL: 'CRITICAL'>`.\n\n### Defaults that build themselves\n\n`Field(default_factory=list)` is the safe spelling for a mutable default. `ReviewResult.findings` uses it, so two results never share one list — the same trap as the mutable default argument, closed by the framework.",
   "code_examples": [
     {
       "id": "2.2-ex-0",
@@ -30,22 +30,22 @@ window.LESSONS.push({
       "q": "`priority: int = 0` — what does the `= 0` change?",
       "options": [
         "It makes the field required",
-        "It gives the field a default, so it may be omitted",
         "It restricts the field to positive numbers",
+        "It gives the field a default, so it may be omitted",
         "It makes the field read-only"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "A default is what turns a required field into an optional one; a constraint on the value needs `Field(ge=...)`, which is lesson 2.3."
     },
     {
       "q": "`Note(priority=\"2\")` on an `int` field — what happens?",
       "options": [
-        "TypeError at once",
-        "It is coerced to 2, because the string is unambiguously an integer",
-        "It stays a string",
-        "It silently becomes 0"
+        "It is coerced to 2, because the string is unambiguously numeric",
+        "It stays the string \"2\" and fails on the next comparison",
+        "It silently becomes 0, the field's default value",
+        "It is coerced to 2, because the string is unambiguously an integer"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Pydantic coerces where the conversion is unambiguous; `\"2\"` is, `\"high\"` is not, which is the line between leniency and guessing."
     },
     {

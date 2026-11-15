@@ -56,7 +56,7 @@
   padding: var(--space-2) var(--space-4);
   transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -310,4 +310,27 @@ details.expected-output pre.code {
 
 .code-figure .code-figure .code-caption {
   display: none; /* the outer figure already carries the header strip */
+}
+
+/* Stacked layout. These rules live here, not in layout.css, because they have to
+ * come after the base .split rule at the same specificity — the two files are
+ * separate sheets and source order decides the winner. */
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--split) 24px minmax(0, 1fr);
+    height: auto;
+  }
+
+  .pane {
+    min-height: 16rem;
+  }
+
+  .divider {
+    cursor: row-resize;
+  }
+
+  .divider::before {
+    inset: 8px 0;
+  }
 }

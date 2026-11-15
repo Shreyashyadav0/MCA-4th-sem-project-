@@ -26,31 +26,31 @@ window.LESSONS.push({
       "q": "What does `verify_offline.py` patch before running the suite?",
       "options": [
         "Only `requests.get`",
-        "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
         "The DNS resolver only",
+        "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
         "Nothing; it runs with the network off"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Three seams, because a library can dial out by any of them — patching one leaves the others open."
     },
     {
       "q": "Why are loopback and AF_UNIX allowed through?",
       "options": [
         "Because tests need localhost",
-        "Because asyncio's event loop builds a self-pipe with a socket",
+        "They are not allowed",
         "Because they are faster",
-        "They are not allowed"
+        "Because asyncio's event loop builds a self-pipe with a socket"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Blocking the event loop's own self-pipe breaks every async test for a reason unrelated to the network."
     },
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That the suite ran",
+        "That no test would reach the network without the patches",
         "That no test would use the network on a machine without the patches",
-        "That the patches were applied",
-        "That the tests passed"
+        "That the patches were applied before pytest started",
+        "That the suite passed while the patches were in place"
       ],
       "answer": 1,
       "why": "It is evidence about this run under these patches — which is exactly what the README claims, no more."
@@ -80,9 +80,9 @@ window.LESSONS.push({
       "lines": "1-40"
     },
     {
-      "label": "The decision behind it",
+      "label": "The offline decision this proof protects",
       "path": "docs/decisions/0002-offline-first-fallback.md",
-      "lines": "1-40"
+      "lines": "1-30"
     }
   ],
   "learn_more": [

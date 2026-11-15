@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "field_validator and model_validator",
   "order": 205,
   "duration_min": 30,
-  "concept_md": "### Two hooks, two jobs\n\nA `@field_validator` sees **one field** after its type has been checked. A `@model_validator` sees **the whole model**, either before or after field validation.\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n    if not _LINE_RE.match(value):\n        raise ValueError(f'line must look like \"42\" or \"42-45\", got {value!r}')\n    return value\n```\n\nThat is the real validator on `Finding.line`, quoted from `app/models.py`. It runs after the string type check, so `value` is already a `str`; raising `ValueError` is how a validator refuses, and Pydantic wraps it into a `ValidationError` entry whose message begins \"Value error, \".\n\n### Before or after\n\n`mode=\"before\"` runs on the raw input — the right place to reshape a payload. `mode=\"after\"` (the default) runs once the fields are valid — the right place to check a relationship between fields. A cross-field rule (\"end must not precede start\") has to be a model validator: no single field validator can see both values.\n\n### `ReviewResult` uses both\n\nIts `_check_mode` field validator rejects anything but `\"live\"` and `\"mock\"`, and its `_drop_computed` model validator (mode `\"before\"`) removes a serialised `verdict` key before validation — so the model can read its own JSON output, which contains a computed field it never declared.\n\n### The rule of thumb\n\nConstraint for one value, field validator for one field's logic, model validator for a relationship. Reach for the later one only when the earlier cannot express the rule.",
+  "concept_md": "### Two hooks, two jobs\n\nA `@field_validator` sees **one field** after its type has been checked. A `@model_validator` sees **the whole model**, either before or after field validation.\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n    if not _LINE_RE.match(value):\n        raise ValueError(f'line must look like \"42\" or \"42-45\", got {value!r}')\n    if \"-\" in value:            # … then the ascending-range check\n        start, _, end = value.partition(\"-\")\n        if int(end) < int(start):\n            raise ValueError(f\"line range must ascend, got {value!r}\")\n    return value\n```\n\nThat is the real validator on `Finding.line`, quoted from `app/models.py`. It runs after the string type check, so `value` is already a `str`; raising `ValueError` is how a validator refuses, and Pydantic wraps it into a `ValidationError` entry whose message begins \"Value error, \".\n\n### Before or after\n\n`mode=\"before\"` runs on the raw input — the right place to reshape a payload. `mode=\"after\"` (the default) runs once the fields are valid — the right place to check a relationship between fields. A cross-field rule (\"end must not precede start\") has to be a model validator: no single field validator can see both values.\n\n### `ReviewResult` uses both\n\nIts `_check_mode` field validator rejects anything but `\"live\"` and `\"mock\"`, and its `_drop_computed` model validator (mode `\"before\"`) removes a serialised `verdict` key before validation — so the model can read its own JSON output, which contains a computed field it never declared.\n\n### The rule of thumb\n\nConstraint for one value, field validator for one field's logic, model validator for a relationship. Reach for the later one only when the earlier cannot express the rule.",
   "code_examples": [
     {
       "id": "2.5-ex-0",
@@ -32,34 +32,34 @@ window.LESSONS.push({
     {
       "q": "A rule that compares two fields of the same model belongs where?",
       "options": [
-        "A `@field_validator` on the first field",
         "A `@model_validator`, which can see both",
+        "A `@field_validator` on the first field",
         "A `Field(...)` constraint",
         "A separate function called by the caller"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "A field validator only ever sees its own value, so any rule about a relationship has to be a model validator."
     },
     {
       "q": "What should a validator raise to reject a value?",
       "options": [
-        "`SystemExit`",
+        "`ValueError`, which Pydantic wraps into a validation entry",
+        "`SystemExit`, which stops the run at once",
         "`ValueError`, which Pydantic wraps into a ValidationError entry",
-        "`AssertionError`",
-        "Nothing — return False"
+        "`AssertionError`, which pytest reports as a failure"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "`ValueError` is the documented signal; the entry's message then begins \"Value error, \" followed by your text."
     },
     {
       "q": "`ReviewResult._drop_computed` runs with `mode=\"before\"`. Why before?",
       "options": [
         "Because it is faster",
-        "Because it must reshape the raw input before any field is validated",
+        "Because `after` does not exist for models",
         "Because computed fields are not validated",
-        "Because `after` does not exist for models"
+        "Because it must reshape the raw input before any field is validated"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "It removes a key the model never declared, and that has to happen before validation looks at the keys at all."
     }
   ],
@@ -82,7 +82,7 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The real field validator on line, and the model validator on ReviewResult",
+      "label": "The field validator on line",
       "path": "app/models.py",
       "lines": "82-100"
     },

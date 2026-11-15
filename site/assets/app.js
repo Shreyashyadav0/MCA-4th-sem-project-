@@ -862,7 +862,9 @@
         return;
       }
       var field = el("fieldset", "quiz-question");
-      field.appendChild(el("legend", "quiz-legend", rendered.length + 1 + ". " + item.q));
+      var legend = el("legend", "quiz-legend");
+      legend.innerHTML = renderInline(escapeHtml(rendered.length + 1 + ". " + String(item.q || "")));
+      field.appendChild(legend);
 
       options.forEach(function (option, oi) {
         var label = el("label", "quiz-option");
@@ -882,7 +884,9 @@
           }
         });
         label.appendChild(input);
-        label.appendChild(el("span", "quiz-option-text", option));
+        var optionText = el("span", "quiz-option-text");
+        optionText.innerHTML = renderInline(escapeHtml(String(option)));
+        label.appendChild(optionText);
         field.appendChild(label);
       });
 

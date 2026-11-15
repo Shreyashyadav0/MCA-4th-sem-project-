@@ -27,11 +27,11 @@ window.LESSONS.push({
       "q": "What does the red step of red-green-refactor require?",
       "options": [
         "A test that passes",
-        "A test that fails, for the reason you expect",
+        "A test with no assertions",
         "A test that is skipped",
-        "A test with no assertions"
+        "A test that fails, for the reason you expect"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "A test that fails for the wrong reason proves nothing; the failure has to be the one you predicted."
     },
     {
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "What is the difference between a unit test and an integration test here?",
       "options": [
-        "One is faster",
         "One tests a function's contract, the other tests the pieces together",
+        "One is faster",
         "One uses pytest and the other does not",
         "There is none"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "The `TestClient` tests drive the whole app in-process; a unit test drives one function and nothing else."
     }
   ],
@@ -76,9 +76,9 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The testing document: what the suite covers and what it does not prove",
-      "path": "TESTING.md",
-      "lines": "1-60"
+      "label": "How to run the suite, and what the README promises",
+      "path": "README.md",
+      "lines": "59-80"
     },
     {
       "label": "How to run the suite",
