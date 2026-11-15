@@ -95,6 +95,14 @@
     "content/part-8/lesson-8.7.js",
     "content/part-8/lesson-8.8.js",
     "content/part-8/lesson-8.9.js",
-    "content/part-8/lesson-8.10.js"
+    "content/part-8/lesson-8.10.js",
+    "content/part-9/lesson-9.1.js",
+    "content/part-9/lesson-9.2.js",
+    "content/part-9/lesson-9.3.js",
+    "content/part-9/lesson-9.4.js",
+    "content/part-9/lesson-9.5.js",
+    "content/part-9/lesson-9.6.js",
+    "content/part-9/lesson-9.7.js",
+    "content/part-9/lesson-9.8.js"
   ];
 })();

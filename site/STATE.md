@@ -20,6 +20,7 @@ is the bug.
 | 4b | 2026-11-15 | `451c822` | 9 added, 4 changed | 8 (`5.1`–`5.8`) | `OK lessons=50 parts_covered=6 manifest_entries=50 ids=0.1,…,5.8` |
 | 5 | 2026-11-15 | `66006dd` | 17 added, 4 changed | 16 (`6.1`–`6.8`, `7.1`–`7.8`) | `OK lessons=66 parts_covered=8 manifest_entries=66 ids=0.1,…,7.8` |
 | 6a | 2026-11-15 | `423fd33` | 11 added, 4 changed | 10 (`8.1`–`8.10`) | `OK lessons=76 parts_covered=9 manifest_entries=76 ids=0.1,…,8.10` |
+| 6b | 2026-11-15 | `89080b0` | 9 added, 4 changed | 8 (`9.1`–`9.8`) | `OK lessons=84 parts_covered=10 manifest_entries=84 ids=0.1,…,9.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -956,3 +957,21 @@ is the helper's name, not `_suppression_for`; the registry is a dict called
 Both checkers exist because these two defects have recurred in every wave.
 
 **Not done:** the nine-auditor round. This wave is built and gated, not audited.
+
+## Wave 6b — Part 9, "Configuration and offline-first"
+
+Eight lessons, the site at 84 across ten parts. **This wave is unaudited** — the
+nine-auditor round has not run, and by the build file's definition it is therefore
+not a finished wave.
+
+All eight examples are terminal. They were browser tier until the validator
+rejected them: `app/config.py` is not one of the seven embedded files, and the
+settings object needs pydantic-settings, so the runner cannot import it. Each now
+carries a heredoc command, an expected output reproduced from a real run, and a
+why_not naming that blocker.
+
+The quiz options were drafted at near-equal length from the start, as the updated
+build file requires, and the generator refuses to write a question whose correct
+option is the unique longest. That guard fired eleven times across eight lessons
+and each set was rebalanced before writing — the first time in five waves the
+tell was caught at authoring time rather than after.
