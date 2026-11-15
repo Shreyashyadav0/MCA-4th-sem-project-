@@ -35,6 +35,24 @@
     "content/part-1/lesson-1.9.js",
     "content/part-1/lesson-1.10.js",
     "content/part-1/lesson-1.11.js",
-    "content/part-1/lesson-1.12.js"
+    "content/part-1/lesson-1.12.js",
+    "content/part-2/lesson-2.1.js",
+    "content/part-2/lesson-2.2.js",
+    "content/part-2/lesson-2.3.js",
+    "content/part-2/lesson-2.4.js",
+    "content/part-2/lesson-2.5.js",
+    "content/part-2/lesson-2.6.js",
+    "content/part-2/lesson-2.7.js",
+    "content/part-2/lesson-2.8.js",
+    "content/part-2/lesson-2.9.js",
+    "content/part-2/lesson-2.10.js",
+    "content/part-3/lesson-3.1.js",
+    "content/part-3/lesson-3.2.js",
+    "content/part-3/lesson-3.3.js",
+    "content/part-3/lesson-3.4.js",
+    "content/part-3/lesson-3.5.js",
+    "content/part-3/lesson-3.6.js",
+    "content/part-3/lesson-3.7.js",
+    "content/part-3/lesson-3.8.js"
   ];
 })();

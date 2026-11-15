@@ -1,0 +1,439 @@
+/* components.css — the pieces a lesson is built from: parts list, search,
+ * prose, practice blocks, quiz, badges and tables.
+ */
+/* ------------------------------------------------------------------ search */
+
+.search-block {
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.search-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.search-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+input[type="search"] {
+  flex: 1 1 18rem;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius);
+}
+
+/* The placeholder is the one visible colour a UA sets, so it is pinned to a
+ * token; the default ~54% of the text colour fails AA on the light theme. */
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.search-key {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.search-hint,
+.search-count,
+.search-empty-hint,
+.search-part,
+.search-snippet {
+  color: var(--muted);
+}
+
+.search-hint {
+  margin: var(--space-3) 0 0;
+  font-size: 0.9375rem;
+}
+
+.search-count {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 0.9375rem;
+}
+
+.search-empty {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.search-empty-title {
+  margin: 0 0 var(--space-1);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.search-empty-hint {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-item {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-link {
+  font-weight: 600;
+}
+
+.search-part {
+  display: block;
+  font-size: 0.8125rem;
+}
+
+.search-snippet {
+  margin: var(--space-1) 0 0;
+  font-size: 0.9375rem;
+}
+
+
+/* ------------------------------------------------------------------- parts */
+
+.parts-note {
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.part {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  background: var(--bg);
+}
+
+.part-pending {
+  background: var(--surface);
+  border-style: dashed;
+}
+
+.part-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.part-title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.part-number {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.part-badge {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 var(--space-3);
+  white-space: nowrap;
+}
+
+.part-note {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.lesson-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+
+.lesson-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+
+.lesson-link {
+  font-weight: 600;
+}
+
+.lesson-meta {
+  display: flex;
+  gap: var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.lesson-id {
+  font-family: var(--font-mono);
+}
+
+.lesson-done {
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 var(--space-2);
+}
+
+.lesson-done::before {
+  content: "\2713  ";
+}
+
+
+/* --------------------------------------------------------------- prose bits */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+pre.code {
+  position: relative;
+  overflow-x: auto;
+  padding: var(--space-4);
+  background: var(--code-bg);
+  color: var(--code-text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+pre.code code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+pre.code[data-lang]::after {
+  content: attr(data-lang);
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+blockquote {
+  margin: var(--space-4) 0;
+  padding: var(--space-2) var(--space-4);
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: var(--space-4) 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-right {
+  text-align: right;
+}
+
+
+/* -------------------------------------------------------------- practice */
+
+.practice-prompt {
+  margin-bottom: var(--space-3);
+}
+
+.practice-explanation {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+details.solution {
+  margin: var(--space-3) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+}
+
+details.solution summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+details.solution[open] summary {
+  margin-bottom: var(--space-2);
+}
+
+.solution-body {
+  margin-top: var(--space-2);
+}
+
+
+/* ------------------------------------------------------------------- links */
+
+.link-list,
+.glossary-list,
+.mistake-list {
+  padding-left: var(--space-5);
+}
+
+.link-item {
+  margin-bottom: var(--space-2);
+}
+
+.link-path {
+  font-weight: 600;
+}
+
+.link-lines {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.link-label {
+  color: var(--muted);
+}
+
+
+/* ------------------------------------------------------------------ quiz */
+
+.quiz {
+  max-width: var(--measure);
+}
+
+.quiz-question {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-5);
+  margin: 0 0 var(--space-4);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-soft);
+}
+
+.quiz-legend {
+  font-weight: 600;
+  padding: 0 var(--space-1);
+}
+
+.quiz-option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  cursor: pointer;
+}
+
+.quiz-option input {
+  flex: 0 0 auto;
+}
+
+.quiz-verdict {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  border-left: 4px solid var(--border);
+  background: var(--surface);
+}
+
+.quiz-verdict.is-right {
+  border-left-color: var(--sev-low);
+}
+
+.quiz-verdict.is-wrong {
+  border-left-color: var(--sev-critical);
+}
+
+.quiz-verdict.is-unanswered {
+  border-left-color: var(--sev-medium);
+}
+
+/* The mark is a word, not only a colour. */
+.quiz-question.is-right .quiz-legend::after {
+  content: " ✓";
+  color: var(--sev-low);
+}
+
+.quiz-question.is-wrong .quiz-legend::after {
+  content: " ✗";
+  color: var(--sev-critical);
+}
+
+.quiz-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+
+/* ---------------------------------------------------------------- noscript */
+
+.noscript-note {
+  max-width: var(--measure);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}

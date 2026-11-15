@@ -1,0 +1,313 @@
+/* code.css — code blocks, the runner's output pane, the terminal fallback and
+ * the full-page split editor.
+ */
+/* --------------------------------------------------------------- examples */
+
+/* A figure is a card: the caption is its header strip, the code its body, the
+ * actions its footer. The strip is what makes a block read as a component
+ * rather than as a paragraph that happens to be monospaced. */
+.code-figure {
+  margin: var(--space-5) 0;
+  max-width: var(--measure);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--code-bg);
+  box-shadow: var(--shadow-soft);
+}
+
+.code-caption {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--code-text);
+  background: var(--code-header);
+  border-bottom: 1px solid var(--code-border);
+}
+
+.code-caption::after {
+  content: attr(data-lang);
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-xs);
+  color: var(--code-muted);
+}
+
+.example-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.btn {
+  font: inherit;
+  font-size: var(--text-sm);
+  min-height: 40px; /* touch target, not decoration */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn-run {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* A disabled control still has to be readable, so the state is carried by
+ * colour and cursor rather than by fading the label into the background. */
+.btn[disabled] {
+  background: var(--surface);
+  color: var(--muted);
+  border-color: var(--border);
+  cursor: progress;
+}
+
+.btn-done {
+  font-weight: 600;
+}
+
+.btn-done.is-done::before {
+  content: "\2713  ";
+}
+
+.terminal-panel {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.terminal-title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.terminal-panel pre.code {
+  margin: 0 0 var(--space-2);
+}
+
+
+/* -------------------------------------------------------- runner states */
+
+/* The loading line. A spinner is decoration; the words carry the meaning, so a
+ * reader with reduced motion loses nothing. */
+.example-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.example-status::before {
+  content: "";
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: 0 0 auto;
+  border: 2px solid var(--muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: pyrun-spin 0.9s linear infinite;
+}
+
+.example-status[hidden] {
+  display: none;
+}
+
+@keyframes pyrun-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* stdout, stderr and tracebacks: monospace, whitespace preserved. */
+.example-output {
+  margin-top: var(--space-2);
+  max-height: 26rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.example-output[hidden] {
+  display: none;
+}
+
+/* The expected output of a runnable example: folded away, because the point is
+ * to run it, but there when a reader wants to know what to look for. */
+details.expected-output {
+  margin-top: var(--space-2);
+  max-width: var(--measure);
+}
+
+details.expected-output summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+details.expected-output pre.code {
+  margin-top: var(--space-2);
+}
+
+.terminal-why {
+  margin: var(--space-2) 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+
+/* --------------------------------------------------------------- try it */
+
+.tryit-page {
+  height: 100%;
+}
+
+.tryit {
+  padding: var(--space-4) var(--space-5) var(--space-6);
+  max-width: none;
+}
+
+.tryit-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.tryit-bar h1 {
+  font-size: 1.25rem;
+  margin: 0;
+  max-width: none;
+}
+
+.tryit-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.split {
+  --split: 50%;
+  display: grid;
+  grid-template-columns: var(--split) 24px minmax(0, 1fr);
+  gap: 0;
+  height: calc(100vh - 12rem);
+  min-height: 20rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.pane {
+  min-width: 0;
+  overflow: auto;
+  background: var(--bg);
+}
+
+.split textarea {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: var(--space-4);
+  border: 0;
+  resize: none;
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+}
+
+.split textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.divider {
+  position: relative;
+  cursor: col-resize;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+/* The track is 24px so it is a real target (WCAG 2.5.8); the bar painted inside
+ * is 8px, so the divider never overlays the textarea or the output. */
+.divider::before {
+  content: "";
+  position: absolute;
+  inset: 0 8px;
+  background: var(--divider);
+  border-radius: 2px;
+}
+
+.divider:hover::before,
+.divider:focus-visible::before {
+  background: var(--accent);
+}
+
+.pane-right .example-output {
+  margin: 0;
+  padding: var(--space-4);
+  max-height: none;
+  height: 100%;
+  border-left: 0;
+  border-radius: 0;
+  background: var(--code-bg);
+  color: var(--code-text);
+}
+
+.tryit-status {
+  margin: var(--space-2) 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+  min-height: 1.25rem;
+}
+
+/* An example figure wraps a code figure; only the outer one is a card. */
+.code-figure .code-figure {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: none;
+}
+
+.code-figure .code-figure .code-caption {
+  display: none; /* the outer figure already carries the header strip */
+}

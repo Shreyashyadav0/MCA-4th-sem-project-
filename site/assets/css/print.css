@@ -1,0 +1,188 @@
+/* print.css — what a printed lesson looks like, plus the accessibility utilities
+ * that apply everywhere: focus rings, skip link, sr-only, reduced motion.
+ */
+/* ------------------------------------------------------------ a11y utilities */
+
+/* Visible focus on every interactive element, in both themes. The ring is
+ * two-tone: the accent outline alone disappears on .btn-run and .skip-link,
+ * which are filled with that same accent, so a background-coloured halo sits
+ * outside it and guarantees one of the two bands contrasts. */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 6px var(--bg);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: calc(-1 * var(--space-6));
+  padding: var(--space-2) var(--space-3);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: var(--radius);
+  z-index: 10;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+
+/* ------------------------------------------------------------------ layout */
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------------------- print */
+
+@media print {
+
+  /* Chrome and controls go; the terminal panel stays, because it holds the
+   * expected output of every example that cannot run in the browser. */
+  .site-header,
+  .breadcrumb,
+  .search-block,
+  .example-actions,
+  .lesson-footer,
+  .skip-link,
+  .sidebar,
+  .sidebar-scrim,
+  .sidebar-toggle,
+  .tryit-bar,
+  .tryit-status,
+  .pane-left,
+  .split textarea,
+  .pager,
+  .quiz-actions,
+  .btn-tryit,
+  .divider {
+    display: none;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .quiz-question {
+    break-inside: avoid;
+  }
+
+  /* An open drawer's scrim is fixed and would print as a veil over the page;
+   * the narrow-width rule that shows it outranks the list above, so it is
+   * repeated here at the same specificity. */
+  body.sidebar-open .sidebar-scrim {
+    display: none;
+  }
+
+  /* The editor prints as a plain page: output on paper, no textarea. */
+  .split {
+    display: block;
+    height: auto;
+    border: 0;
+  }
+
+  .pane-right {
+    overflow: visible;
+  }
+
+  .pane-right .example-output {
+    height: auto;
+    max-height: none;
+    padding: 0;
+    background: transparent;
+  }
+
+  body {
+    font-size: 11pt;
+  }
+
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  a {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  /* Only blocks that fit on a page avoid a break; a long code sample or table
+   * must be allowed to flow, or it is clipped instead of continued. */
+  blockquote {
+    break-inside: avoid;
+  }
+
+  /* A scroll box prints as a truncated box: on paper the whole result is shown,
+   * and the loading line (a frozen spinner) is not printed at all. */
+  .example-output,
+  pre.code,
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .example-status {
+    display: none;
+  }
+
+  details.expected-output > summary {
+    display: none;
+  }
+
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* A closed <details> renders no body, and the summary is hidden in print, so
+   * the answer would vanish. Force the body visible on paper. */
+  details.solution {
+    border: none;
+    padding: 0;
+    break-inside: auto;
+  }
+
+  details.solution > summary {
+    display: none;
+  }
+
+  details.solution > *:not(summary) {
+    display: block;
+  }
+
+  .table-wrap {
+    overflow: visible;
+  }
+
+  table {
+    font-size: 9pt;
+  }
+
+  th,
+  td {
+    word-break: break-word;
+  }
+
+  .lesson-section {
+    break-inside: auto;
+  }
+}

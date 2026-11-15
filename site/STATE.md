@@ -15,6 +15,7 @@ is the bug.
 | 2 | 2026-11-14 | `ade2c8d` | 14 added, 5 changed | 14 (`0.2`–`0.4`, `1.2`–`1.12`) | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 2a | 2026-11-15 | `3e2eee1` | 0 added, 18 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 2b | 2026-11-15 | `b3924dc` | 0 added, 15 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
+| 3 | 2026-11-15 | `f0c83f7` | 24 added, 12 changed | 18 (`2.1`–`2.10`, `3.1`–`3.8`) | `OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,…,3.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -637,3 +638,82 @@ longest in 35 of 48 questions, but the median gap to the next-longest is now
 under 10 characters, against a maximum of 71 before). Removing the last of that
 signal means rewriting every distractor by hand; it is recorded here rather than
 claimed as done.
+
+## Curriculum changes
+
+**Wave 3 — 108 lessons became 110.** Part 2 (Typing and data modelling) grew from
+8 planned lessons to 10, because Pydantic deserves two lessons the outline did not
+have: serialisation (`model_dump` and JSON mode) and tolerant parsing (returning
+`None` instead of raising). Part 3 (Testing with pytest) stays at 8. Parts 0 and 1
+are untouched. The remaining wave map is now 34 written of 110.
+
+## Wave 3 — Parts 2 and 3, and the visual design pass
+
+Eighteen new lessons: `2.1`–`2.10` (Pydantic v2 at the boundary) and `3.1`–`3.8`
+(pytest, from discovery to the zero-network proof). Parts 0 and 1 were not touched:
+`git diff HEAD~1 -- site/content/part-0 site/content/part-1` prints nothing.
+
+**The design pass.** The single 1,467-line `style.css` became five files under
+`assets/css/`, linked in order from all three pages:
+
+```
+tokens.css      50 lines   every colour, type and space value; both themes; print tokens
+layout.css     560 lines   reset, shell, header, sidebar, lesson column, pager, drawer
+components.css 438 lines   parts list, search, prose, practice, quiz, badges, tables
+code.css       292 lines   code blocks, output pane, terminal panel, split editor
+print.css      180 lines   print rules + the a11y utilities (focus, skip link, sr-only, motion)
+```
+
+`style.css` is now a five-line shim that `@import`s the five, so an old link still
+works. All 148 selectors from the old file survive — the split moved rules, it did
+not rewrite them — and the restyle is a new token palette plus targeted component
+rules:
+
+- Accent `#0F766E` (deep blue-teal) with its own hover and soft tints, kept clear
+  of the severity ramp, which stays red/orange/amber/blue.
+- Type: 17px body, 1.65 line height, a 13/15/17/20/26/34/44 scale, 72ch measure.
+- Space: a 4px scale from `--space-1` to `--space-10`; every margin and padding
+  in the five files reads from it.
+- Shape: 12px cards, 1px borders, two soft shadows, no heavy drop shadows.
+- Code blocks are dark cards in both themes with a header strip that names the
+  language, so a block reads as a component rather than as a paragraph that
+  happens to be monospaced. The output pane keeps its own darker surface.
+- Buttons are 40px tall (a real touch target), Run is the accent fill, the rest
+  are outlined. Focus is a 3px accent ring with a halo, visible on accent-filled
+  controls too.
+- Motion is 120–160ms on hover and expand only, and `prefers-reduced-motion`
+  zeroes it.
+
+**Gate, verbatim.**
+
+```
+$ python site/tools/validate_lessons.py
+OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,0.2,0.3,0.4,1.1,…,3.8
+
+$ python site/tools/embed_sources.py --check
+OK repo-sources.js matches 7 embedded files
+
+$ python -m pytest -q tests
+640 passed, 1 skipped
+
+$ grep -n "#[0-9a-fA-F]\{3,6\}" site/assets/css/*.css | grep -v tokens.css
+(no output — every colour literal lives in tokens.css)
+```
+
+**Executed, not trusted.** Every `browser` example in Parts 2 and 3 was run under
+CPython and matched its `expected_output` byte for byte; `2.5` was then re-run in
+the page through the real runner (`accepted: 42-45 / rejected: Value error`).
+The `terminal` examples in Part 3 quote outputs captured from this repository at
+this commit — `640 passed, 1 skipped`, `641 tests collected`, `7 passed` for the
+parametrised test, `63 passed, 578 deselected` for `-k github`, and the `-rs`
+skip line naming `tests/test_openai_compat_provider.py:1062`.
+
+**Two facts the writing corrected.** `model_copy(update=...)` does **not** validate
+its update, so a string where a `Severity` belongs survives until something reads
+it — lesson 2.4 now teaches the re-validating pattern instead. And `Finding.line`
+is typed `str` (not `int`) because the contract allows a range, which 2.2 and 2.7
+both use as the example of why the type has to match the contract.
+
+**Left for Wave 4.** Parts 4 and 5. The sidebar's collapsed state is still
+per-session, `tryit.html` still prints only its output pane, and the CSS has no
+syntax highlighting yet — code is one colour, which is honest but plain.

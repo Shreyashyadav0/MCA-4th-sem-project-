@@ -651,7 +651,11 @@
   function codeFigure(caption, code, lang) {
     var figure = el("figure", "code-figure");
     if (caption) {
-      figure.appendChild(el("figcaption", "code-caption", caption));
+      var head = el("figcaption", "code-caption", caption);
+      if (lang) {
+        head.setAttribute("data-lang", lang); /* the strip's right-hand label */
+      }
+      figure.appendChild(head);
     }
     var pre = el("pre", "code");
     if (lang) {
@@ -693,7 +697,11 @@
     }
 
     if (example.caption) {
-      figure.appendChild(el("figcaption", "code-caption", example.caption));
+      var exampleHead = el("figcaption", "code-caption", example.caption);
+      if (example.lang) {
+        exampleHead.setAttribute("data-lang", example.lang);
+      }
+      figure.appendChild(exampleHead);
     }
 
     figure.appendChild(codeFigure(null, example.code, example.lang));

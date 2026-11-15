@@ -1,0 +1,156 @@
+/* tokens.css — the design system's only source of colour, type and space.
+ *
+ * Rules this file keeps:
+ *   1. Every colour in the site is declared here, on :root, and overridden under
+ *      [data-theme="dark"]. No other file may contain a hex value.
+ *   2. The brand accent is a deep blue-teal that cannot be confused with the
+ *      severity ramp: a CRITICAL finding must never look like a button.
+ *   3. Sizes come from the scales. A number written straight into a rule is a bug.
+ */
+
+:root {
+  /* --- brand ------------------------------------------------------------- */
+  --accent: #0f766e;
+  --accent-hover: #115e59;
+  --accent-soft: #ccfbf1;
+  --accent-contrast: #ffffff;
+
+  /* --- surfaces ---------------------------------------------------------- */
+  --bg: #ffffff;
+  --surface: #f6f8f9;
+  --surface-2: #eef2f4;
+  --surface-raised: #ffffff;
+  --text: #16202a;
+  --muted: #56646f;
+  --border: #d7dee3;
+  --border-strong: #b6c2ca;
+
+  /* --- code -------------------------------------------------------------- */
+  --code-bg: #0f1b23;
+  --code-text: #e6edf3;
+  --code-muted: #94a3ae;
+  --code-border: #1e2f3a;
+  --code-header: #0a141b;
+
+  /* --- severity: a ramp of its own, never the accent --------------------- */
+  --sev-critical: #a4133c;
+  --sev-high: #b34700;
+  --sev-medium: #7a5900;
+  --sev-low: #1f5f8b;
+
+  /* --- states ------------------------------------------------------------ */
+  --ok: #116d3f;
+  --ok-soft: #dcf5e7;
+  --bad: #a4133c;
+  --bad-soft: #fbe4ea;
+  --scrim: #0b1220;
+  --divider: #6b7688;
+
+  /* --- type -------------------------------------------------------------- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --text-xs: 0.8125rem;   /* 13px */
+  --text-sm: 0.9375rem;   /* 15px */
+  --text-base: 1.0625rem; /* 17px */
+  --text-md: 1.25rem;     /* 20px */
+  --text-lg: 1.625rem;    /* 26px */
+  --text-xl: 2.125rem;    /* 34px */
+  --text-2xl: 2.75rem;    /* 44px */
+  --leading: 1.65;
+  --leading-tight: 1.25;
+  --measure: 72ch;
+
+  /* --- space: a 4px scale, and nothing outside it ------------------------ */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 6rem;
+
+  /* --- shape ------------------------------------------------------------- */
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow-soft: 0 1px 2px rgba(15, 27, 35, 0.06), 0 1px 3px rgba(15, 27, 35, 0.04);
+  --shadow-lift: 0 4px 12px rgba(15, 27, 35, 0.08), 0 1px 3px rgba(15, 27, 35, 0.06);
+
+  /* --- motion ------------------------------------------------------------ */
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+  --fast: 120ms;
+  --slow: 160ms;
+
+  /* --- focus ------------------------------------------------------------- */
+  --focus-ring: var(--accent);
+  --focus-halo: var(--bg);
+}
+
+[data-theme="dark"] {
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-soft: #0d2f2c;
+  --accent-contrast: #06251f;
+
+  --bg: #0d1418;
+  --surface: #131c21;
+  --surface-2: #182329;
+  --surface-raised: #182329;
+  --text: #e8eef2;
+  --muted: #a7b4bd;
+  --border: #27353d;
+  --border-strong: #3a4a54;
+
+  --code-bg: #0a1216;
+  --code-text: #e6edf3;
+  --code-muted: #94a3ae;
+  --code-border: #22323c;
+  --code-header: #060d11;
+
+  --sev-critical: #ff8fa3;
+  --sev-high: #ffb07a;
+  --sev-medium: #ffd166;
+  --sev-low: #8fd3ff;
+
+  --ok: #6ee7a8;
+  --ok-soft: #0d2a1d;
+  --bad: #ff8fa3;
+  --bad-soft: #2c1219;
+  --scrim: #6b7688;
+  --divider: #8892a4;
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  --focus-ring: var(--accent);
+  --focus-halo: var(--bg);
+}
+
+/* Print: paper has no dark theme, so the few tokens print actually uses are
+ * restated here rather than leaking the screen values onto white paper. */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --text: #000000;
+    --muted: #333333;
+    --border: #999999;
+    --accent: #000000;
+    --accent-contrast: #ffffff;
+    --code-bg: #f4f4f4;
+    --code-text: #000000;
+    /* --sev-* are re-declared here because the dark theme overrides them with
+     * pastels that are unreadable on white paper. */
+    --sev-critical: #a4133c;
+    --sev-high: #a63f00;
+    --sev-medium: #6f5200;
+    --sev-low: #1c5d86;
+    --scrim: #0b1220;
+    --divider: #6b7688;
+  }
+}

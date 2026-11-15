@@ -25,7 +25,7 @@
   var PARTS = [
     { n: 0, title: "Orientation", lessons: 4 },
     { n: 1, title: "Python fundamentals", lessons: 12 },
-    { n: 2, title: "Typing and data modelling", lessons: 8 },
+    { n: 2, title: "Typing and data modelling", lessons: 10 },
     { n: 3, title: "Testing with pytest", lessons: 8 },
     { n: 4, title: "HTTP and FastAPI", lessons: 8 },
     { n: 5, title: "Unified diffs", lessons: 8 },
