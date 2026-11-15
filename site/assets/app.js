@@ -553,9 +553,9 @@
       var current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
       button.textContent = current === "dark" ? "Light mode" : "Dark mode";
       button.setAttribute("aria-pressed", current === "dark" ? "true" : "false");
-      /* The name stays "Dark mode" in both states — swapping it broke the
-       * visible-label rule; aria-pressed carries the state instead. */
-      button.setAttribute("aria-label", "Dark mode");
+      /* The name must contain the visible label, so it follows textContent;
+       * aria-pressed carries the on/off state. */
+      button.setAttribute("aria-label", current === "dark" ? "Light mode" : "Dark mode");
     };
     themeSync = sync;
     if (themeBound) {

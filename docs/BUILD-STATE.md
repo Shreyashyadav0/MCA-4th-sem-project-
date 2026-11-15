@@ -26,6 +26,19 @@ parts complete (0–9 minus the last), 26 lessons to go to 110.
 - **Stage 1 — quiz length tell: DONE.** 121 → 0 of 252, and the clustered rule 20 → 0.
   `check_quiz.py` exits 0 and runs in CI beside the other two checkers.
 
+## Re-audit of the 6b fixes — done
+
+Three auditors over the fixes found 18 findings, four of them regressions the fixes
+themselves introduced, all now fixed:
+- the sidebar fix left index.html with all 84 links hidden (no lesson is current
+  there, so no part opened); the rule is now: explicitly-closed stays closed, the
+  current part opens, and with no lesson selected every part with lessons opens
+- dark had no `--muted-on-surface`, so the terminal note was 2.73:1 in dark
+- dark sets `--accent-strong` to the brand green, so the header hover was back to
+  3.01:1; the hover is now a literal that clears 4.5:1 on both bars
+- the theme toggle's fixed aria-label did not contain a visible label of "Light
+  mode"; the name now follows the visible label
+
 ## Next stage
 
 **Stage 2's re-audit — three auditors over the fixes — then Stage 3, Wave 7a

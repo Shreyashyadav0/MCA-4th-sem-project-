@@ -1,4 +1,4 @@
-/* 9.6 — Pinned dependencies: ranges versus a lock
+/* 9.6 — Pinned dependencies: direct pins and a lock
  * One lesson per file. Do not add a second push() here.
  */
 window.LESSONS = window.LESSONS || [];
@@ -6,20 +6,20 @@ window.LESSONS.push({
   "id": "9.6",
   "part": 9,
   "part_title": "Configuration and offline-first",
-  "title": "Pinned dependencies: ranges versus a lock",
+  "title": "Pinned dependencies: direct pins and a lock",
   "order": 906,
   "duration_min": 25,
-  "concept_md": "### Two files, two jobs\n\n`requirements.txt` lists the eight direct dependencies, each pinned exactly with `==`. `requirements.lock` adds the transitive and development pins — thirty-seven in all — and is what CI installs. There are no ranges in either file.\n\n### Why both\n\nTwo pins in two files answer two questions: the direct list says what the project asks for, and the lock says what was installed. Installing without the lock means today's install can differ from yesterday's, which is how a suite that was green on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### Why the lock is the longer file\n\nThe lock is longer because it is transitive: the eight direct pins pull in twenty-nine more. That is why CI installs the lock and a reader reads the list.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
+  "concept_md": "### Two files, two jobs\n\n`requirements.txt` lists the eight direct dependencies, each pinned exactly with `==`. `requirements.lock` adds the transitive and development pins — thirty-seven in all — and is what CI installs. There are no ranges in either file.\n\n### Why both\n\nTwo pins in two files answer two questions: the direct list says what the project asks for, and the lock says what was installed. Installing without the lock means today's install can differ from yesterday's, which is how a suite that was green on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the pin in requirements.txt, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### Why the lock is the longer file\n\nThe lock is longer because it is transitive: the eight direct pins pull in twenty-nine more. That is why CI installs the lock and a reader reads the list.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
   "code_examples": [
     {
       "id": "9.6-ex-0",
       "lang": "python",
-      "caption": "Count the pins, and show the first range",
-      "code": "import pathlib\n\nlock = pathlib.Path(\"requirements.lock\").read_text().splitlines()\npins = [l for l in lock if \"==\" in l and not l.strip().startswith(\"#\")]\nprint(\"pins:\", len(pins))\nprint(\"first range:\", pathlib.Path(\"requirements.txt\").read_text().splitlines()[0])",
+      "caption": "Count the pins, and show the first",
+      "code": "python - <<'PY'\nimport pathlib\n\nlock = pathlib.Path(\"requirements.lock\").read_text().splitlines()\npins = [l for l in lock if \"==\" in l and not l.strip().startswith(\"#\")]\nprint(\"pins:\", len(pins))\nprint(\"first pin:\", pins[0])\nPY",
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
-      "expected_output": "/bin/sh: 1: import: not found\n/bin/sh: 3: Syntax error: \"(\" unexpected"
+      "expected_output": "pins: 37\nfirst pin: annotated-doc==0.0.6"
     }
   ],
   "quiz": [
@@ -27,23 +27,23 @@ window.LESSONS.push({
       "q": "What does the lock file record?",
       "options": [
         "The project's direct needs",
-        "What would be compatible with the range",
+        "What would be compatible with the code",
         "Exactly what was tested",
         "The Python version only"
       ],
       "answer": 2,
-      "why": "A pin says what ran; a range says what is allowed, and the two answer different questions."
+      "why": "A pin says what ran; the direct list says what the project asks for, and the two answer different questions."
     },
     {
-      "q": "How is a version in the lock changed?",
+      "q": "How is a pin in the lock changed?",
       "options": [
-        "Add a second pin beside it",
+        "Add a second pin beside the first one",
         "Edit the version by hand",
         "Delete the line and reinstall",
-        "Regenerate it from the range"
+        "Regenerate it from the direct pins"
       ],
       "answer": 3,
-      "why": "A hand-edited lock lies about what was tested, so the range changes first and the lock is regenerated."
+      "why": "A hand-edited lock lies about what was tested, so the direct pin changes first and the lock is regenerated."
     },
     {
       "q": "What does the pin count describe?",
@@ -70,8 +70,8 @@ window.LESSONS.push({
     "explanation": "The lock is far longer: it pins transitive packages the requirement file never names."
   },
   "common_mistakes": [
-    "Editing a version in the lock instead of the range.",
-    "Installing from ranges in CI, so the run is not reproducible.",
+    "Editing a version in the lock instead of the direct pin.",
+    "Installing without the lock in CI, so the run is not reproducible.",
     "Treating the pin count as a quality target."
   ],
   "project_links": [
@@ -81,9 +81,9 @@ window.LESSONS.push({
       "lines": "1-8"
     },
     {
-      "label": "The pins CI installs",
+      "label": "The whole lock, comments and pins",
       "path": "requirements.lock",
-      "lines": "1-8"
+      "lines": "1-40"
     }
   ],
   "learn_more": [

@@ -117,6 +117,7 @@
   --surface-raised: #1f2229;
   --text: #ffffff;
   --muted: #b9c0cc;
+  --muted-on-surface: #b9c0cc; /* the panel ground is dark here, not grey */
   --border: #3a4150;
   --border-strong: #4c566a;
   --border-control: #8b96a5;

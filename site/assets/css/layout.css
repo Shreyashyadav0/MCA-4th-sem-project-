@@ -73,9 +73,10 @@ a:hover {
 
 .site-header .btn:hover {
   /* white on #04AA6D is 3.01:1 — fine for a fill under large text, not for a
-   * 16px label. The darker green carries it at 5.48:1. */
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
+   * 16px label. A literal, not --accent-strong: dark sets that token to the
+   * brand green, which would put the 3.01:1 back. */
+  background: #047857;
+  border-color: #047857;
   color: var(--accent-contrast);
 }
 

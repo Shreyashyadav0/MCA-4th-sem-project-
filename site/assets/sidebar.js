@@ -205,12 +205,18 @@
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      /* Every part starts closed, except the one being read: with all of them
-       * shut, the only aria-current="page" in the nav sits inside a hidden
-       * body, so nothing visible says where you are. */
-      var openByDefault = collapsed[part.n] === true
-        ? true
-        : (currentPart !== null && String(part.n) === String(currentPart));
+      /* Three rules, in order. A part the reader explicitly closed stays
+       * closed. The part being read opens, so aria-current is visible. With no
+       * lesson selected — index.html, tryit.html — every part with lessons
+       * opens, because a permanent topic list is what that page is for. */
+      var openByDefault;
+      if (collapsed[part.n] === false) {
+        openByDefault = false;
+      } else if (currentPart !== null) {
+        openByDefault = String(part.n) === String(currentPart);
+      } else {
+        openByDefault = lessons.length > 0;
+      }
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
       /* Both numbers are real: done/written, with the planned total named
@@ -256,7 +262,7 @@
         body.hidden = open;
         /* Store the state we are moving TO. Storing `open` recorded the previous
          * state, so the next render inverted every part the reader had touched. */
-        collapsed[part.n] = !open;
+        collapsed[part.n] = open; /* store the state we move to */
       });
 
       scroller.appendChild(group);

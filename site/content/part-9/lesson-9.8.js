@@ -29,7 +29,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
-      "expected_output": "sssss                                                                    [100%]\nall tests skip until rebuild/offline.py exists"
+      "expected_output": "sssss                                                                    [100%]\n5 skipped"
     }
   ],
   "quiz": [
@@ -93,7 +93,7 @@ window.LESSONS.push({
     {
       "label": "The rebuild suite",
       "path": "rebuild/tests/test_rebuild_offline.py",
-      "lines": "1-36"
+      "lines": "1-109"
     }
   ],
   "learn_more": [
