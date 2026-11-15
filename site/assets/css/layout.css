@@ -546,8 +546,13 @@ figure {
     min-width: 0;
   }
 
+  /* The buttons themselves must shrink: a nowrap label inside a flex item with
+   * min-width:auto still pushes the page wider than the screen. */
   .header-actions .btn {
     padding-inline: var(--space-3);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 }

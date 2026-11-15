@@ -179,8 +179,8 @@ materialise is actually embedded. It exits non-zero with one line per problem.
 - No claimed outcomes. Nothing here says the model layer produced a review, or that
   a benchmark number exists, because in this repository neither has happened. See
   `HANDOFF.md`.
-- Test counts, rule counts and module counts are quoted from the repository at
-  commit `c5a8c8b`, and only there.
+- Test counts, rule counts and module counts are quoted from the repository as it
+  ships, and only there.
 
 ## Licence
 

@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The app object and the route decorators",
   "order": 402,
   "duration_min": 20,
-  "concept_md": "### One object, many routes\n\n`app/main.py` builds a single `FastAPI()` instance and attaches every endpoint to it with a decorator. There are fourteen decorators in the file, and each one is a path operation:\n\n```python\n@app.get(\"/health\", tags=[\"ops\"], summary=\"Liveness and credential state\")\ndef health() -> HealthResponse: ...\n```\n\nThe decorator registers the function; the function's name is not part of the URL. Two things inside it are documentation rather than behaviour: `tags` groups the endpoint in the generated UI, and `summary` is the one-line description that appears beside it.\n\n### A decorator can be several lines\n\n`@app.get(\"/rules\", …)` is a single line, but `@app.post(\"/review\", …)` runs to fifteen because it carries a `responses={422: …}` block that documents an error body with an example. That is the same decorator, given more to say — and the example it carries appears in `/docs` untouched by any test.\n\n### What the decorator decides\n\nThe method and the path. `@app.get(\"/rules\")` and `@app.post(\"/rules\")` would be two different operations. Two paths here do carry two methods — `/test-review` (GET and POST) and `/users` (POST and GET) — which is how one path serves two jobs without a second URL. The decorator also fixes the response model when one is given, which is lesson 4.4's subject.\n\n### Reading the file in order\n\nThe routes appear in the order they were added: `/` and `/health` at the top of the block, then `/rules`, `/review`, `/test-review`, `/webhook`, and the later `/reviews`, `/users`, `/stats` group from 1424. Reading them in file order is reading the surface in the order it grew.",
+  "concept_md": "### One object, many routes\n\n`app/main.py` builds a single `FastAPI()` instance and attaches every endpoint to it with a decorator. There are fourteen decorators in the file, and each one is a path operation:\n\n```python\n@app.get(\"/health\", tags=[\"ops\"], summary=\"Liveness and credential state\")\ndef health() -> HealthResponse: ...\n```\n\nThe decorator registers the function; the function's name is not part of the URL. Two things inside it are documentation rather than behaviour: `tags` groups the endpoint in the generated UI, and `summary` is the one-line description that appears beside it.\n\n### A decorator can be several lines\n\n`@app.get(\"/rules\", …)` is a single line, but `@app.post(\"/review\", …)` runs to sixteen lines because it carries a `responses={422: …}` block that documents an error body with an example. That is the same decorator, given more to say — and the example it carries appears in `/docs` untouched by any test.\n\n### What the decorator decides\n\nThe method and the path. `@app.get(\"/rules\")` and `@app.post(\"/rules\")` would be two different operations. Two paths here do carry two methods — `/test-review` (GET and POST) and `/users` (POST and GET) — which is how one path serves two jobs without a second URL. The decorator also fixes the response model when one is given, which is lesson 4.4's subject.\n\n### Reading the file in order\n\nThe routes appear in the order they were added: `/` and `/health` at the top of the block, then `/rules`, `/review`, `/test-review`, `/webhook`, and the later `/reviews`, `/users`, `/stats` group from 1424. Reading them in file order is reading the surface in the order it grew.",
   "code_examples": [
     {
       "id": "4.2-ex-0",
@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"status\":\"ok\",\"mode\":\"mock\",\"rules\":63,\"categories\":[\"auth\",\"complexity\",\"config\",\"crypto\",\"deserialisation\",\"injection\",\"quality\",\"reliability\",\"secrets\",\"style\"],\"sarvam_key\":\"missing\",\"github_token\":\"missing\",\"webhook_secret\":\"missing\",…[abridged]",
-      "why_not": "a request needs a running app on a socket; the browser runner has Python but no server and no repository checkout."
+      "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
   "quiz": [
@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "A decorator spread over several lines",
       "path": "app/main.py",
-      "lines": "924-944"
+      "lines": "924-930"
     }
   ],
   "learn_more": [

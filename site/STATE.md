@@ -16,7 +16,7 @@ is the bug.
 | 2a | 2026-11-15 | `3e2eee1` | 0 added, 18 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 2b | 2026-11-15 | `b3924dc` | 0 added, 15 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 3 | 2026-11-15 | `f0c83f7` | 24 added, 12 changed | 18 (`2.1`–`2.10`, `3.1`–`3.8`) | `OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,…,3.8` |
-| 4a | 2026-11-15 | `615602d` | 9 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
+| 4a | 2026-11-15 | `615602d` | 8 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -811,7 +811,7 @@ Eight lessons, `4.1`–`4.8`, filling the part `contracts.js` already declared a
 eight. Nothing was renamed and nothing renumbered; part 5 is untouched.
 
 The part teaches the surface the code actually exposes: one request and one
-response (4.1), the app object and its thirteen decorators (4.2), the request
+response (4.1), the app object and its fourteen decorators (4.2), the request
 model and the two different 422s (4.3), `response_model` and the generated
 schema (4.4), the status codes in use and `HTTPException` (4.5), headers and the
 webhook signature (4.6), `TestClient` in-process (4.7), and a guided read of
@@ -837,6 +837,6 @@ never quote a number.
 
 **Gate.** `validate_lessons.py` → `OK lessons=42 parts_covered=5
 manifest_entries=42`, exit 0. Banned numbers under `site/` → empty. `grep -rn
-'passed' site/content/part-4/` → empty. the suite is still green and this wave touches no code under `app/`, `tests/` or
-`benchmarks/`, so no test number is quoted here. Manifest and all three pages
+'passed' site/content/part-4/` → empty. The suite is still green; this wave touches no code under
+`app/`, `tests/` or `benchmarks/`, so this entry quotes no test number. Manifest and all three pages
 list the same eight paths in lesson order.

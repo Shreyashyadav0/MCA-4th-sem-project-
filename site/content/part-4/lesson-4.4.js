@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "['/', '/health', '/review', '/reviews', '/reviews/{review_id}', '/rules', '/rules/{rule_id}', '/stats', '/test-review', '/users', '/users/{user_id}', '/webhook']",
-      "why_not": "a request needs a running app on a socket; the browser runner has Python but no server and no repository checkout."
+      "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
   "quiz": [
@@ -58,15 +58,15 @@ window.LESSONS.push({
     }
   ],
   "try_it": {
-    "prompt": "Fetch the schema and find the response model declared for `/review`.",
+    "prompt": "Fetch the schema and count how many paths document a 422 response.",
     "starter": "",
-    "solution": "```console\n$ curl -s http://127.0.0.1:8000/openapi.json | python -c \"import json,sys; d=json.load(sys.stdin); print(d['paths']['/review']['post']['responses']['200']['content']['application/json']['schema'])\"\n{'$ref': '#/components/schemas/ReviewResponse'}\n```",
-    "explanation": "The `$ref` names the model, and `components.schemas.ReviewResponse` holds its fields — the same class the handler is annotated with."
+    "solution": "```console\n$ curl -s http://127.0.0.1:8000/openapi.json | python -c \"import json,sys; d=json.load(sys.stdin); print(sum(1 for p,v in d['paths'].items() if '422' in next(iter(v.values())).get('responses',{})))\"\n9\n```",
+    "explanation": "Nine of the twelve paths document a 422, because every endpoint that accepts a body can refuse it. `/review` and `/test-review` also attach an example body, which is why their schema entries are longer."
   },
   "exercise": {
     "prompt": "Fetch `/openapi.json` and read the `$ref` for `/review`'s 200 response, then name three fields of that model from `components.schemas`.",
-    "hint": "One path appears twice in the file.",
-    "solution": "```console\n$ curl -s http://127.0.0.1:8000/openapi.json | python -c \"import json,sys; d=json.load(sys.stdin); print(d['paths']['/review']['post']['responses']['200']['content']['application/json']['schema']); print(sorted(d['components']['schemas']['ReviewResponse']['properties']))\"\n{'$ref': '#/components/schemas/ReviewResponse'}\n['comment', 'notice', 'provider', 'review', 'source', 'stats']\n```",
+    "hint": "The `$ref` names a key under `components.schemas`; its `properties` are the fields.",
+    "solution": "```console\n$ curl -s http://127.0.0.1:8000/openapi.json | python -c \"import json,sys; d=json.load(sys.stdin); print(d['paths']['/review']['post']['responses']['200']['content']['application/json']['schema']); print(sorted(d['components']['schemas']['ReviewResponse']['properties']))\"\n{'$ref': '#/components/schemas/ReviewResponse'}\n['comment', 'model', 'notice', 'posting', 'provider', 'review', 'source', 'stats']\n```",
     "explanation": "The `$ref` names the class the handler is annotated with, and the properties are its fields — so the schema documents the same object the code returns, without a second list to keep in step."
   },
   "common_mistakes": [

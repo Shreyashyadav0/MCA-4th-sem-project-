@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The request body is a Pydantic model",
   "order": 403,
   "duration_min": 25,
-  "concept_md": "### The model is the contract\n\n`POST /review` accepts a body that FastAPI validates against `ReviewRequest`. If the declared model is the contract, then the model's fields are the API: a field you add to the class becomes an accepted field, and one you remove becomes a 422.\n\n```python\nclass ReviewRequest(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\")\n    diff: str | None = None\n    code: str | None = None\n```\n\n### Two different 422s\n\nThis distinction is the point of the lesson. A **422 raised by FastAPI** happens before your function runs: the body did not match the model. Its `detail` is a **list** of entries, each naming a location:\n\n```text\n{\"detail\": [{\"type\": \"extra_forbidden\", \"loc\": [\"body\", \"nope\"], …}]}\n```\n\nA **422 raised by your own code** is a plain sentence, because it is an `HTTPException` you wrote:\n\n```text\n{\"detail\": \"provide either 'diff' or 'code'\"}\n```\n\nSame status, different shape — and a client that parses one will misread the other. That is why the model carries `extra=\"forbid\"`: an unknown field is a client bug, and it should be reported as one rather than silently dropped.\n\n### Neither field is required\n\nBoth `diff` and `code` are optional, so `{}` is a valid *body* — it fails later, in the handler, with the sentence above. The model says \"you may send either\"; the handler says \"you must send one\". Contracts in two layers, each with its own error.",
+  "concept_md": "### The model is the contract\n\n`POST /review` accepts a body that FastAPI validates against `ReviewRequest`. If the declared model is the contract, then the model's fields are the API: a field you add to the class becomes an accepted field, and one you remove becomes a 422.\n\n```python\nclass ReviewRequest(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\", …)\n    diff: str | None = None\n    code: str | None = None\n    filename: str | None = None      # … and three more, plus a validator\n```\n\n### Two different 422s\n\nThis distinction is the point of the lesson. A **422 raised by FastAPI** happens before your function runs: the body did not match the model. Its `detail` is a **list** of entries, each naming a location:\n\n```text\n{\"detail\": [{\"type\": \"extra_forbidden\", \"loc\": [\"body\", \"nope\"], …}]}\n```\n\nA **422 raised by your own code** is a plain sentence, because it is an `HTTPException` you wrote:\n\n```text\n{\"detail\": \"provide either 'diff' or 'code'\"}\n```\n\nSame status, different shape — and a client that parses one will misread the other. That is why the model carries `extra=\"forbid\"`: an unknown field is a client bug, and it should be reported as one rather than silently dropped.\n\n### Neither field is required\n\nBoth `diff` and `code` are optional, so `{}` is a valid *body* — it fails later, in the handler, with the sentence above. The model says \"you may send either\"; the handler says \"you must send one\". Contracts in two layers, each with its own error.",
   "code_examples": [
     {
       "id": "4.3-ex-0",
@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":\"provide either 'diff' or 'code'\"}",
-      "why_not": "a request needs a running app on a socket; the browser runner has Python but no server and no repository checkout."
+      "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     },
     {
       "id": "4.3-ex-1",
@@ -29,7 +29,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":[{\"type\":\"extra_forbidden\",\"loc\":[\"body\",\"nope\"],\"msg\":\"Extra inputs are not permitted\",\"input\":1}]}",
-      "why_not": "a request needs a running app on a socket; the browser runner has Python but no server and no repository checkout."
+      "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
   "quiz": [

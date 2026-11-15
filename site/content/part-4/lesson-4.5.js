@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "HTTP/1.1 404 Not Found\ncontent-type: application/json\n\n{\"detail\":\"no rule with id 'nope'\"}",
-      "why_not": "a request needs a running app on a socket; the browser runner has Python but no server and no repository checkout."
+      "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
   "quiz": [

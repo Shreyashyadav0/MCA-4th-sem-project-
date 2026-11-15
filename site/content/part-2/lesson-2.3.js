@@ -44,7 +44,7 @@ window.LESSONS.push({
     {
       "q": "When should you write a validator instead of a constraint?",
       "options": [
-        "When the rule needs more than one field or more than one line",
+        "When the rule only constrains the field's type",
         "When the rule needs more than one field or more than one line of logic",
         "Always — a validator is clearer than a constraint",
         "When the field happens to be a string type"
