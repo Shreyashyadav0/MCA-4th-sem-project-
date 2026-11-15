@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "What HTTP is: one request, one response",
   "order": 401,
   "duration_min": 15,
-  "concept_md": "### One question, one answer\n\nEvery call to this project's API is the same shape: the client sends **one request** and gets **one response**. A request is four things.\n\n- **Method** — the verb. `GET` asks for something; `POST` sends something.\n- **Path** — which resource. `/`, `/health`, `/rules`, `/review`.\n- **Headers** — metadata about the message, outside the body.\n- **Body** — the payload, usually absent on a `GET`.\n\nA response is a **status code** plus headers plus a body. The code is the part a program reads before it looks at anything else: `200` means the request was understood and answered, `404` means the path or the thing named in it does not exist, `422` means the body did not match what the endpoint expects.\n\n### Stateless, which is the whole design\n\nThe server keeps nothing between requests. Nothing about your last call changes this one; every request carries everything needed to answer it. That is why the API can be restarted at any moment, and why two identical requests get two identical answers here — there is no session to drift.\n\n### JSON is the body format\n\nBoth directions use JSON: an object with string keys. The `/` endpoint returns six fields, and reading them is the fastest way to learn what the service thinks it is:\n\n```text\n{\"name\": \"…\", \"version\": \"0.1.0\", \"mode\": \"mock\", \"rules\": 63,\n \"endpoints\": [\"/health\", …], \"docs\": \"/docs\"}\n```\n\n`mode` is `mock` because no provider is configured; `rules` is 63 because the rule engine is loaded; `endpoints` is the service describing its own surface. None of that is a status — the status is `200`, and it lives outside the body.",
+  "concept_md": "### One question, one answer\n\nEvery call to this project's API is the same shape: the client sends **one request** and gets **one response**. A request is four things.\n\n- **Method** — the verb. `GET` asks for something; `POST` sends something.\n- **Path** — which resource. `/`, `/health`, `/rules`, `/review`.\n- **Headers** — metadata about the message, outside the body.\n- **Body** — the payload, usually absent on a `GET`.\n\nA response is a **status code** plus headers plus a body. The code is the part a program reads before it looks at anything else: `200` means the request was understood and answered, `404` means the path or the thing named in it does not exist, `422` means the body did not match what the endpoint expects.\n\n### Running it, or not\n\nThe app is served by `uvicorn app.main:app`, and that is what a `curl` in this part would talk to. Every capture in Part 4 was instead replayed in-process with `TestClient`, which needs no port at all — lesson 4.7 is about that. The bodies are identical either way.\n\n### Stateless, which is the whole design\n\nThe server keeps nothing between requests. Nothing about your last call changes this one; every request carries everything needed to answer it. That is why the API can be restarted at any moment, and why two identical requests get two identical answers here — there is no session to drift.\n\n### JSON is the body format\n\nBoth directions use JSON: an object with string keys. The `/` endpoint returns six fields, and reading them is the fastest way to learn what the service thinks it is:\n\n```text\n{\"name\": \"…\", \"version\": \"0.1.0\", \"mode\": \"mock\", \"rules\": 63,\n \"endpoints\": [\"/health\", …], \"docs\": \"/docs\"}\n```\n\n`mode` is `mock` because no provider is configured; `rules` is 63 because the rule engine is loaded; `endpoints` is the service describing its own surface. None of that is a status — the status is `200`, and it lives outside the body.",
   "code_examples": [
     {
       "id": "4.1-ex-0",
@@ -37,10 +37,10 @@ window.LESSONS.push({
     {
       "q": "What does `mode: \"mock\"` in that body tell you?",
       "options": [
-        "That no model provider is configured, so the rule engine answered",
-        "That the request failed and was retried",
-        "That the response came from a cache",
-        "That the endpoint is read-only"
+        "That no provider is configured, so the rules answered",
+        "That the request failed and was retried once",
+        "That the answer was served from a cache",
+        "That this endpoint is read-only by design"
       ],
       "answer": 0,
       "why": "It is the service reporting which reviewer produced the result — the same fact the CLI prints as `mode : mock`."

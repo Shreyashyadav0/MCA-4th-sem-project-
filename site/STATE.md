@@ -824,11 +824,12 @@ reproduced on `615602d` with `TestClient`, including the two shapes of 422
 (a list with `loc` from the framework, a sentence from the handler), the twelve
 `/openapi.json` paths, and the webhook's 200-with-a-notice.
 
-**Two things the writing turned up.** The file has thirteen route decorators for
-twelve paths, because `/webhook` is registered twice (`1086` and `1135`); the
-later one wins, which is why the schema shows one entry. And `{}` is a *valid*
-`ReviewRequest` — both fields are optional — so the "provide either diff or code"
-422 comes from the handler, not the model.
+**Two things the writing turned up.** The file has fourteen route decorators for
+twelve paths, because `/test-review` carries GET and POST (`1025`, `1086`) and
+`/users` carries POST and GET (`1510`, `1554`) — two methods on one path, not a
+duplicate registration. And `{}` is a *valid* `ReviewRequest` — both fields are
+optional — so the "provide either diff or code" 422 comes from the handler, not
+the model.
 
 **No lesson states a test count.** The suite will change; the phrasing rule for
 this wave is that a lesson may say the suite is green and point at `make verify`,
@@ -836,6 +837,6 @@ never quote a number.
 
 **Gate.** `validate_lessons.py` → `OK lessons=42 parts_covered=5
 manifest_entries=42`, exit 0. Banned numbers under `site/` → empty. `grep -rn
-'passed' site/content/part-4/` → empty. `pytest -q tests` → `640 passed,
-1 skipped`, unchanged (this wave touches no code). Manifest and all three pages
+'passed' site/content/part-4/` → empty. the suite is still green and this wave touches no code under `app/`, `tests/` or
+`benchmarks/`, so no test number is quoted here. Manifest and all three pages
 list the same eight paths in lesson order.

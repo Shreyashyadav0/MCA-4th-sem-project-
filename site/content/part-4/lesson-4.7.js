@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "expected_output": "404 {'detail': \"no rule with id 'nope'\"}",
-      "why_not": "it imports the application and drives it in-process, which needs the repository on disk; the browser runner has neither."
+      "why_not": "it imports the application and needs an installed fastapi plus the repository on disk; the browser runner has neither."
     }
   ],
   "quiz": [
@@ -37,10 +37,10 @@ window.LESSONS.push({
     {
       "q": "Why does that matter for this project's offline claim?",
       "options": [
-        "It makes the tests faster",
-        "A test that needed a port would break the promise the moment CI had no loopback",
-        "It removes the need for assertions",
-        "It lets the tests run without Python"
+        "It makes the whole suite run faster",
+        "A test needing a port would break the offline promise",
+        "It removes the need for any assertions",
+        "It lets the tests run without Python installed"
       ],
       "answer": 1,
       "why": "The suite's zero-network promise is only true if the tests never open a socket; in-process requests make that structural."
@@ -48,9 +48,9 @@ window.LESSONS.push({
     {
       "q": "What can a TestClient test not prove?",
       "options": [
-        "That routing works",
-        "That the response model filters its output",
-        "That the app behaves behind a real server, proxy or TLS terminator",
+        "That request routing resolves correctly",
+        "That the response model filters its own output",
+        "That the app works behind a proxy or TLS",
         "That a 404 carries a detail string"
       ],
       "answer": 2,
@@ -97,8 +97,8 @@ window.LESSONS.push({
     }
   ],
   "glossary_terms": [
-    "TestClient — drives an ASGI app in-process",
-    "ASGI — the interface between a Python web app and a server",
-    "in-process — no socket, no port, no network"
+    "TestClient — a client that calls the ASGI app object directly instead of opening a socket",
+    "ASGI — the interface between a Python web app and the server that drives it",
+    "in-process — the app runs in the same interpreter, so no port is bound and no packet is sent"
   ]
 });

@@ -522,7 +522,8 @@ figure {
 
 @media (max-width: 40rem) {
   /* One row: the brand truncates, the actions stay right, the header stops
-   * eating a sixth of the viewport. */
+   * eating a sixth of the viewport — and the actions must be allowed to shrink,
+   * or the theme button pushes the page 33px wider than the screen. */
   .site-header-inner {
     padding-block: var(--space-2);
     flex-wrap: nowrap;
@@ -541,6 +542,12 @@ figure {
   }
 
   .header-actions {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .header-actions .btn {
+    padding-inline: var(--space-3);
+    white-space: nowrap;
   }
 }

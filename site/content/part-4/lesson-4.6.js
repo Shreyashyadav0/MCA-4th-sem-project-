@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Headers: how the client identifies itself",
   "order": 406,
   "duration_min": 20,
-  "concept_md": "### Metadata outside the body\n\nA header is a name/value pair sent with the message, not inside it. GitHub sends two that this app reads:\n\n- `X-GitHub-Event` — which kind of event fired, such as `pull_request`.\n- `X-Hub-Signature-256` — an HMAC of the body, so the receiver can prove the body is unchanged and came from someone holding the secret.\n\nIn FastAPI a header becomes a parameter by being declared:\n\n```python\nx_github_event: str = Header(alias=\"X-GitHub-Event\")\n```\n\nThe alias is needed because a Python identifier cannot contain a hyphen.\n\n### Verified only when a secret exists\n\n`_verify_signature` compares the HMAC only when `GITHUB_WEBHOOK_SECRET` is configured. With no secret, the same request succeeds — which is why the capture below is a **200** and not a 401. That is a deliberate local-development behaviour, and it is the kind of default worth knowing before you deploy: an unset secret means unverified bodies are accepted.\n\n### What the capture shows\n\nThe webhook accepted a body with no usable pull-request number and fell back to the bundled sample diff, saying so in `notice`. Nothing was posted. That sentence is the honesty rule in action: the run happened, the outcome is described, and no claim is made about a real pull request.",
+  "concept_md": "### Metadata outside the body\n\nA header is a name/value pair sent with the message, not inside it. GitHub sends two that this app reads:\n\n- `X-GitHub-Event` — which kind of event fired, such as `pull_request`.\n- `X-Hub-Signature-256` — an HMAC of the body, so the receiver can prove the body is unchanged and came from someone holding the secret.\n\nIn FastAPI a header becomes a parameter by being declared:\n\n```python\nx_github_event: str = Header(default=\"pull_request\", description=\"GitHub event type.\")\n```\n\nThe parameter name is the header name with underscores: `x_github_event` reads the\n`X-GitHub-Event` header, and FastAPI does that mapping itself. An `alias=` is only\nneeded when the two spellings do not correspond.\n\n### Verified only when a secret exists\n\n`_verify_signature` compares the HMAC only when `GITHUB_WEBHOOK_SECRET` is configured. With no secret, the same request succeeds — which is why the capture below is a **200** and not a 401. That is a deliberate local-development behaviour, and it is the kind of default worth knowing before you deploy: an unset secret means unverified bodies are accepted.\n\n### What the capture shows\n\nThe webhook accepted a body with no usable pull-request number and fell back to the bundled sample diff, saying so in `notice`. Nothing was posted. That sentence is the honesty rule in action: the run happened, the outcome is described, and no claim is made about a real pull request.",
   "code_examples": [
     {
       "id": "4.6-ex-0",
@@ -24,23 +24,23 @@ window.LESSONS.push({
   ],
   "quiz": [
     {
-      "q": "Why does the header parameter need `alias=\"X-GitHub-Event\"`?",
+      "q": "How does `x_github_event` end up reading the `X-GitHub-Event` header?",
       "options": [
-        "Because a Python identifier cannot contain a hyphen",
-        "To rename it in the JSON body",
-        "To make it optional",
-        "To lowercase the header name"
+        "FastAPI maps underscores onto hyphens for you",
+        "An alias argument spells the header name out",
+        "The handler reads it off the raw request",
+        "GitHub sends both spellings in the request"
       ],
       "answer": 0,
-      "why": "`x_github_event` is a valid Python name; the alias is how it maps back to the real header spelling."
+      "why": "The conversion is automatic: underscores become hyphens and the lookup is case-insensitive, which is why no alias appears in this file."
     },
     {
       "q": "The webhook answers 200 with no secret configured. Why?",
       "options": [
-        "The signature was correct",
-        "GitHub webhooks cannot be rejected",
-        "The request was rejected and retried",
-        "The signature is only checked when a secret is set, so nothing was checked"
+        "The signature matched the body exactly",
+        "GitHub webhooks can never be rejected",
+        "The request was rejected and then retried",
+        "No secret is set, so nothing was checked"
       ],
       "answer": 3,
       "why": "`_verify_signature` runs only when `settings.has_webhook_secret` — an unset secret means unverified bodies are accepted locally."
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "What does `notice` in that body tell the reader?",
       "options": [
-        "That the request failed",
-        "Which source was used and why, in plain words",
-        "The signature that was checked",
-        "The number of rules applied"
+        "That the request was rejected outright",
+        "Which source was used, and why, in words",
+        "Which signature was compared, and with what",
+        "How many rules the engine applied"
       ],
       "answer": 1,
       "why": "It is the same honesty field the CLI prints: the run happened, and the fallback is named rather than hidden."
@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The header parameters",
       "path": "app/main.py",
-      "lines": "1148-1155"
+      "lines": "1146-1158"
     },
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-500"
+      "lines": "467-479"
     },
     {
       "label": "The guard that decides whether to check",

@@ -36,10 +36,10 @@ window.LESSONS.push({
     {
       "q": "Which 422 comes from the framework rather than your code?",
       "options": [
-        "The one whose `detail` is a plain sentence",
-        "Neither — 422 is always yours",
-        "Both come from your code",
-        "The one whose `detail` is a list of entries with a `loc`"
+        "The one whose detail is a plain sentence",
+        "Neither — every 422 is raised by you",
+        "Both shapes come from your own code",
+        "The one whose detail is a list with loc"
       ],
       "answer": 3,
       "why": "A list with locations is FastAPI's validation report; a sentence is an `HTTPException` you raised yourself."
@@ -47,10 +47,10 @@ window.LESSONS.push({
     {
       "q": "Why does `ReviewRequest` set `extra=\"forbid\"`?",
       "options": [
-        "To make every field required",
-        "So an unknown field is reported as a client error instead of being dropped",
-        "To speed up parsing",
-        "To allow either `diff` or `code`"
+        "To make every declared field required",
+        "So an unknown key is an error, not a shrug",
+        "To make parsing measurably faster",
+        "To allow either diff or code, not both"
       ],
       "answer": 1,
       "why": "Silently ignoring `nope` would let a client believe it sent something meaningful; forbidding turns it into a named error."
@@ -59,9 +59,9 @@ window.LESSONS.push({
       "q": "`{}` is rejected with a sentence, not a list. What does that tell you?",
       "options": [
         "The body did not match the model",
-        "The endpoint does not exist",
-        "The body was valid and the handler rejected it",
-        "The request had no content type"
+        "The endpoint path does not exist",
+        "The body was valid; the handler refused",
+        "The request carried no content type"
       ],
       "answer": 2,
       "why": "Both fields are optional, so an empty object is a valid model; the sentence is the handler's own check firing afterwards."
@@ -70,7 +70,7 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Send `{\"diff\": \"x\"}` — a field that exists but holds a diff with no file headers. Read the `detail` and say which layer rejected it.",
     "starter": "",
-    "solution": "```console\n$ curl -s -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\"}'\n{\"detail\":\"cannot parse diff: no file headers found\"}\n```",
+    "solution": "```console\n$ curl -s -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\"}'\n{\"detail\":\"cannot parse diff: no file headers found; expected 'diff --git' or a '--- / +++' pair\"}\n```",
     "explanation": "A sentence, so it came from the handler after the model accepted the body — the diff parsed to nothing usable."
   },
   "exercise": {
@@ -88,7 +88,7 @@ window.LESSONS.push({
     {
       "label": "The request model",
       "path": "app/main.py",
-      "lines": "152-200"
+      "lines": "152-207"
     },
     {
       "label": "The review endpoint that consumes it",
