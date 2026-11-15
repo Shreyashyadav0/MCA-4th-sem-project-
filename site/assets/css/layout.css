@@ -35,6 +35,33 @@ a:hover {
 
 
 
+/* W3Schools' tutorial pages carry a charcoal bar with a green rule under it —
+ * that bar is most of what makes the site read as green at a glance. */
+.site-header {
+  background: var(--bar);
+  border-bottom: 3px solid var(--accent);
+}
+
+.site-header .brand {
+  color: var(--bar-text);
+}
+
+.site-header .brand span {
+  color: var(--bar-muted);
+}
+
+.site-header .btn {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.45);
+  color: var(--bar-text);
+}
+
+.site-header .btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
 .site-header-inner,
 .page {
   max-width: 78rem;

@@ -13,6 +13,9 @@
   --accent-strong: #047857;   /* text and filled buttons (AA at 16px) */
   --accent-hover: #059862;
   --accent-soft: #d9eee1;
+  --bar: #282a35;          /* the charcoal top bar */
+  --bar-text: #ffffff;
+  --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
 
   /* --- surfaces ---------------------------------------------------------- */
@@ -99,6 +102,9 @@
   --accent-strong: #04aa6d;  /* same green in dark: their button, not a mint variant */
   --accent-hover: #059862;
   --accent-soft: #14352a;
+  --bar: #1b1e26;
+  --bar-text: #ffffff;
+  --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
 
   --bg: #282a35;

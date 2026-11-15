@@ -46,10 +46,9 @@
 
 /* ------------------------------------------------------------------ layout */
 
-.site-header {
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
+/* The header's own colours live in layout.css. This sheet used to restate them
+ * here, outside any media query, and because print.css loads last it silently
+ * beat the real rule — which is why the top bar stayed grey. */
 
 /* ------------------------------------------------------------------- print */
 
