@@ -29,7 +29,7 @@ window.LESSONS.push({
     {
       "q": "`priority: int = 0` — what does the `= 0` change?",
       "options": [
-        "It raises ValidationError, because int fields refuse strings",
+        "It raises ValidationError, because int fields are strict",
         "It restricts the field to positive numbers",
         "It gives the field a default, so it may be omitted",
         "It makes the field read-only"
@@ -40,7 +40,7 @@ window.LESSONS.push({
     {
       "q": "`Note(priority=\"2\")` on an `int` field — what happens?",
       "options": [
-        "It is coerced to 2, because the string is unambiguously numeric",
+        "It raises, because int fields are strict about strings",
         "It stays the string \"2\" and fails on the next comparison",
         "It silently becomes 0, the field's default value",
         "It is coerced to 2"

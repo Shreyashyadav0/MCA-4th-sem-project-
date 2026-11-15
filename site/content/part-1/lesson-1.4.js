@@ -98,7 +98,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "dataclass — a class whose __init__, __repr__ and __eq__ are generated from its fields",
-    "frozen — immutable and therefore hashable",
+    "frozen — immutable; hashable only when every field is",
     "BaseModel — Pydantic's validated data class, used at boundaries",
     "@property — a method that reads like an attribute and recomputes on each read"
   ]

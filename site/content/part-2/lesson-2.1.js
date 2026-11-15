@@ -34,7 +34,7 @@ window.LESSONS.push({
       "q": "What does a plain dict give you that a BaseModel does not?",
       "options": [
         "Nothing — it accepts any key and any value",
-        "Because Pydantic refuses to validate the same model twice",
+        "So the error arrives before the value is stored",
         "A default for missing keys",
         "JSON serialisation for free"
       ],
@@ -44,7 +44,7 @@ window.LESSONS.push({
     {
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
-        "So the failure names the field while the writer is on the stack",
+        "So the error arrives before the value is stored",
         "Because Pydantic is faster when it validates early",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"

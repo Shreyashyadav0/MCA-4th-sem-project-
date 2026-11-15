@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The issue and fix fields",
       "path": "app/models.py",
-      "lines": "68-86"
+      "lines": "68-83"
     },
     {
       "label": "Where the row puts them",
@@ -99,7 +99,7 @@ window.LESSONS.push({
     },
     {
       "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [

@@ -68,13 +68,13 @@ window.LESSONS.push({
     "prompt": "Find one benign line that does fire, if any exists.",
     "starter": "",
     "solution": "```python\nfrom app.rules import review_lines\n\nfor text in (\"key = os.environ['KEY']\", \"api_key = 'not-a-real-key'\", \"# password: see vault\"):\n    print(bool(review_lines(\"app/a.py\", [(1, text)])), text)\n```",
-    "explanation": "All three are silent in app code, which is the false-positive budget being spent deliberately."
+    "explanation": "The second line fires and the other two are silent — `api_key = 'not-a-real-key'` matches the hardcoded-credential rule, which is the false positive the prompt asks you to find."
   },
   "exercise": {
-    "prompt": "Which benign line fires only because of the path it is given? Show both paths.",
-    "hint": "The test-file skip is a function of the path, not the text.",
-    "solution": "```python\nfrom app.rules import review_lines\n\nline = \"KEY = 'AKIAIOSFODNN7EXAMPLE'\"\nprint(\"app/   :\", len(review_lines(\"app/demo.py\", [(1, line)])))\nprint(\"tests/ :\", len(review_lines(\"tests/test_demo.py\", [(1, line)])))\n```",
-    "explanation": "The same text is a finding in app code and silent in a test, which is the whole reason `is_test_file` exists."
+    "prompt": "Run the same fake AWS key through `app/demo.py` and `tests/test_demo.py`. Are the two answers different, and why?",
+    "hint": "Look at whether the rule was registered with the test-file skip.",
+    "solution": "```python\nfrom app.rules import review_lines\n\nline = \"KEY = 'AKIAIOSFODNN7EXAMPLE'\"\nprint(len(review_lines(\"app/demo.py\", [(1, line)])))\nprint(len(review_lines(\"tests/test_demo.py\", [(1, line)])))\n```\n\nBoth print 1: `secret/aws-access-key` never inspects the path. A 40-character random literal is different — it also trips `secret/high-entropy-string`, which skips test files, so app/ gives 2 and tests/ gives 1.",
+    "explanation": "The path matters only for the rules that check it themselves; a prefix match like the AWS key does not, which is why the two answers agree for one rule and differ for another."
   },
   "common_mistakes": [
     "Adding a rule without a benign line beside it.",
@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The benign-line test",
       "path": "tests/test_rules.py",
-      "lines": "222-272"
+      "lines": "232-259"
     },
     {
       "label": "The path check it relies on",

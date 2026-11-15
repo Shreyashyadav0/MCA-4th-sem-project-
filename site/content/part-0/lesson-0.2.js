@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The curriculum this site follows",
       "path": "docs/learning/README.md",
-      "lines": "1-30"
+      "lines": "1-21"
     }
   ],
   "learn_more": [

@@ -49,7 +49,7 @@ window.LESSONS.push({
         "It prevents the fields from being validated"
       ],
       "answer": 1,
-      "why": "Frozen blocks attribute assignment after construction, so what the rule engine produced is what the comment says. It is not about hashing — a dict field would still make it unhashable."
+      "why": "`frozen=True` stops assignment; hashing needs every field to hash, and `Finding` has only str and enum fields."
     },
     {
       "q": "Which field makes a finding anchorable to a diff?",
@@ -66,7 +66,7 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Build a finding and print its row as a dictionary, then change one field and watch it fail.",
     "starter": "",
-    "solution": "```python\nfrom app.models import Finding\n\nfinding = Finding(file=\"app/db.py\", line=\"3\", severity=\"HIGH\",\n                  issue=\"A token is hardcoded.\", suggested_fix=\"Use os.environ.\")\nprint(finding.as_row())\nfinding.severity = \"LOW\"   # FrozenInstanceError\n```",
+    "solution": "```python\nfrom app.models import Finding\n\nfinding = Finding(file=\"app/db.py\", line=\"3\", severity=\"HIGH\",\n                  issue=\"A token is hardcoded.\", suggested_fix=\"Use os.environ.\")\nprint(finding.as_row())\nfinding.severity = \"LOW\"   # ValidationError [type=frozen_instance]\n```",
     "explanation": "The row prints in contract order; the assignment raises because the model is frozen. Both behaviours come from `model_config`, one line."
   },
   "exercise": {
@@ -78,7 +78,7 @@ window.LESSONS.push({
   "common_mistakes": [
     "Adding a sixth field to carry extra detail, which breaks every consumer that knows five.",
     "Editing a finding after construction to fix its severity; the model is frozen.",
-    "Assuming `frozen=True` makes a finding hashable — a dict-valued field still blocks it."
+    "Assuming a frozen model with a dict-valued field is hashable; `Finding` has only str and enum fields, so it hashes, but `MatchResult.per_category` does not."
   ],
   "project_links": [
     {
@@ -98,8 +98,8 @@ window.LESSONS.push({
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
     },
     {
-      "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "label": "ADR 0001 — strict Pydantic v2",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [

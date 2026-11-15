@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "Real fixtures, one of them autouse",
       "path": "tests/test_auth.py",
-      "lines": "35-73"
+      "lines": "52-73"
     },
     {
       "label": "A function-scoped fixture used by many tests",

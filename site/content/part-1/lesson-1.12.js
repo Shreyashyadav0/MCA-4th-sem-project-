@@ -54,7 +54,7 @@ window.LESSONS.push({
         "It is a longer spelling of a required parameter"
       ],
       "answer": 1,
-      "why": "The repository gets that decoupling by convention — one OpenAI-compatible adapter both providers speak — so a Protocol is how you would state the same property in the type system, not a class the code already declares."
+      "why": "`X | None = None` widens the type and supplies a default, so omitting the argument means no threshold rather than a required one."
     }
   ],
   "try_it": {

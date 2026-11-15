@@ -98,7 +98,7 @@ window.LESSONS.push({
     },
     {
       "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [

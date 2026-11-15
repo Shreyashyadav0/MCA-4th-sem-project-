@@ -71,10 +71,10 @@ window.LESSONS.push({
     "explanation": "Most rules are HIGH or CRITICAL, and only seven are LOW — a distribution lesson 8.6 explains."
   },
   "exercise": {
-    "prompt": "Which category has the fewest rules, and how many? Check it rather than reading the enum.",
-    "hint": "Sort the counter ascending.",
-    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES\n\nc = Counter(r.category.value for r in RULES)\nprint(sorted(c.items(), key=lambda p: p[1])[:2])\n```\n\nReliability holds 2 and auth 3.",
-    "explanation": "The two smallest categories are the ones with the least mechanical signal, which is why they are smallest."
+    "prompt": "Which category is third-smallest by rule count, and how many rules does it hold?",
+    "hint": "Sort the counter ascending and take the third entry.",
+    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES\n\nc = Counter(r.category.value for r in RULES)\nprint(sorted(c.items(), key=lambda p: p[1]))\n```\n\nReliability 2, then auth 3 and complexity 3 tied — the third category in count order is complexity with 3.",
+    "explanation": "The concept names the two smallest; the third needs the counter."
   },
   "common_mistakes": [
     "Quoting a rule count without reading `RULE_COUNT` at this commit.",
@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The exported count",
       "path": "app/rules.py",
-      "lines": "113-130"
+      "lines": "1491"
     },
     {
       "label": "Registration, which builds the list",

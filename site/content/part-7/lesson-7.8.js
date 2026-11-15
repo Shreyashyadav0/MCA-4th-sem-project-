@@ -61,7 +61,7 @@ window.LESSONS.push({
     "prompt": "Print every top-level definition with its line number and count them.",
     "starter": "",
     "solution": "```python\nimport subprocess\n\nout = subprocess.run([\"grep\", \"-n\", \"^class \\\\|^def \", \"app/parser.py\"],\n                     capture_output=True, text=True).stdout\nprint(out.strip())\nprint(\"count:\", len(out.strip().splitlines()))\n```",
-    "explanation": "Thirteen definitions across 614 lines — the module is mostly docstrings and the builder's logic."
+    "explanation": "Fifteen definitions across 614 lines — the module is mostly docstrings and the builder's logic."
   },
   "exercise": {
     "prompt": "Give the range of `anchor_findings` and say which two models it consumes.",

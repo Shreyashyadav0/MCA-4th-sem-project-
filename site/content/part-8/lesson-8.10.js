@@ -93,7 +93,7 @@ window.LESSONS.push({
     {
       "label": "The rebuild suite",
       "path": "rebuild/tests/test_rebuild_rules.py",
-      "lines": "1-40"
+      "lines": "1-86"
     }
   ],
   "learn_more": [

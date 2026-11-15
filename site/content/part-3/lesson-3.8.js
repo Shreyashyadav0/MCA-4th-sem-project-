@@ -47,7 +47,7 @@ window.LESSONS.push({
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That the suite passed while the patches were installed",
+        "That pytest imported the patches before collection",
         "That no test would use the network on a machine without the patches",
         "That the patches were applied before pytest started",
         "That the suite passed while the patches were in place"
@@ -82,7 +82,7 @@ window.LESSONS.push({
     {
       "label": "The offline decision this proof protects",
       "path": "docs/decisions/0002-offline-first-fallback.md",
-      "lines": "1-30"
+      "lines": "1-31"
     }
   ],
   "learn_more": [

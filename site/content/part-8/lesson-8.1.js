@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The Rule record",
       "path": "app/rules.py",
-      "lines": "113-125"
+      "lines": "112-121"
     },
     {
       "label": "RuleHit, the two strings a rule returns",

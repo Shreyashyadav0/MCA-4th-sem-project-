@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why `delenv(\"X\", raising=False)`?",
       "options": [
-        "Because deleting an unset variable raises an error",
+        "Because the fixture is autouse, so every test pays for it",
         "Because deleting an unset variable raises unless you say otherwise",
         "Because it makes the test measurably faster to run",
         "Because it sets the variable to an empty string"
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "monkeypatch.setenv in a real test",
       "path": "tests/test_api.py",
-      "lines": "62-79"
+      "lines": "72-74"
     },
     {
       "label": "The fake-client seam the tests install",

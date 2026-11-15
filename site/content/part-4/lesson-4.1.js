@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "What the service says it is",
       "path": "README.md",
-      "lines": "1-40"
+      "lines": "1-41"
     }
   ],
   "learn_more": [

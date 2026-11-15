@@ -32,7 +32,7 @@ window.LESSONS.push({
     {
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
-        "It makes the dump faster by skipping validation entirely",
+        "Because it skips validation for speed",
         "It converts values to JSON-safe primitives",
         "It makes the dump faster by skipping validation",
         "It sorts the keys so two dumps compare equal"

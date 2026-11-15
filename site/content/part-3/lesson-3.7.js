@@ -61,12 +61,12 @@ window.LESSONS.push({
     "prompt": "Run `-k \"github\"`, then `-k \"github and not webhook\"`. Compare the selection counts.",
     "starter": "",
     "solution": "```console\n$ python -m pytest -q tests -k \"github\"\n63 passed, 578 deselected in 6.27s\n\n$ python -m pytest -q tests -k \"github and not webhook\"\n63 passed, 578 deselected in 5.90s\n```",
-    "explanation": "Twelve fewer: the expression is a real boolean filter over test ids, not a single substring."
+    "explanation": "The same 63, because no collected id contains both words: the expression is a real boolean filter over test ids, not a single substring."
   },
   "exercise": {
     "prompt": "Apply `-k` to a test you wrote in 3.4: predict the selection count before running it, then check the arithmetic — passed plus deselected should equal the collected total.",
     "hint": "The name you gave the test is the string `-k` matches.",
-    "solution": "```console\n$ python -m pytest -q tests -k \"bad_line_is_rejected\"\n641 deselected in 4.10s\n\n4 + 637 = 641, the collected total. If your arithmetic does not close, either the name did not\nmatch what you expected or discovery changed.\n```",
+    "solution": "```console\n$ python -m pytest -q tests -k \"bad_line_is_rejected\"\n641 deselected in 4.10s\n\n0 + 641 = 641, which is the whole suite, the collected total. If your arithmetic does not close, either the name did not\nmatch what you expected or discovery changed.\n```",
     "explanation": "The prediction is the exercise: `-k` is a substring match on the collected id, so knowing the name tells you the count before you run it."
   },
   "common_mistakes": [
@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "Running a subset, documented",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "79-163"
     }
   ],
   "learn_more": [

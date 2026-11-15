@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "A provider returns prose instead of JSON. What does `model_validate_json` raise?",
       "options": [
         "`ValidationError`, with the entry type `json_invalid`",
-        "Because a raised exception cannot cross a function boundary",
+        "Because None is cheaper to serialise than an exception",
         "`ValueError` from the JSON module",
         "Nothing, it returns None"
       ],
@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "Why return `None` instead of raising from a parse helper?",
       "options": [
-        "So the caller decides what a failed parse means",
+        "Because a raised exception cannot cross a function boundary",
         "Because exceptions cost more than a returned None does",
         "So the caller decides what a failed parse means",
         "So the error is hidden from whoever reads the log"

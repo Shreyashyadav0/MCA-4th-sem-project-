@@ -4734,7 +4734,17 @@ details.expected-output pre.code code {
     "content/part-7/lesson-7.5.js",
     "content/part-7/lesson-7.6.js",
     "content/part-7/lesson-7.7.js",
-    "content/part-7/lesson-7.8.js"
+    "content/part-7/lesson-7.8.js",
+    "content/part-8/lesson-8.1.js",
+    "content/part-8/lesson-8.2.js",
+    "content/part-8/lesson-8.3.js",
+    "content/part-8/lesson-8.4.js",
+    "content/part-8/lesson-8.5.js",
+    "content/part-8/lesson-8.6.js",
+    "content/part-8/lesson-8.7.js",
+    "content/part-8/lesson-8.8.js",
+    "content/part-8/lesson-8.9.js",
+    "content/part-8/lesson-8.10.js"
   ];
 })();
 
@@ -4988,7 +4998,7 @@ window.LESSONS.push({
     {
       "label": "The curriculum this site follows",
       "path": "docs/learning/README.md",
-      "lines": "1-30"
+      "lines": "1-21"
     }
   ],
   "learn_more": [
@@ -5103,7 +5113,7 @@ window.LESSONS.push({
     {
       "label": "The targets you will actually type: verify, test, lint, run",
       "path": "Makefile",
-      "lines": "1-36"
+      "lines": "1-38"
     }
   ],
   "learn_more": [
@@ -5454,7 +5464,7 @@ window.LESSONS.push({
     {
       "label": "The rule registry a comprehension would flatten",
       "path": "app/rules.py",
-      "lines": "113-158"
+      "lines": "112-124"
     }
   ],
   "learn_more": [
@@ -5681,7 +5691,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "dataclass — a class whose __init__, __repr__ and __eq__ are generated from its fields",
-    "frozen — immutable and therefore hashable",
+    "frozen — immutable; hashable only when every field is",
     "BaseModel — Pydantic's validated data class, used at boundaries",
     "@property — a method that reads like an attribute and recomputes on each read"
   ]
@@ -5770,7 +5780,7 @@ window.LESSONS.push({
     {
       "label": "The GitHubError family: one base, four subclasses",
       "path": "app/github_client.py",
-      "lines": "124-160"
+      "lines": "124-155"
     },
     {
       "label": "read_source — raising ReviewInputError with `from exc`",
@@ -6294,12 +6304,12 @@ window.LESSONS.push({
     {
       "label": "The expected-label shape this exercise mirrors",
       "path": "benchmarks/loader.py",
-      "lines": "92-112"
+      "lines": "91-109"
     },
     {
       "label": "The compiled hunk-header pattern",
       "path": "app/parser.py",
-      "lines": "62-70"
+      "lines": "62-66"
     }
   ],
   "learn_more": [
@@ -6481,7 +6491,7 @@ window.LESSONS.push({
         "It is a longer spelling of a required parameter"
       ],
       "answer": 1,
-      "why": "The repository gets that decoupling by convention — one OpenAI-compatible adapter both providers speak — so a Protocol is how you would state the same property in the type system, not a class the code already declares."
+      "why": "`X | None = None` widens the type and supplies a default, so omitting the argument means no threshold rather than a required one."
     }
   ],
   "try_it": {
@@ -6570,7 +6580,7 @@ window.LESSONS.push({
       "q": "What does a plain dict give you that a BaseModel does not?",
       "options": [
         "Nothing — it accepts any key and any value",
-        "Because Pydantic refuses to validate the same model twice",
+        "So the error arrives before the value is stored",
         "A default for missing keys",
         "JSON serialisation for free"
       ],
@@ -6580,7 +6590,7 @@ window.LESSONS.push({
     {
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
-        "So the failure names the field while the writer is on the stack",
+        "So the error arrives before the value is stored",
         "Because Pydantic is faster when it validates early",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"
@@ -6680,7 +6690,7 @@ window.LESSONS.push({
     {
       "q": "`priority: int = 0` — what does the `= 0` change?",
       "options": [
-        "It raises ValidationError, because int fields refuse strings",
+        "It raises ValidationError, because int fields are strict",
         "It restricts the field to positive numbers",
         "It gives the field a default, so it may be omitted",
         "It makes the field read-only"
@@ -6691,7 +6701,7 @@ window.LESSONS.push({
     {
       "q": "`Note(priority=\"2\")` on an `int` field — what happens?",
       "options": [
-        "It is coerced to 2, because the string is unambiguously numeric",
+        "It raises, because int fields are strict about strings",
         "It stays the string \"2\" and fails on the next comparison",
         "It silently becomes 0, the field's default value",
         "It is coerced to 2"
@@ -7012,7 +7022,7 @@ window.LESSONS.push({
       "q": "A rule that compares two fields of the same model belongs where?",
       "options": [
         "A `@model_validator`, which can see both",
-        "TypeError, which aborts validation before any field is checked",
+        "`TypeError`, which Pydantic re-raises unchanged",
         "A `Field(...)` constraint",
         "A separate function called by the caller"
       ],
@@ -7022,7 +7032,7 @@ window.LESSONS.push({
     {
       "q": "What should a validator raise to reject a value?",
       "options": [
-        "`ValueError`, which Pydantic wraps into a validation entry",
+        "`TypeError`, which Pydantic re-raises unchanged",
         "`SystemExit`, which stops the run at once",
         "`ValueError`, which Pydantic wraps into a ValidationError entry",
         "`AssertionError`, which pytest reports as a failure"
@@ -7068,7 +7078,7 @@ window.LESSONS.push({
     {
       "label": "The before-mode model validator",
       "path": "app/models.py",
-      "lines": "166-181"
+      "lines": "171-177"
     }
   ],
   "learn_more": [
@@ -7178,7 +7188,7 @@ window.LESSONS.push({
     {
       "label": "AnchoredFinding: a model wrapping another model",
       "path": "app/models.py",
-      "lines": "108-130"
+      "lines": "108-122"
     }
   ],
   "learn_more": [
@@ -7283,7 +7293,7 @@ window.LESSONS.push({
     {
       "label": "Severity: the str-valued Enum with a rank",
       "path": "app/models.py",
-      "lines": "46-61"
+      "lines": "46-57"
     },
     {
       "label": "The provider field typed as a Literal",
@@ -7345,7 +7355,7 @@ window.LESSONS.push({
     {
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
-        "It makes the dump faster by skipping validation entirely",
+        "Because it skips validation for speed",
         "It converts values to JSON-safe primitives",
         "It makes the dump faster by skipping validation",
         "It sorts the keys so two dumps compare equal"
@@ -7456,7 +7466,7 @@ window.LESSONS.push({
       "q": "A provider returns prose instead of JSON. What does `model_validate_json` raise?",
       "options": [
         "`ValidationError`, with the entry type `json_invalid`",
-        "Because a raised exception cannot cross a function boundary",
+        "Because None is cheaper to serialise than an exception",
         "`ValueError` from the JSON module",
         "Nothing, it returns None"
       ],
@@ -7466,7 +7476,7 @@ window.LESSONS.push({
     {
       "q": "Why return `None` instead of raising from a parse helper?",
       "options": [
-        "So the caller decides what a failed parse means",
+        "Because a raised exception cannot cross a function boundary",
         "Because exceptions cost more than a returned None does",
         "So the caller decides what a failed parse means",
         "So the error is hidden from whoever reads the log"
@@ -7569,7 +7579,7 @@ window.LESSONS.push({
     {
       "q": "What decides dataclass or BaseModel in this repository?",
       "options": [
-        "Performance",
+        "That dataclasses ignore annotations entirely",
         "The number of fields",
         "Whether the data arrives from outside the program",
         "Whether it needs to be frozen"
@@ -7580,7 +7590,7 @@ window.LESSONS.push({
     {
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
-        "That a frozen dataclass cannot be compared for equality",
+        "That a frozen dataclass ignores its annotations",
         "That frozen dataclasses cannot be compared for equality",
         "That a dataclass is always faster than a BaseModel",
         "That annotations are not enforced at runtime without a validator"
@@ -7631,7 +7641,7 @@ window.LESSONS.push({
     {
       "label": "InlineComment and ReviewPayload — frozen dataclasses at the posting seam",
       "path": "app/github_client.py",
-      "lines": "154-200"
+      "lines": "163-206"
     }
   ],
   "learn_more": [
@@ -7739,7 +7749,7 @@ window.LESSONS.push({
     {
       "label": "The testing document: what the suite covers",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "27-75"
     }
   ],
   "learn_more": [
@@ -7838,12 +7848,12 @@ window.LESSONS.push({
     {
       "label": "A parametrised test that asserts on an exit code",
       "path": "tests/test_cli.py",
-      "lines": "62-82"
+      "lines": "62-73"
     },
     {
       "label": "The layers the suite covers",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "27-75"
     }
   ],
   "learn_more": [
@@ -7942,7 +7952,7 @@ window.LESSONS.push({
     {
       "label": "Real fixtures, one of them autouse",
       "path": "tests/test_auth.py",
-      "lines": "35-73"
+      "lines": "52-73"
     },
     {
       "label": "A function-scoped fixture used by many tests",
@@ -8047,12 +8057,12 @@ window.LESSONS.push({
     {
       "label": "The seven-case parametrised test quoted above",
       "path": "tests/test_cli.py",
-      "lines": "62-82"
+      "lines": "62-73"
     },
     {
       "label": "A parametrised test over hostile paths",
       "path": "tests/test_api.py",
-      "lines": "205-218"
+      "lines": "211-214"
     }
   ],
   "learn_more": [
@@ -8110,7 +8120,7 @@ window.LESSONS.push({
     {
       "q": "Why `delenv(\"X\", raising=False)`?",
       "options": [
-        "Because deleting an unset variable raises an error",
+        "Because the fixture is autouse, so every test pays for it",
         "Because deleting an unset variable raises unless you say otherwise",
         "Because it makes the test measurably faster to run",
         "Because it sets the variable to an empty string"
@@ -8151,7 +8161,7 @@ window.LESSONS.push({
     {
       "label": "monkeypatch.setenv in a real test",
       "path": "tests/test_api.py",
-      "lines": "62-79"
+      "lines": "72-74"
     },
     {
       "label": "The fake-client seam the tests install",
@@ -8255,12 +8265,12 @@ window.LESSONS.push({
     {
       "label": "The one skipped test and its marker",
       "path": "tests/test_openai_compat_provider.py",
-      "lines": "1037-1078"
+      "lines": "1062-1085"
     },
     {
       "label": "How a skip differs from a failure",
       "path": "TESTING.md",
-      "lines": "181-199"
+      "lines": "189-214"
     }
   ],
   "learn_more": [
@@ -8343,12 +8353,12 @@ window.LESSONS.push({
     "prompt": "Run `-k \"github\"`, then `-k \"github and not webhook\"`. Compare the selection counts.",
     "starter": "",
     "solution": "```console\n$ python -m pytest -q tests -k \"github\"\n63 passed, 578 deselected in 6.27s\n\n$ python -m pytest -q tests -k \"github and not webhook\"\n63 passed, 578 deselected in 5.90s\n```",
-    "explanation": "Twelve fewer: the expression is a real boolean filter over test ids, not a single substring."
+    "explanation": "The same 63, because no collected id contains both words: the expression is a real boolean filter over test ids, not a single substring."
   },
   "exercise": {
     "prompt": "Apply `-k` to a test you wrote in 3.4: predict the selection count before running it, then check the arithmetic — passed plus deselected should equal the collected total.",
     "hint": "The name you gave the test is the string `-k` matches.",
-    "solution": "```console\n$ python -m pytest -q tests -k \"bad_line_is_rejected\"\n641 deselected in 4.10s\n\n4 + 637 = 641, the collected total. If your arithmetic does not close, either the name did not\nmatch what you expected or discovery changed.\n```",
+    "solution": "```console\n$ python -m pytest -q tests -k \"bad_line_is_rejected\"\n641 deselected in 4.10s\n\n0 + 641 = 641, which is the whole suite, the collected total. If your arithmetic does not close, either the name did not\nmatch what you expected or discovery changed.\n```",
     "explanation": "The prediction is the exercise: `-k` is a substring match on the collected id, so knowing the name tells you the count before you run it."
   },
   "common_mistakes": [
@@ -8365,7 +8375,7 @@ window.LESSONS.push({
     {
       "label": "Running a subset, documented",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "79-163"
     }
   ],
   "learn_more": [
@@ -8433,7 +8443,7 @@ window.LESSONS.push({
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That the suite passed while the patches were installed",
+        "That pytest imported the patches before collection",
         "That no test would use the network on a machine without the patches",
         "That the patches were applied before pytest started",
         "That the suite passed while the patches were in place"
@@ -8468,7 +8478,7 @@ window.LESSONS.push({
     {
       "label": "The offline decision this proof protects",
       "path": "docs/decisions/0002-offline-first-fallback.md",
-      "lines": "1-30"
+      "lines": "1-31"
     }
   ],
   "learn_more": [
@@ -8576,7 +8586,7 @@ window.LESSONS.push({
     {
       "label": "What the service says it is",
       "path": "README.md",
-      "lines": "1-40"
+      "lines": "1-41"
     }
   ],
   "learn_more": [
@@ -8720,7 +8730,7 @@ window.LESSONS.push({
   "title": "The request body is a Pydantic model",
   "order": 403,
   "duration_min": 25,
-  "concept_md": "### The model is the contract\n\n`POST /review` accepts a body that FastAPI validates against `ReviewRequest`. If the declared model is the contract, then the model's fields are the API: a field you add to the class becomes an accepted field, and one you remove becomes a 422.\n\n```python\nclass ReviewRequest(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\", …)\n    diff: str | None = None\n    code: str | None = None\n    filename: str | None = None      # … and three more, plus a validator\n```\n\n### Two different 422s\n\nThis distinction is the point of the lesson. A **422 raised by FastAPI** happens before your function runs: the body did not match the model. Its `detail` is a **list** of entries, each naming a location:\n\n```text\n{\"detail\": [{\"type\": \"extra_forbidden\", \"loc\": [\"body\", \"nope\"], …}]}\n```\n\nA **422 raised by your own code** is a plain sentence, because it is an `HTTPException` you wrote:\n\n```text\n{\"detail\": \"provide either 'diff' or 'code'\"}\n```\n\nSame status, different shape — and a client that parses one will misread the other. That is why the model carries `extra=\"forbid\"`: an unknown field is a client bug, and it should be reported as one rather than silently dropped.\n\n### Neither field is required\n\nBoth `diff` and `code` are optional, so `{}` is a valid *body* — it fails later, in the handler, with the sentence above. The model says \"you may send either\"; the handler says \"you must send one\". Contracts in two layers, each with its own error.",
+  "concept_md": "### The model is the contract\n\n`POST /review` accepts a body that FastAPI validates against `ReviewRequest`. If the declared model is the contract, then the model's fields are the API: a field you add to the class becomes an accepted field, and one you remove becomes a 422.\n\n```python\nclass ReviewRequest(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\", …)\n    diff: str | None = None\n    code: str | None = None\n    filename: str = \"submission.py\"      # … and three more, plus a validator\n```\n\n### Two different 422s\n\nThis distinction is the point of the lesson. A **422 raised by FastAPI** happens before your function runs: the body did not match the model. Its `detail` is a **list** of entries, each naming a location:\n\n```text\n{\"detail\": [{\"type\": \"extra_forbidden\", \"loc\": [\"body\", \"nope\"], …}]}\n```\n\nA **422 raised by your own code** is a plain sentence, because it is an `HTTPException` you wrote:\n\n```text\n{\"detail\": \"provide either 'diff' or 'code'\"}\n```\n\nSame status, different shape — and a client that parses one will misread the other. That is why the model carries `extra=\"forbid\"`: an unknown field is a client bug, and it should be reported as one rather than silently dropped.\n\n### Neither field is required\n\nBoth `diff` and `code` are optional, so `{}` is a valid *body* — it fails later, in the handler, with the sentence above. The model says \"you may send either\"; the handler says \"you must send one\". Contracts in two layers, each with its own error.",
   "code_examples": [
     {
       "id": "4.3-ex-0",
@@ -9135,7 +9145,7 @@ window.LESSONS.push({
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-490"
+      "lines": "467-478"
     },
     {
       "label": "The guard that decides whether to check",
@@ -9243,7 +9253,7 @@ window.LESSONS.push({
     {
       "label": "The TestClient import and the single client",
       "path": "tests/test_api.py",
-      "lines": "17-27"
+      "lines": "17-23"
     },
     {
       "label": "A request asserted on status and body",
@@ -9282,7 +9292,7 @@ window.LESSONS.push({
   "title": "Guided read of app/main.py",
   "order": 408,
   "duration_min": 30,
-  "concept_md": "### One file, read in order\n\n`app/main.py` is 1610 lines and holds the whole HTTP surface. Read it in this order and it stops being a wall.\n\n**1. The module docstring** (top of the file) — what the surface promises, and the one rule that governs every handler: a client error is never a 200.\n\n**2. The models** — `ReviewRequest` at **152**, `ReviewResponse` at **260**, `RuleInfo` at **312**, `HealthResponse` at **322**. Everything the API accepts and returns is declared here, before a single route.\n\n**3. The helpers that raise** — the path guard at **427–429**, the storage guard at **627**, the diff-parse failures at **664** and **668**. These are the vocabulary of failures the routes reuse.\n\n**4. `_verify_signature` at 467** — the only cryptographic function in the file.\n\n**5. The route block, in file order, 879–1610** — `/` and `/health`, then `/rules`, `/review`, `/test-review`, `/webhook`, then the later `/reviews`, `/users` and `/stats` group from **1424** on. Fourteen decorators over twelve paths, because `/test-review` and `/users` each carry two methods.\n\n### Where the two halves divide\n\nEverything up to `/review` (945) is the original surface: the banner, a health check, the rule engine's two endpoints and the review endpoint itself. From `/test-review` at 1025 on, each block is a later concern arriving — the review history, the webhook, then persistence at 1424 with its own models and its own 503. A reader who starts at 1424 meets a storage layer before knowing what it stores.\n\n### One habit that pays\n\nCite a decorator by its range, never its first line: `/review` starts at 945 and the closing bracket is at **960**, because the `responses=` block runs to fifteen lines. The same habit applies to `_verify_signature` at **467–479**, which ends where its last `return False` does.",
+  "concept_md": "### One file, read in order\n\n`app/main.py` is 1610 lines and holds the whole HTTP surface. Read it in this order and it stops being a wall.\n\n**1. The module docstring** (top of the file) — what the surface promises, and the one rule that governs every handler: a client error is never a 200.\n\n**2. The models** — `ReviewRequest` at **152**, `ReviewResponse` at **260**, `RuleInfo` at **312**, `HealthResponse` at **322**. Everything the API accepts and returns is declared here, before a single route.\n\n**3. The helpers that raise** — the path guard at **427–429**, the storage guard at **627**, the diff-parse failures at **664** and **668**. These are the vocabulary of failures the routes reuse.\n\n**4. `_verify_signature` at 467** — the only cryptographic function in the file.\n\n**5. The route block, in file order, 879–1610** — `/` and `/health`, then `/rules`, `/review`, `/test-review`, `/webhook`, then the later `/reviews`, `/users` and `/stats` group from **1424** on. Fourteen decorators over twelve paths, because `/test-review` and `/users` each carry two methods.\n\n### Where the two halves divide\n\nEverything up to `/review` (945) is the original surface: the banner, a health check, the rule engine's two endpoints and the review endpoint itself. From `/test-review` at 1025 on, each block is a later concern arriving — the review history, the webhook, then persistence at 1424 with its own models and its own 503. A reader who starts at 1424 meets a storage layer before knowing what it stores.\n\n### One habit that pays\n\nCite a decorator by its range, never its first line: `/review` starts at 945 and the closing bracket is at **960**, because the `responses=` block runs to sixteen lines. The same habit applies to `_verify_signature` at **467–479**, which ends where its last `return False` does.",
   "code_examples": [
     {
       "id": "4.8-ex-0",
@@ -9361,7 +9371,7 @@ window.LESSONS.push({
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-490"
+      "lines": "467-478"
     },
     {
       "label": "The route block, in file order",
@@ -9474,7 +9484,7 @@ window.LESSONS.push({
     {
       "label": "The regex that recognises the `diff --git` header",
       "path": "app/parser.py",
-      "lines": "61-66"
+      "lines": "61"
     }
   ],
   "learn_more": [
@@ -9823,7 +9833,7 @@ window.LESSONS.push({
     {
       "label": "The four change kinds",
       "path": "app/parser.py",
-      "lines": "57-66"
+      "lines": "57"
     },
     {
       "label": "The builder and its explicit_change slot",
@@ -10371,7 +10381,7 @@ window.LESSONS.push({
         "It prevents the fields from being validated"
       ],
       "answer": 1,
-      "why": "Frozen blocks attribute assignment after construction, so what the rule engine produced is what the comment says. It is not about hashing — a dict field would still make it unhashable."
+      "why": "`frozen=True` stops assignment; hashing needs every field to hash, and `Finding` has only str and enum fields."
     },
     {
       "q": "Which field makes a finding anchorable to a diff?",
@@ -10388,7 +10398,7 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Build a finding and print its row as a dictionary, then change one field and watch it fail.",
     "starter": "",
-    "solution": "```python\nfrom app.models import Finding\n\nfinding = Finding(file=\"app/db.py\", line=\"3\", severity=\"HIGH\",\n                  issue=\"A token is hardcoded.\", suggested_fix=\"Use os.environ.\")\nprint(finding.as_row())\nfinding.severity = \"LOW\"   # FrozenInstanceError\n```",
+    "solution": "```python\nfrom app.models import Finding\n\nfinding = Finding(file=\"app/db.py\", line=\"3\", severity=\"HIGH\",\n                  issue=\"A token is hardcoded.\", suggested_fix=\"Use os.environ.\")\nprint(finding.as_row())\nfinding.severity = \"LOW\"   # ValidationError [type=frozen_instance]\n```",
     "explanation": "The row prints in contract order; the assignment raises because the model is frozen. Both behaviours come from `model_config`, one line."
   },
   "exercise": {
@@ -10400,7 +10410,7 @@ window.LESSONS.push({
   "common_mistakes": [
     "Adding a sixth field to carry extra detail, which breaks every consumer that knows five.",
     "Editing a finding after construction to fix its severity; the model is frozen.",
-    "Assuming `frozen=True` makes a finding hashable — a dict-valued field still blocks it."
+    "Assuming a frozen model with a dict-valued field is hashable; `Finding` has only str and enum fields, so it hashes, but `MatchResult.per_category` does not."
   ],
   "project_links": [
     {
@@ -10420,8 +10430,8 @@ window.LESSONS.push({
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
     },
     {
-      "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "label": "ADR 0001 — strict Pydantic v2",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [
@@ -10520,7 +10530,7 @@ window.LESSONS.push({
     {
       "label": "The line pattern",
       "path": "app/models.py",
-      "lines": "42-43"
+      "lines": "42"
     },
     {
       "label": "The validator that enforces it",
@@ -10748,7 +10758,7 @@ window.LESSONS.push({
     {
       "label": "The issue and fix fields",
       "path": "app/models.py",
-      "lines": "68-86"
+      "lines": "68-83"
     },
     {
       "label": "Where the row puts them",
@@ -10763,7 +10773,7 @@ window.LESSONS.push({
     },
     {
       "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [
@@ -10867,7 +10877,7 @@ window.LESSONS.push({
     {
       "label": "The fields it applies to",
       "path": "app/models.py",
-      "lines": "68-86"
+      "lines": "68-83"
     }
   ],
   "learn_more": [
@@ -10981,7 +10991,7 @@ window.LESSONS.push({
     {
       "label": "The constraints on file, issue and fix",
       "path": "app/models.py",
-      "lines": "68-86"
+      "lines": "68-83"
     }
   ],
   "learn_more": [
@@ -11218,7 +11228,7 @@ window.LESSONS.push({
     },
     {
       "label": "docs/decisions/0001-five-field-finding.md",
-      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-five-field-finding.md"
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
   "glossary_terms": [
@@ -11539,7 +11549,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Name three fields the two models share and one only `FileDiff` has.",
     "hint": "The shared ones are the summary's whole content.",
-    "solution": "```text\nShared: path, change, added_spans (also added_line_count, hunk_count, binary).\nOnly FileDiff: hunks (and therefore lines, old_path, new_path).\n```",
+    "solution": "```text\nShared: path, change, added_spans (also added_line_count, binary).\nOnly FileDiff: hunks (and therefore lines, old_path, new_path).\n```",
     "explanation": "The summary is the diff minus the hunks — which is exactly why it can be derived from it."
   },
   "common_mistakes": [
@@ -11595,7 +11605,7 @@ window.LESSONS.push({
   "title": "added_spans and the _spans compaction",
   "order": 704,
   "duration_min": 30,
-  "concept_md": "### The problem with a list of numbers\n\nA file with four added lines reports `[3, 4, 7, 8]`. That is accurate and hard to read: a reviewer has to reconstruct that it means two blocks rather than four scattered lines.\n\n`_spans` turns a sorted list into ranges:\n\n```text\n[3, 4, 7, 8]   ->   ['3-4', '7-8']\n[1, 2, 3, 4, 5] ->   ['1-5']\n[9]             ->   ['9']\n```\n\n### Why the shape matters downstream\n\nThe anchorer asks \"does this finding's line fall in an added span?\". With ranges it splits on `-` and compares two integers; with a list it would scan. And the Markdown comment shows the ranges, so the reader sees two blocks at a glance.\n\n### The invariant\n\n`added_spans` covers exactly the added line numbers, no more and no fewer. `added_line_count` is the length of the underlying list, not of the span strings — which is why `['3-4','7-8']` sits beside `4`.\n\n### Where it is computed\n\n`added_spans` is a property on `FileDiff`: every access runs `_spans(self.added_line_numbers)`, over a set built from the hunk lines. Nothing is cached, so a span cannot go stale — and the cost is paid only by a caller that asks.\n\n### Who actually uses it\n\nThe summary and the Markdown table read the spans. The anchorer does not: it compares against `added_line_numbers`, the set of integers, because a membership test on a set is cheaper than parsing range strings.",
+  "concept_md": "### The problem with a list of numbers\n\nA file with four added lines reports `[3, 4, 7, 8]`. That is accurate and hard to read: a reviewer has to reconstruct that it means two blocks rather than four scattered lines.\n\n`_spans` turns a sorted list into ranges:\n\n```text\n[3, 4, 7, 8]   ->   ['3-4', '7-8']\n[1, 2, 3, 4, 5] ->   ['1-5']\n[9]             ->   ['9']\n```\n\n### Why the shape matters downstream\n\nThe anchorer asks a different question: it parses the finding's range and tests membership in `added_line_numbers`, a set of integers. The Markdown comment shows the ranges, so the reader sees two blocks at a glance.\n\n### The invariant\n\n`added_spans` covers exactly the added line numbers, no more and no fewer. `added_line_count` is the length of the underlying list, not of the span strings — which is why `['3-4','7-8']` sits beside `4`.\n\n### Where it is computed\n\n`added_spans` is a property on `FileDiff`: every access runs `_spans(self.added_line_numbers)`, over a set built from the hunk lines. Nothing is cached, so a span cannot go stale — and the cost is paid only by a caller that asks.\n\n### Who actually uses it\n\nThe summary and the Markdown table read the spans. The anchorer does not: it compares against `added_line_numbers`, the set of integers, because a membership test on a set is cheaper than parsing range strings.",
   "code_examples": [
     {
       "id": "7.4-ex-0",
@@ -12111,7 +12121,7 @@ window.LESSONS.push({
     "prompt": "Print every top-level definition with its line number and count them.",
     "starter": "",
     "solution": "```python\nimport subprocess\n\nout = subprocess.run([\"grep\", \"-n\", \"^class \\\\|^def \", \"app/parser.py\"],\n                     capture_output=True, text=True).stdout\nprint(out.strip())\nprint(\"count:\", len(out.strip().splitlines()))\n```",
-    "explanation": "Thirteen definitions across 614 lines — the module is mostly docstrings and the builder's logic."
+    "explanation": "Fifteen definitions across 614 lines — the module is mostly docstrings and the builder's logic."
   },
   "exercise": {
     "prompt": "Give the range of `anchor_findings` and say which two models it consumes.",
@@ -12155,6 +12165,1164 @@ window.LESSONS.push({
     "layer — a block that uses only the blocks above it",
     "side effect — work done at import time",
     "entry point — a public function a caller uses"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.1.js */
+/* 8.1 — Anatomy of a rule
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.1",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "Anatomy of a rule",
+  "order": 801,
+  "duration_min": 25,
+  "concept_md": "### Six fields and a function\n\nA rule is a small frozen record plus one callable:\n\n```python\n@dataclass(frozen=True, slots=True)\nclass Rule:\n    id: str\n    title: str\n    category: RuleCategory\n    owasp: str\n    severity: Severity\n    check: Callable[[LineContext], RuleHit | None]\n```\n\n`id` is the stable name — `secret/hardcoded-credential` — and it is what a `# noqa` names. `severity` is fixed per rule, not decided per hit, so the same mistake is never CRITICAL in one file and LOW in another.\n\n### What a rule is given and what it returns\n\nIt receives a `LineContext`: the path, the line number, the text, and the sibling added lines. It returns either `None` or a `RuleHit` carrying two strings:\n\n```python\n@dataclass(frozen=True, slots=True)\nclass RuleHit:\n    issue: str\n    suggested_fix: str\n```\n\nNotice what is *not* in the hit: the file, the line and the severity. Those belong to the rule and the context, so a rule cannot disagree with itself about where it fired.\n\n### Why the split matters\n\nBecause the check is a plain function of one line, it can be tested with a string literal — no file, no diff, no engine. Every rule on this site is exercised that way, which is why the rule layer can be proven offline while the model layer cannot.",
+  "code_examples": [
+    {
+      "id": "8.1-ex-0",
+      "lang": "python",
+      "caption": "One rule, its fields, and what it returns",
+      "code": "from app.rules import RULES, LineContext\n\nrule = RULES[0]\nprint(rule.id, \"|\", rule.category.value, \"|\", rule.severity.value)\nprint(rule.title)\n\nctx = LineContext(path=\"app/demo.py\", lineno=1, text=\"\", added=(), index=0)\nhit = rule.check(ctx)\nprint(\"fires on a blank line:\", hit)",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "secret/hardcoded-credential | secrets | CRITICAL\nHardcoded credential\nfires on a blank line: None",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a `RuleHit` deliberately not carry?",
+      "options": [
+        "The issue and the suggested fix",
+        "The file, the line and the grade",
+        "The rule id and its short title",
+        "The category and the citation"
+      ],
+      "answer": 1,
+      "why": "Those three come from the context and the rule, so a hit cannot contradict the rule about where it fired or how serious it is."
+    },
+    {
+      "q": "Why is `severity` fixed on the rule rather than chosen per hit?",
+      "options": [
+        "So the enum can be sorted",
+        "Because the context has no grade",
+        "So one mistake is never graded two ways",
+        "Because Pydantic forbids a per-hit grade"
+      ],
+      "answer": 2,
+      "why": "A rule that graded itself per hit would make the verdict depend on where the code sat, which is the opposite of a rule."
+    },
+    {
+      "q": "What makes a single rule testable without a diff?",
+      "options": [
+        "The rule is registered at import time",
+        "The registry is a module-level list",
+        "`LineContext` is a frozen dataclass",
+        "`check` takes one context and returns"
+      ],
+      "answer": 3,
+      "why": "A pure function of one context can be called with a literal, which is why the rule layer is proven offline and the model layer is not."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the id and severity of the first five rules.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import RULES\n\nfor rule in RULES[:5]:\n    print(rule.id, rule.severity.value)\n```",
+    "explanation": "The ids read like paths — `secret/…`, `injection/…` — because the category is the first segment."
+  },
+  "exercise": {
+    "prompt": "How many fields does a `Rule` have, and which one makes the rule findable by a `# noqa` comment?",
+    "hint": "Count the dataclass fields; the comment names one of them.",
+    "solution": "```text\nSix fields: id, title, category, owasp, severity, check.\n\nThe id — that is the string a targeted # noqa names, e.g. noqa: secret/hardcoded-credential.\n```",
+    "explanation": "The id is both the stable name and the suppression handle, which is why it is a path-like string rather than a number."
+  },
+  "common_mistakes": [
+    "Returning a severity from `check`, which the rule already owns.",
+    "Treating `id` as a display label; it is the stable name a suppression names.",
+    "Testing a rule through the engine when calling `check` with a literal would do."
+  ],
+  "project_links": [
+    {
+      "label": "The Rule record",
+      "path": "app/rules.py",
+      "lines": "112-121"
+    },
+    {
+      "label": "RuleHit, the two strings a rule returns",
+      "path": "app/rules.py",
+      "lines": "75-79"
+    },
+    {
+      "label": "LineContext, what a rule is given",
+      "path": "app/rules.py",
+      "lines": "83-109"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "rebuild/tests/test_rebuild_rules.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/rebuild/tests/test_rebuild_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "rule — a named check with one fixed severity and category",
+    "rule hit — the issue and the fix a firing rule returns",
+    "line context — the line a rule sees, plus its path and number"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.2.js */
+/* 8.2 — RuleCategory and its ten members
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.2",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "RuleCategory and its ten members",
+  "order": 802,
+  "duration_min": 20,
+  "concept_md": "### Ten names, one enum\n\n```python\nclass RuleCategory(str, Enum):\n    SECRETS = \"secrets\"\n    INJECTION = \"injection\"\n    DESERIALISATION = \"deserialisation\"\n    CRYPTO = \"crypto\"\n    AUTH = \"auth\"\n    CONFIG = \"config\"\n    RELIABILITY = \"reliability\"\n    QUALITY = \"quality\"\n    COMPLEXITY = \"complexity\"\n    STYLE = \"style\"\n```\n\nIt subclasses `str`, so a category serialises as `\"secrets\"` and a client filters on that text.\n\n### What the categories are for\n\nThree jobs, none of them cosmetic. They group the report so a reviewer can skip style and read secrets first. They are a filter on `review_lines(categories=…)`, so a caller can ask for injection only. The id prefix is a *family* label that only sometimes matches the category name: `secret/hardcoded-credential` sits under `secrets`, but eighteen rules begin `unsafe/` — only fourteen of them injection — and two begin `security/`, both crypto.\n\n### Why ten and not fewer\n\nThe four that look mergeable — `quality`, `complexity`, `style`, `reliability` — answer different questions. `complexity` is about the shape of the control flow, `style` about naming and layout, `quality` about the code's own hygiene, `reliability` about what breaks under load or at a boundary. Merging them would make the report's first column meaningless.\n\n### The count is checked\n\n`test_registry_covers_every_category` fails if a category has no rules, so the enum cannot grow a member that nothing uses.\n\n### Reading the enum in a report\n\nThe member name and the value differ in case — `DESERIALISATION` against `deserialisation` — so a report that prints the member rather than the value will not match a client that filters on the text. Print `.value`.",
+  "code_examples": [
+    {
+      "id": "8.2-ex-0",
+      "lang": "python",
+      "caption": "The ten members, and how many rules each holds",
+      "code": "from collections import Counter\nfrom app.rules import RULES, RuleCategory\n\nprint(\"members:\", len(RuleCategory))\nfor name, count in Counter(r.category.value for r in RULES).most_common():\n    print(\"%-16s %d\" % (name, count))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "members: 10\nsecrets          15\ninjection        14\nconfig           7\ncrypto           6\nquality          5\ndeserialisation  4\nstyle            4\nauth             3\ncomplexity       3\nreliability      2",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does `RuleCategory` being a `str` enum give you?",
+      "options": [
+        "The enum can hold duplicate values",
+        "Categories can be compared as integers",
+        "A category serialises as its own text",
+        "Rules can be sorted by category name"
+      ],
+      "answer": 2,
+      "why": "The JSON and the display text are the same string, so a client filters on `secrets` without an enum encoder."
+    },
+    {
+      "q": "Which job do categories NOT do?",
+      "options": [
+        "Prefix each rule id",
+        "Group the report for a reader",
+        "Filter which rules run",
+        "Decide a finding's severity"
+      ],
+      "answer": 3,
+      "why": "Severity is a field on the rule; the category groups, filters and namespaces, but it never grades."
+    },
+    {
+      "q": "Why are `quality`, `complexity`, `style` and `reliability` kept apart?",
+      "options": [
+        "Each answers a different question",
+        "Because merging would break ids",
+        "Because the enum needs ten members",
+        "Because the API exposes them"
+      ],
+      "answer": 0,
+      "why": "Control-flow shape, naming, hygiene and failure-at-a-boundary are different diagnoses; merging them makes the first column of the report say nothing."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the category that holds the most rules and the one that holds the fewest.",
+    "starter": "",
+    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES\n\nc = Counter(r.category.value for r in RULES)\nprint(c.most_common(1), c.most_common()[-1])\n```",
+    "explanation": "Secrets leads and reliability trails, which matches what the tool is for: leaked credentials are the failure that matters most."
+  },
+  "exercise": {
+    "prompt": "Which categories contain no rule at all, and what would the test suite do about it?",
+    "hint": "Run a counter over the categories and compare with the enum's members.",
+    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES, RuleCategory\n\nused = {r.category for r in RULES}\nprint([c.value for c in RuleCategory if c not in used])\n```\n\nIt prints `[]`. If it did not, `test_registry_covers_every_category` would fail.",
+    "explanation": "The empty list is the assertion: an enum member with no rule behind it is a promise the report cannot keep."
+  },
+  "common_mistakes": [
+    "Adding a category without a rule, which the registry test catches.",
+    "Filtering on the enum member instead of its `.value` in JSON.",
+    "Assuming the category decides severity; it does not."
+  ],
+  "project_links": [
+    {
+      "label": "The ten-member enum",
+      "path": "app/rules.py",
+      "lines": "59-71"
+    },
+    {
+      "label": "The registry the categories describe",
+      "path": "app/rules.py",
+      "lines": "113-130"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the registry tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "category — the coarse group a rule belongs to",
+    "filter — restricting a run to some categories",
+    "namespace — the first segment of a rule id"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.3.js */
+/* 8.3 — The 63 rules by category
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.3",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "The 63 rules by category",
+  "order": 803,
+  "duration_min": 30,
+  "concept_md": "### The shape of the set\n\nSixty-three rules, and they are not spread evenly. Secrets holds 15 and injection 14; reliability holds 2 and auth 3. That distribution is the design: the tool exists to catch the mistakes that leak credentials and execute attacker-controlled strings, not to nag about naming.\n\n### Why the count is a constant\n\n`RULE_COUNT` is exported and asserted against `len(RULES)`, so the number in a report and the number in the registry cannot drift. A test also checks the severity spread, so a wave of new CRITICAL rules fails rather than passing quietly.\n\n### Reading the registry\n\nEach entry is a `Rule`; the ids are stable strings; the categories group them. `RULES` is a plain list, built at import time by `_register`, so its order is registration order — which is a contract, and lesson 8.8's subject.\n\n### What the number is not\n\nIt is not a coverage claim. Sixty-three rules is not \"63 classes of bug found\"; it is 63 regexes and hand-written checks over added lines. A file with no additions gets no findings at all, whatever it contains.\n\n### Where the number comes from\n\n`RULE_COUNT` is assigned once, at import, from `len(RULES)`. Nothing recomputes it later, so a rule added to the list without the constant being re-read would be a bug — which is why the test compares the two rather than trusting either.",
+  "code_examples": [
+    {
+      "id": "8.3-ex-0",
+      "lang": "python",
+      "caption": "Every category, its rules, and the total",
+      "code": "from collections import Counter\nfrom app.rules import RULE_COUNT, RULES\n\nprint(\"RULE_COUNT:\", RULE_COUNT, \"| len(RULES):\", len(RULES))\nfor name, count in sorted(Counter(r.category.value for r in RULES).items(), key=lambda p: -p[1]):\n    print(\"%-16s %2d\" % (name, count))\nprint(\"total           %2d\" % sum(1 for _ in RULES))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "RULE_COUNT: 63 | len(RULES): 63\nsecrets          15\ninjection        14\nconfig            7\ncrypto            6\nquality           5\ndeserialisation   4\nstyle             4\nauth              3\ncomplexity        3\nreliability       2\ntotal           63",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which two categories hold the most rules?",
+      "options": [
+        "Config and reliability",
+        "Style and quality",
+        "Auth and crypto",
+        "Secrets and injection"
+      ],
+      "answer": 3,
+      "why": "15 and 14 — the tool is aimed at leaked credentials and injected strings, which is why those two dominate the registry."
+    },
+    {
+      "q": "What does `RULE_COUNT` protect?",
+      "options": [
+        "The report number and the registry",
+        "The ids from being renamed",
+        "The enum from gaining a member",
+        "The severities from being reordered"
+      ],
+      "answer": 0,
+      "why": "It is exported and compared with `len(RULES)`, so a rule added without updating the constant fails a test instead of a report."
+    },
+    {
+      "q": "What does 63 rules NOT mean?",
+      "options": [
+        "That the registry holds 63 entries",
+        "That 63 classes of bug are covered",
+        "That every rule has a category",
+        "That every rule has an OWASP mapping"
+      ],
+      "answer": 1,
+      "why": "They are checks over added lines; a file with no additions yields no findings regardless of what it contains."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the severity mix across all 63 rules.",
+    "starter": "",
+    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES\n\nprint(Counter(r.severity.value for r in RULES))\n```",
+    "explanation": "Most rules are HIGH or CRITICAL, and only seven are LOW — a distribution lesson 8.6 explains."
+  },
+  "exercise": {
+    "prompt": "Which category is third-smallest by rule count, and how many rules does it hold?",
+    "hint": "Sort the counter ascending and take the third entry.",
+    "solution": "```python\nfrom collections import Counter\nfrom app.rules import RULES\n\nc = Counter(r.category.value for r in RULES)\nprint(sorted(c.items(), key=lambda p: p[1]))\n```\n\nReliability 2, then auth 3 and complexity 3 tied — the third category in count order is complexity with 3.",
+    "explanation": "The concept names the two smallest; the third needs the counter."
+  },
+  "common_mistakes": [
+    "Quoting a rule count without reading `RULE_COUNT` at this commit.",
+    "Reading 63 as a coverage claim rather than a registry size.",
+    "Assuming the categories are evenly populated."
+  ],
+  "project_links": [
+    {
+      "label": "The exported count",
+      "path": "app/rules.py",
+      "lines": "1491"
+    },
+    {
+      "label": "Registration, which builds the list",
+      "path": "app/rules.py",
+      "lines": "128-130"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the registry tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "registry — the list every rule is registered into",
+    "RULE_COUNT — the exported size, asserted against the list",
+    "spread — how rules are distributed across severities"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.4.js */
+/* 8.4 — Regex matchers and line-local evaluation
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.4",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "Regex matchers and line-local evaluation",
+  "order": 804,
+  "duration_min": 25,
+  "concept_md": "### Two ways to make a rule\n\nHand-written, with `_rule`, when the check needs to look at more than the line. Declarative, with `_pattern_rule`, when it does not:\n\n```python\ndef check(ctx: LineContext) -> RuleHit | None:\n    if skip_tests and ctx.is_test_file:\n        return None\n    text = ctx.scan_text\n    if pattern.search(text) is None:\n        return None\n    if exempt is not None and exempt.search(text) is not None:\n        return None\n    return RuleHit(issue=issue, suggested_fix=suggested_fix)\n```\n\nThat is the whole contract of a pattern rule: skip test files if asked, search, honour an exemption, return a hit. No rule passes the flag today, but two hand-written checks test `ctx.is_test_file` directly, so test paths are already exempt for those two. No state, no history.\n\n### Line-local is a decision, not a limitation\n\nA rule sees one added line and the sibling added lines. It does not see the whole file, and it cannot see a block. That is why `# noqa` is line-local too, and why a secret split across two lines is not caught — a real limitation, stated in the docs rather than hidden.\n\n### `scan_text` exists for one reason\n\nA pathological line — a minified bundle pasted into a `.py` file — would make a backtracking regex run for seconds. `scan_text` truncates to a budget before the pattern ever sees it, so the worst case is bounded.\n\n### What a pattern rule cannot say\n\nIt cannot say \"this file has three of these\". Counting is the engine's job, not a rule's, because a rule that counted would need memory between lines and would stop being a pure function.",
+  "code_examples": [
+    {
+      "id": "8.4-ex-0",
+      "lang": "python",
+      "caption": "A pattern rule, the exemption, and the test-file skip",
+      "code": "from app.rules import LineContext, RULES\n\nrule = next(r for r in RULES if r.id == \"secret/hardcoded-credential\")\n\nfor text in (\"API_KEY = \\\"sk-live-abcdef1234567890\\\"\", \"API_KEY = os.environ[\\\"API_KEY\\\"]\"):\n    ctx = LineContext(path=\"app/demo.py\", lineno=1, text=text, added=(), index=0)\n    hit = rule.check(ctx)\n    print(\"%-46s -> %s\" % (text[:44], \"fires\" if hit else \"silent\"))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "API_KEY = \"sk-live-abcdef1234567890\"           -> fires\nAPI_KEY = os.environ[\"API_KEY\"]                -> silent",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a pattern rule check before it searches?",
+      "options": [
+        "Whether the path is a test file",
+        "Whether the severity is above LOW",
+        "Whether the registry has room",
+        "Whether the line ends in a newline"
+      ],
+      "answer": 0,
+      "why": "`skip_tests` exists because a fake key in a fixture is legitimate; the check runs before the search so a test file costs nothing."
+    },
+    {
+      "q": "Why does `scan_text` truncate the line?",
+      "options": [
+        "So the finding fits inside a comment",
+        "So a pathological line cannot stall it",
+        "So the line number stays correct",
+        "So the exemption pattern can match"
+      ],
+      "answer": 1,
+      "why": "A minified bundle pasted into a Python file would otherwise let a regex run for seconds; the budget bounds the worst case."
+    },
+    {
+      "q": "What can a line-local rule not do?",
+      "options": [
+        "Return the fix beside the issue text",
+        "Skip a file that is a test file",
+        "Count how often a pattern appeared",
+        "Honour an exemption pattern"
+      ],
+      "answer": 2,
+      "why": "Counting needs memory between lines, and a rule is a pure function of one context; the engine does the counting."
+    }
+  ],
+  "try_it": {
+    "prompt": "Run the hardcoded-credential rule over three lines and print which fire.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import LineContext, RULES\n\nrule = next(r for r in RULES if r.id == \"secret/hardcoded-credential\")\nfor text in (\"TOKEN = 'ghp_exampleTokenValue1234567890'\", \"TOKEN = os.environ['T']\", \"\"):\n    ctx = LineContext(path=\"a.py\", lineno=1, text=text, added=(), index=0)\n    print(bool(rule.check(ctx)), repr(text[:20]))\n```",
+    "explanation": "The empty line and the environment read are both silent, which is the false-positive budget working."
+  },
+  "exercise": {
+    "prompt": "Which rules are registered with `skip_tests=True`, and what does that tell you about the test-file skip?",
+    "hint": "Count the registrations that pass the flag.",
+    "solution": "```console\n$ grep -c 'skip_tests=True' app/rules.py\n0\n```\n\nNone passes the flag. The exemption is not absent, though: `_check_high_entropy` and `_check_print` call `ctx.is_test_file` themselves, so those two are already path-aware without it.",
+    "explanation": "A capability with no user is still worth knowing about: the mechanism is there and the decision to use it was not taken."
+  },
+  "common_mistakes": [
+    "Writing a rule that counts across lines; the engine counts, not the rule.",
+    "Forgetting that `# noqa` is line-local, so it cannot suppress a block.",
+    "Assuming a rule sees the whole file; it sees the line and its siblings."
+  ],
+  "project_links": [
+    {
+      "label": "The pattern-rule factory",
+      "path": "app/rules.py",
+      "lines": "145-170"
+    },
+    {
+      "label": "scan_text and the regex budget",
+      "path": "app/rules.py",
+      "lines": "93-103"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the rule tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "pattern rule — a rule declared from a regex and an exemption",
+    "exemption — a pattern that cancels a hit",
+    "regex budget — the truncation that bounds a regex's worst case"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.5.js */
+/* 8.5 — # noqa and # nosec: line-local, never block-level
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.5",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "# noqa and # nosec: line-local, never block-level",
+  "order": 805,
+  "duration_min": 25,
+  "concept_md": "### One regex, three answers\n\n```python\n_NOQA_RE = re.compile(r\"#\\s*(?:noqa|nosec)(?P<ids>[:=][A-Za-z0-9_,\\s/\\-]+)?\", re.IGNORECASE)\n```\n\nThe helper returns a pair: `(suppress_all, rule_ids)`. A bare `# noqa` gives `(True, set())`. A targeted `# noqa: secret/hardcoded-credential` gives `(False, {\"secret/hardcoded-credential\"})`. No marker gives `(False, set())`.\n\n### Why two spellings\n\n`noqa` is the flake8 convention and `nosec` is bandit's. Accepting both means a reader arriving from either tool finds the marker they already know, rather than learning a third.\n\n### Why the ids are a set, not a count\n\nBecause the marker may name several: `# noqa: secret/aws-access-key, secret/aws-secret-key`. Splitting on commas and whitespace and keeping a set means the check is a membership test, and a duplicate id costs nothing.\n\n### The line-local decision\n\nA marker suppresses the line it sits on, not the block below it. That is deliberate: a block-level suppression would silence rules the author never considered, and the whole point of naming an id is to say which rule you have thought about. If you need three lines suppressed, you write three markers — and a reviewer sees three.\n\n### What a marker cannot do\n\nIt cannot suppress a finding a rule made about a different line, and it cannot suppress a parse error. It is a comment in the source under review, so a file that is not parsed as Python has no markers at all — which is why a suppression in a YAML file does nothing.",
+  "code_examples": [
+    {
+      "id": "8.5-ex-0",
+      "lang": "python",
+      "caption": "Bare, targeted and absent",
+      "code": "from app.rules import _suppressed_ids\n\nfor text in (\"x = 1  # noqa\", \"x = 1  # noqa: secret/aws-access-key\", \"x = 1  # nosec: injection/eval\", \"x = 1\"):\n    print(\"%-40s -> %s\" % (text, _suppressed_ids(text)))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "x = 1  # noqa                            -> (True, set())\nx = 1  # noqa: secret/aws-access-key     -> (False, {'secret/aws-access-key'})\nx = 1  # nosec: injection/eval           -> (False, {'injection/eval'})\nx = 1                                    -> (False, set())",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a bare `# noqa` suppress?",
+      "options": [
+        "Every rule in the file",
+        "Every rule on that one line",
+        "Only CRITICAL rules",
+        "Nothing until an id is named"
+      ],
+      "answer": 1,
+      "why": "It returns `(True, set())` — suppress all, on that line. The scope is the line, never the block."
+    },
+    {
+      "q": "Why accept both `noqa` and `nosec`?",
+      "options": [
+        "One is for Python, one for YAML files",
+        "The regex needs two branches",
+        "They are the flake8 and bandit names",
+        "Bandit rules are stricter than flake8"
+      ],
+      "answer": 2,
+      "why": "Two established conventions, one marker: a reader arriving from either tool does not have to learn a third spelling."
+    },
+    {
+      "q": "What does the targeted form return?",
+      "options": [
+        "An error if the id is unknown",
+        "Suppress all, plus the named ids",
+        "Suppress all, with an empty set",
+        "Suppress nothing, plus the named ids"
+      ],
+      "answer": 3,
+      "why": "`(False, ids)` — the first element is the bare-marker flag, and the ids are what the caller tests membership against."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print what a marker naming two rules returns.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import _suppressed_ids\n\nprint(_suppressed_ids(\"x = 1  # noqa: secret/a, secret/b\"))\n```",
+    "explanation": "Two ids in one set, and the bare flag false — the marker names what it silences."
+  },
+  "exercise": {
+    "prompt": "Does `# noqa` on one line silence the same rule three lines below? Prove it.",
+    "hint": "The marker is matched per line; look at how the caller uses the pair.",
+    "solution": "```python\nfrom app.rules import LineContext, RULES, _suppressed_ids\n\nprint(_suppressed_ids(\"x = 1  # noqa\"))\nprint(_suppressed_ids(\"x = 1\"))\n```\n\n`(True, set())` then `(False, set())` — the second line has no marker, so nothing is suppressed there.",
+    "explanation": "Suppression is a property of a line, so a marker cannot reach another line even one below it."
+  },
+  "common_mistakes": [
+    "Expecting a bare `# noqa` to cover the block beneath it.",
+    "Naming an id that does not exist, which suppresses nothing and hides the typo.",
+    "Adding a marker in a test file where `skip_tests` already handles it."
+  ],
+  "project_links": [
+    {
+      "label": "The marker regex",
+      "path": "app/rules.py",
+      "lines": "334"
+    },
+    {
+      "label": "The helper that reads it",
+      "path": "app/rules.py",
+      "lines": "1494-1512"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the rule tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "suppression — a marker that silences a rule on its own line",
+    "bare marker — a suppression with no ids, silencing every rule",
+    "targeted marker — a suppression naming the ids it silences"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.6.js */
+/* 8.6 — Severity assignment discipline
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.6",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "Severity assignment discipline",
+  "order": 806,
+  "duration_min": 20,
+  "concept_md": "### The ladder, and who climbs it\n\nFour values — LOW, MEDIUM, HIGH, CRITICAL — with `rank` giving 0 to 3. The verdict blocks on CRITICAL or HIGH. So severity is not a label; it is the input to the gate decision.\n\n### Fixed per rule\n\nA rule is registered with its severity. `secret/hardcoded-credential` is CRITICAL wherever it fires. That is the discipline: the grade belongs to the mistake, not to the file it happened in. If the same mistake were CRITICAL in `app/main.py` and LOW in a script, the verdict would depend on where code lived, which is indefensible.\n\n### The distribution is a design statement\n\nSeventeen CRITICAL, twenty-three HIGH, sixteen MEDIUM, seven LOW. Most rules sit in the top half because the registry is aimed at security defects. A tool where most rules were LOW would be a linter; this one is meant to block.\n\n### What a test protects\n\n`test_severity_spread_is_sane` asserts the shape of the distribution, so a wave of new CRITICAL rules fails the suite rather than silently making everything block. That is a rule about the rules, and it is the kind of check that only exists when someone has been burned by severity inflation.",
+  "code_examples": [
+    {
+      "id": "8.6-ex-0",
+      "lang": "python",
+      "caption": "The distribution, and what it decides",
+      "code": "from collections import Counter\nfrom app.models import verdict_for\nfrom app.rules import RULES\nfrom app.models import Finding\n\nprint(Counter(r.severity.value for r in RULES))\n\nfor sev in (\"CRITICAL\", \"HIGH\", \"MEDIUM\", \"LOW\"):\n    f = Finding(file=\"a.py\", line=\"1\", severity=sev, issue=\"x\", suggested_fix=\"y\")\n    print(\"%-9s -> %s\" % (sev, verdict_for([f])))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "Counter({'HIGH': 23, 'CRITICAL': 17, 'MEDIUM': 16, 'LOW': 7})\nCRITICAL  -> block\nHIGH      -> block\nMEDIUM    -> approve with comments\nLOW       -> approve with comments",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Where is a rule's severity decided?",
+      "options": [
+        "By the file the line sits inside",
+        "By the run's own finding count",
+        "At registration, never per hit",
+        "By the category's default value"
+      ],
+      "answer": 2,
+      "why": "The grade belongs to the mistake; deciding it per hit would make the verdict depend on where the code lived."
+    },
+    {
+      "q": "Which severities block the verdict?",
+      "options": [
+        "Every severity above LOW",
+        "CRITICAL only",
+        "CRITICAL, HIGH and MEDIUM",
+        "CRITICAL and HIGH"
+      ],
+      "answer": 3,
+      "why": "`verdict_for` blocks on those two and approves with comments for MEDIUM and LOW."
+    },
+    {
+      "q": "What does `test_severity_spread_is_sane` guard against?",
+      "options": [
+        "Inflation making every run block",
+        "A category losing its last rule",
+        "A rule registered twice by mistake",
+        "An id being renamed by a wave"
+      ],
+      "answer": 0,
+      "why": "It asserts the shape of the distribution, so adding a wave of CRITICAL rules fails the suite instead of silently changing every verdict."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the rank of each severity, lowest first.",
+    "starter": "",
+    "solution": "```python\nfrom app.models import Severity\n\nfor s in Severity:\n    print(s.value, s.rank)\n```",
+    "explanation": "LOW is 0 and CRITICAL is 3, which is what `sort_findings` orders by."
+  },
+  "exercise": {
+    "prompt": "Which single severity change would flip a review from approve-with-comments to block? Name it and show the two verdicts.",
+    "hint": "Look at the threshold in `verdict_for`.",
+    "solution": "```python\nfrom app.models import Finding, verdict_for\n\nfor sev in (\"MEDIUM\", \"HIGH\"):\n    f = Finding(file=\"a.py\", line=\"1\", severity=sev, issue=\"x\", suggested_fix=\"y\")\n    print(sev, verdict_for([f]))\n```\n\nMEDIUM approves with comments; HIGH blocks.",
+    "explanation": "One step on the ladder is the difference between a comment and a block, which is why the grade is fixed per rule."
+  },
+  "common_mistakes": [
+    "Raising a rule's severity to make a demo look decisive.",
+    "Grading a finding by the file it sits in rather than by the mistake.",
+    "Assuming MEDIUM blocks; it approves with comments."
+  ],
+  "project_links": [
+    {
+      "label": "The ladder and its rank",
+      "path": "app/models.py",
+      "lines": "46-57"
+    },
+    {
+      "label": "The verdict the ladder decides",
+      "path": "app/models.py",
+      "lines": "141-148"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/models.py — the models",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
+    },
+    {
+      "label": "tests/test_rules.py — the severity-spread test",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "severity — the fixed grade a rule carries",
+    "rank — the integer a severity sorts by",
+    "verdict — the gate decision the severities produce"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.7.js */
+/* 8.7 — The OWASP mapping and the gaps
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.7",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "The OWASP mapping and the gaps",
+  "order": 807,
+  "duration_min": 30,
+  "concept_md": "### Every rule carries a citation\n\nEach `Rule` has an `owasp` string — `A02:2021-Cryptographic Failures`, `A03:2021-Injection` — and the registry holds nine distinct values across 63 rules. That is a claim a reader can check: this check is an instance of that published category.\n\n### Why it is a string and not an enum\n\nBecause the citation must be quotable in a report and readable in a JSON response without a lookup table. A string also lets a future rule cite something the enum does not yet name.\n\n### The gaps are real\n\nNine of the ten 2021 entries are cited. The one nothing cites is `A06:2021-Vulnerable and Outdated Components` — a dependency pin is not visible on an added line, so no rule can claim it. `A04:2021-Insecure Design` *is* cited, by eleven rules, which is the tool saying a design smell can sometimes be seen in a single line. That is the honest reading: the mapping says what each rule is an instance of, not that the tool covers the OWASP Top Ten.\n\n### What to do with it\n\nIn a report, group by citation to show which class of defect a change introduces. In a review, a rule with a citation is arguable; a rule without one is opinion. If you add a rule, add its citation — and if there is none, say so rather than inventing one.",
+  "code_examples": [
+    {
+      "id": "8.7-ex-0",
+      "lang": "python",
+      "caption": "The nine citations, and which category uses each",
+      "code": "from collections import Counter, defaultdict\nfrom app.rules import RULES\n\nby_cat = defaultdict(set)\nfor r in RULES:\n    by_cat[r.category.value].add(r.owasp.split(\":\")[0])\n\nprint(\"distinct citations:\", len({r.owasp for r in RULES}))\nfor cat, refs in sorted(by_cat.items()):\n    print(\"%-16s %s\" % (cat, sorted(refs)))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "distinct citations: 9\nauth             ['A01', 'A07']\ncomplexity       ['A04']\nconfig           ['A05']\ncrypto           ['A02']\ndeserialisation  ['A08']\ninjection        ['A01', 'A03', 'A10']\nquality          ['A04', 'A09']\nreliability      ['A04']\nsecrets          ['A02', 'A07']\nstyle            ['A04', 'A09']",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a rule's `owasp` field assert?",
+      "options": [
+        "The tool covers the whole Top Ten",
+        "OWASP audited this rule",
+        "The rule is therefore CRITICAL",
+        "This check is an instance of"
+      ],
+      "answer": 3,
+      "why": "It is a citation for one check, not a coverage claim about the ten categories."
+    },
+    {
+      "q": "Why is the citation a string rather than an enum?",
+      "options": [
+        "So it can be quoted and read in JSON",
+        "So it can be translated later",
+        "So it can be sorted alphabetically",
+        "Because enums cannot hold a colon"
+      ],
+      "answer": 0,
+      "why": "The report and the API both show the text; a string also lets a new rule cite something the enum has not named."
+    },
+    {
+      "q": "Which 2021 entry does no rule cite?",
+      "options": [
+        "A06, vulnerable and outdated components",
+        "A04, insecure design",
+        "A02, cryptographic failures",
+        "A10, server-side request forgery"
+      ],
+      "answer": 0,
+      "why": "A dependency version is not visible on an added line, so no line-local rule can claim that entry; A04 is cited by eleven rules."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print every rule that cites injection.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import RULES\n\nfor r in RULES:\n    if \"Injection\" in r.owasp:\n        print(r.id, \"|\", r.owasp)\n```",
+    "explanation": "A02 (cryptographic failures) is the largest group with 20 rules; A03 covers 11 of the 14 injection rules, because three of them cite a neighbouring weakness."
+  },
+  "exercise": {
+    "prompt": "Which category maps to the most distinct OWASP citations, and which to the fewest? Check it.",
+    "hint": "Group by category and count distinct citations.",
+    "solution": "```python\nfrom collections import defaultdict\nfrom app.rules import RULES\n\nm = defaultdict(set)\nfor r in RULES:\n    m[r.category.value].add(r.owasp)\nfor cat, refs in sorted(m.items(), key=lambda p: -len(p[1])):\n    print(cat, len(refs))\n```",
+    "explanation": "The spread shows where a category draws on more than one published weakness."
+  },
+  "common_mistakes": [
+    "Reading the citation as proof of OWASP coverage.",
+    "Adding a rule without a citation, or inventing one.",
+    "Assuming every category maps to a distinct citation."
+  ],
+  "project_links": [
+    {
+      "label": "The owasp field on a rule",
+      "path": "app/rules.py",
+      "lines": "119"
+    },
+    {
+      "label": "Where the citation is registered",
+      "path": "app/rules.py",
+      "lines": "133-142"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the registry tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "citation — the OWASP category a rule is an instance of",
+    "coverage — what a citation does not claim",
+    "Top Ten — the published list the citations point into"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.8.js */
+/* 8.8 — The rule registry and why order is a contract
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.8",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "The rule registry and why order is a contract",
+  "order": 808,
+  "duration_min": 20,
+  "concept_md": "### A list built at import time\n\n`RULES` starts empty and `_register` appends. Because Python runs the module top to bottom, the list ends up in the order the decorators and factory calls appear in the file. That order is visible in the report, in `RULE_COUNT`, and in any test that indexes `RULES[0]`.\n\n### Why that is a contract\n\nTwo reasons. A report that reordered itself between runs would make a diff of two reports useless. And a test that asserts `RULES[0].id` is asserting registration order, so inserting a rule in the middle is a deliberate act with a visible consequence.\n\n### What registration does not do\n\nIt does not sort, deduplicate or validate. A duplicate id would be registered twice and nothing would complain — which is why the ids are checked in review rather than at runtime. The registry is a list, not a set, because order matters and the cost of a duplicate is small.\n\n### The stable part\n\nIds are stable strings; the position is not. Code that needs a rule looks it up by id — `RULES_BY_ID` exists for exactly that — so a reordering cannot break a caller.\n\n### What the list is not\n\nIt is not a plugin registry. Nothing discovers rules from a directory or an entry point; every rule is declared in this one module, which is why the file is 1615 lines and why its import cost is fixed.",
+  "code_examples": [
+    {
+      "id": "8.8-ex-0",
+      "lang": "python",
+      "caption": "Registration order is the list's order",
+      "code": "from app.rules import RULES, RULES_BY_ID\n\nprint(\"first three:\", [r.id for r in RULES[:3]])\nprint(\"lookup by id :\", RULES_BY_ID[\"unsafe/sql-injection\"].id)\nprint(\"ids are unique:\", len({r.id for r in RULES}) == len(RULES))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "first three: ['secret/hardcoded-credential', 'secret/aws-access-key', 'secret/aws-secret-key']\nlookup by id : unsafe/sql-injection\nids are unique: True",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Why is `RULES` a list rather than a set?",
+      "options": [
+        "Because registration order is visible",
+        "Because a list searches much faster",
+        "Because sets cannot hold dataclasses",
+        "Because duplicate ids are impossible"
+      ],
+      "answer": 0,
+      "why": "The report and the tests both read position, so the order has to be stable and intentional."
+    },
+    {
+      "q": "What does registration NOT check?",
+      "options": [
+        "That the severity is set",
+        "That the id is unique",
+        "That the category is an enum",
+        "That a check is callable"
+      ],
+      "answer": 1,
+      "why": "A duplicate id would register twice silently; uniqueness is enforced by review, not at runtime."
+    },
+    {
+      "q": "What should a caller use to find one rule?",
+      "options": [
+        "The index into `RULES`, because it is ordered",
+        "The category filter, because it is smaller",
+        "`RULES_BY_ID`, because ids are stable",
+        "A scan of `RULES` by title"
+      ],
+      "answer": 2,
+      "why": "A reordering changes every index but no id, so lookup by id survives a registry change."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print how many rules would be lost if duplicates were dropped.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import RULES\n\nids = [r.id for r in RULES]\nprint(len(ids) - len(set(ids)), \"duplicate ids\")\n```",
+    "explanation": "It prints 0 — the registry is clean today, which is a fact worth checking rather than assuming."
+  },
+  "exercise": {
+    "prompt": "Which rule sits at index 30, and would a caller that hard-coded that index survive a new rule inserted at index 5?",
+    "hint": "Print the id at 30, then consider what insertion does to every index after it.",
+    "solution": "```python\nfrom app.rules import RULES\n\nprint(RULES[30].id)\n```\n\nThe id is stable; index 30 is not, so the hard-coded caller would now get a different rule.",
+    "explanation": "That is the difference between an id and a position, and why `RULES_BY_ID` exists."
+  },
+  "common_mistakes": [
+    "Indexing `RULES` in application code instead of looking up by id.",
+    "Assuming the registry sorts or deduplicates.",
+    "Inserting a rule mid-file without checking what indexes it."
+  ],
+  "project_links": [
+    {
+      "label": "The registry list",
+      "path": "app/rules.py",
+      "lines": "113-130"
+    },
+    {
+      "label": "Lookup by id",
+      "path": "app/rules.py",
+      "lines": "1490-1491"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "tests/test_rules.py — the registry tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "registry — the ordered list of registered rules",
+    "registration — appending a rule at import time",
+    "stable id — a name that survives reordering"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.9.js */
+/* 8.9 — Benign-input regression tests
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.9",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "Benign-input regression tests",
+  "order": 809,
+  "duration_min": 25,
+  "concept_md": "### The test that keeps a rule honest\n\nA rule that fires on everything is worse than no rule. `test_benign_lines_do_not_fire` is parametrised over lines that look suspicious and are not — a comment mentioning a password, an `os.environ` read, a variable called `token` — and asserts silence.\n\n### Why parametrised\n\nBecause each false positive is a separate lesson. One test with twenty cases fails with the offending line in the id, so the failure names the input rather than saying \"the rule is wrong\".\n\n### What it protects\n\nThree things at once: the regex, the exemption list, and the test-file skip. A change to any of them can make a benign line fire, and this is the only check that would notice.\n\n### The discipline\n\nWhen a rule is added, a benign line goes with it. When a false positive is reported, the line is added to this list before the regex is changed — so the fix is proven by a test that failed first, which is the only way to know the test is real.\n\n### Reading a failure\n\nWhen the parametrised test fails, the id carries the input, so the failure reads as the line rather than as a rule name. That is deliberate: the first question is always which input, not which rule.",
+  "code_examples": [
+    {
+      "id": "8.9-ex-0",
+      "lang": "python",
+      "caption": "Benign lines, and the one that is not",
+      "code": "from app.rules import LineContext, RULES, review_lines\n\nbenign = [\n    \"password = os.environ[\\\"PASSWORD\\\"]\",\n    \"# TODO: never hardcode the API key here\",\n    \"token_count = 0\",\n]\nfor text in benign:\n    found = review_lines(\"app/demo.py\", [(1, text)])\n    print(\"%-42s -> %d finding(s)\" % (text[:40], len(found)))",
+      "runnable": true,
+      "run_tier": "browser",
+      "expected_output": "password = os.environ[\"PASSWORD\"]          -> 0 finding(s)\n# TODO: never hardcode the API key here    -> 1 finding(s)\ntoken_count = 0                            -> 0 finding(s)",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py",
+        "app/rules.py"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the benign-line test protect?",
+      "options": [
+        "Only the regex itself",
+        "The regex, the exemptions and the skip",
+        "Only the severity chosen for the rule",
+        "Only the OWASP citation"
+      ],
+      "answer": 1,
+      "why": "Any of the three can turn a benign line into a finding, and this parametrised test is the only check that would notice."
+    },
+    {
+      "q": "Why is the test parametrised per line?",
+      "options": [
+        "So it runs faster",
+        "So it can be skipped in CI",
+        "So a failure names the input",
+        "So each line gets a severity"
+      ],
+      "answer": 2,
+      "why": "The failing case id carries the line, so the report points at the input rather than saying the rule is wrong."
+    },
+    {
+      "q": "What is the right order when a false positive is reported?",
+      "options": [
+        "Change the regex, then add the line",
+        "Lower the rule's severity",
+        "Delete the rule",
+        "Add the line, then change the regex"
+      ],
+      "answer": 3,
+      "why": "The line has to fail first, or the test you add afterwards proves nothing about the fix."
+    }
+  ],
+  "try_it": {
+    "prompt": "Find one benign line that does fire, if any exists.",
+    "starter": "",
+    "solution": "```python\nfrom app.rules import review_lines\n\nfor text in (\"key = os.environ['KEY']\", \"api_key = 'not-a-real-key'\", \"# password: see vault\"):\n    print(bool(review_lines(\"app/a.py\", [(1, text)])), text)\n```",
+    "explanation": "The second line fires and the other two are silent — `api_key = 'not-a-real-key'` matches the hardcoded-credential rule, which is the false positive the prompt asks you to find."
+  },
+  "exercise": {
+    "prompt": "Run the same fake AWS key through `app/demo.py` and `tests/test_demo.py`. Are the two answers different, and why?",
+    "hint": "Look at whether the rule was registered with the test-file skip.",
+    "solution": "```python\nfrom app.rules import review_lines\n\nline = \"KEY = 'AKIAIOSFODNN7EXAMPLE'\"\nprint(len(review_lines(\"app/demo.py\", [(1, line)])))\nprint(len(review_lines(\"tests/test_demo.py\", [(1, line)])))\n```\n\nBoth print 1: `secret/aws-access-key` never inspects the path. A 40-character random literal is different — it also trips `secret/high-entropy-string`, which skips test files, so app/ gives 2 and tests/ gives 1.",
+    "explanation": "The path matters only for the rules that check it themselves; a prefix match like the AWS key does not, which is why the two answers agree for one rule and differ for another."
+  },
+  "common_mistakes": [
+    "Adding a rule without a benign line beside it.",
+    "Fixing a false positive by lowering the severity instead of narrowing the pattern.",
+    "Assuming a fixture key and a leaked key are judged the same."
+  ],
+  "project_links": [
+    {
+      "label": "The benign-line test",
+      "path": "tests/test_rules.py",
+      "lines": "232-259"
+    },
+    {
+      "label": "The path check it relies on",
+      "path": "app/rules.py",
+      "lines": "105-109"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "tests/test_rules.py — the rule tests",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/tests/test_rules.py"
+    },
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    }
+  ],
+  "glossary_terms": [
+    "false positive — a finding on a line that is not a defect",
+    "parametrised test — one test body run over many inputs",
+    "regression — a case that once failed and must keep passing"
+  ]
+});
+
+</script>
+<script>
+/* content/part-8/lesson-8.10.js */
+/* 8.10 — Guided read and rebuild against the rule tests
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "8.10",
+  "part": 8,
+  "part_title": "The rule engine",
+  "title": "Guided read and rebuild against the rule tests",
+  "order": 810,
+  "duration_min": 30,
+  "concept_md": "### Reading the file in order\n\n`app/rules.py` is 1615 lines and reads in five parts. **The types** — `RuleCategory`, `RuleHit`, `LineContext`, `Rule` — at the top, because everything below uses them. **The registry machinery** — `RULES`, `_register`, `_rule`, `_pattern_rule` — next, so a rule can be declared before it is written. **The helpers** — entropy, comment stripping, the marker regex — which the checks call. **The checks**, one function each, in registration order. **The entry points** — `review_lines` and `review_diff` — which walk the lines and call every rule.\n\n### Why that order\n\nReading top to bottom, no name is used before it is defined, and the file can be imported without side effects beyond building the registry. The same property makes it testable: importing the module gives you the whole rule set with nothing running.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_rules.py` is a small suite you can run against your own implementation. Start with `Rule`, `RuleHit` and `LineContext`; add two rules; then run the tests and read the failures — they are written to name the missing behaviour rather than a line number.\n\n### What to look for as you read\n\nEvery check returns either `None` or a hit, never a list. Every regex goes through `scan_text`. Every rule has a citation. When those three hold across 63 functions, the file is consistent; when one does not, that is the bug.",
+  "code_examples": [
+    {
+      "id": "8.10-ex-0",
+      "lang": "console",
+      "caption": "The types come first, then the registry machinery",
+      "code": "grep -n '^class \\|^def ' app/rules.py | head -6",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "59:class RuleCategory(str, Enum):\n75:class RuleHit:\n83:class LineContext:\n113:class Rule:\n128:def _register(rule: Rule) -> None:\n133:def _rule("
+    },
+    {
+      "id": "8.10-ex-1",
+      "lang": "console",
+      "caption": "The rebuild suite skips until you write the module, then runs",
+      "code": "python -m pytest -q rebuild/tests/test_rebuild_rules.py 2>&1 | tail -3",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
+      "expected_output": "sssss                                                                    [100%]\n5 skipped in 0.35s"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which part of the file must come first?",
+      "options": [
+        "The entry points, which are public",
+        "The checks, which are the content",
+        "The types, which everything uses",
+        "The registry, which is a plain list"
+      ],
+      "answer": 2,
+      "why": "Reading top to bottom, no name is used before it is defined, which is also what makes the module importable without side effects."
+    },
+    {
+      "q": "What does importing the module give you?",
+      "options": [
+        "A review of the current directory",
+        "A live model-provider connection",
+        "A database handle",
+        "The whole registry, nothing running"
+      ],
+      "answer": 3,
+      "why": "The only import-time work is building the registry, which is why the rule layer is provable offline."
+    },
+    {
+      "q": "What shape does every check function return?",
+      "options": [
+        "`None` or a single `RuleHit`",
+        "A list of hits, possibly empty",
+        "A boolean",
+        "A tuple of hit and line number"
+      ],
+      "answer": 0,
+      "why": "One line, one hit: the engine accumulates across lines, so a check that returned a list would duplicate that job."
+    }
+  ],
+  "try_it": {
+    "prompt": "Count the check functions and compare with the registry size.",
+    "starter": "",
+    "solution": "```console\n$ grep -c \"^def _check_\" app/rules.py\n$ python -c \"from app.rules import RULES; print(len(RULES))\"\n```",
+    "explanation": "There are fewer hand-written checks than rules, because most rules are declared with `_pattern_rule`."
+  },
+  "exercise": {
+    "prompt": "Read `_check_sql_injection` and name the one thing it checks that a pure regex could not.",
+    "hint": "It looks at the sibling lines, not only its own.",
+    "solution": "```console\n$ sed -n '625,650p' app/rules.py\n```\n\nIt inspects surrounding added lines for the concatenation that makes the string a query, which is why it is hand-written rather than a pattern rule.",
+    "explanation": "The sibling lines are in the context for exactly this: a check that needs a little more than its own line, but not the whole file."
+  },
+  "common_mistakes": [
+    "Writing a check that returns a list; the engine accumulates.",
+    "Calling `re.search` on `ctx.text` instead of `ctx.scan_text`.",
+    "Adding a rule without registering it, so the registry and the file disagree."
+  ],
+  "project_links": [
+    {
+      "label": "The entry point that walks the lines",
+      "path": "app/rules.py",
+      "lines": "1515-1568"
+    },
+    {
+      "label": "The rebuild suite",
+      "path": "rebuild/tests/test_rebuild_rules.py",
+      "lines": "1-86"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/rules.py — the rule engine",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/rules.py"
+    },
+    {
+      "label": "rebuild/README.md — the rebuild exercises",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/rebuild/README.md"
+    }
+  ],
+  "glossary_terms": [
+    "guided read — a walk through a file in dependency order",
+    "rebuild exercise — reimplementing a module against its tests",
+    "entry point — the function a caller uses to run the rules"
   ]
 });
 

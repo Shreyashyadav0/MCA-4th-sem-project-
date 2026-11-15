@@ -95,7 +95,7 @@ window.LESSONS.push({
     {
       "label": "The rule registry a comprehension would flatten",
       "path": "app/rules.py",
-      "lines": "113-158"
+      "lines": "112-124"
     }
   ],
   "learn_more": [

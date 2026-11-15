@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The testing document: what the suite covers",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "27-75"
     }
   ],
   "learn_more": [

@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-490"
+      "lines": "467-478"
     },
     {
       "label": "The guard that decides whether to check",

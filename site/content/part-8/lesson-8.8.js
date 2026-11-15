@@ -90,7 +90,7 @@ window.LESSONS.push({
     {
       "label": "Lookup by id",
       "path": "app/rules.py",
-      "lines": "145-168"
+      "lines": "1490-1491"
     }
   ],
   "learn_more": [

@@ -85,12 +85,12 @@ window.LESSONS.push({
     {
       "label": "The marker regex",
       "path": "app/rules.py",
-      "lines": "197-365"
+      "lines": "334"
     },
     {
       "label": "The helper that reads it",
       "path": "app/rules.py",
-      "lines": "1490-1512"
+      "lines": "1494-1512"
     }
   ],
   "learn_more": [

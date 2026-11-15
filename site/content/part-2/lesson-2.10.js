@@ -32,7 +32,7 @@ window.LESSONS.push({
     {
       "q": "What decides dataclass or BaseModel in this repository?",
       "options": [
-        "Performance",
+        "That dataclasses ignore annotations entirely",
         "The number of fields",
         "Whether the data arrives from outside the program",
         "Whether it needs to be frozen"
@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
-        "That a frozen dataclass cannot be compared for equality",
+        "That a frozen dataclass ignores its annotations",
         "That frozen dataclasses cannot be compared for equality",
         "That a dataclass is always faster than a BaseModel",
         "That annotations are not enforced at runtime without a validator"
@@ -94,7 +94,7 @@ window.LESSONS.push({
     {
       "label": "InlineComment and ReviewPayload — frozen dataclasses at the posting seam",
       "path": "app/github_client.py",
-      "lines": "154-200"
+      "lines": "163-206"
     }
   ],
   "learn_more": [

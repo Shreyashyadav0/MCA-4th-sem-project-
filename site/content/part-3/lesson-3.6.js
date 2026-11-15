@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The one skipped test and its marker",
       "path": "tests/test_openai_compat_provider.py",
-      "lines": "1037-1078"
+      "lines": "1062-1085"
     },
     {
       "label": "How a skip differs from a failure",
       "path": "TESTING.md",
-      "lines": "181-199"
+      "lines": "189-214"
     }
   ],
   "learn_more": [

@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "A rule that compares two fields of the same model belongs where?",
       "options": [
         "A `@model_validator`, which can see both",
-        "TypeError, which aborts validation before any field is checked",
+        "`TypeError`, which Pydantic re-raises unchanged",
         "A `Field(...)` constraint",
         "A separate function called by the caller"
       ],
@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "What should a validator raise to reject a value?",
       "options": [
-        "`ValueError`, which Pydantic wraps into a validation entry",
+        "`TypeError`, which Pydantic re-raises unchanged",
         "`SystemExit`, which stops the run at once",
         "`ValueError`, which Pydantic wraps into a ValidationError entry",
         "`AssertionError`, which pytest reports as a failure"
@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "The before-mode model validator",
       "path": "app/models.py",
-      "lines": "166-181"
+      "lines": "171-177"
     }
   ],
   "learn_more": [

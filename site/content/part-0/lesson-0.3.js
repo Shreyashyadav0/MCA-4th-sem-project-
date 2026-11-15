@@ -94,7 +94,7 @@ window.LESSONS.push({
     {
       "label": "The targets you will actually type: verify, test, lint, run",
       "path": "Makefile",
-      "lines": "1-36"
+      "lines": "1-38"
     }
   ],
   "learn_more": [

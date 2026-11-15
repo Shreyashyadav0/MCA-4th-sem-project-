@@ -55,6 +55,10 @@ def bad_start(lines: list[str], start: int) -> str | None:
     return None
 
 
+def start_of(lines: list[str], end: int) -> int:
+    return end
+
+
 def bad_end(lines: list[str], end: int) -> str | None:
     """Why this line cannot end a range, or None.
 
@@ -69,6 +73,8 @@ def bad_end(lines: list[str], end: int) -> str | None:
         return "mid-call"
     if end == len(lines) - 1:
         return None
+    if end == start_of(lines, end):
+        return None  # a one-line range whose line does not dangle
     nxt = lines[end + 1]
     if not nxt.strip():
         return None

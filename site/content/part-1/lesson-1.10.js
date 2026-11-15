@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The expected-label shape this exercise mirrors",
       "path": "benchmarks/loader.py",
-      "lines": "92-112"
+      "lines": "91-109"
     },
     {
       "label": "The compiled hunk-header pattern",
       "path": "app/parser.py",
-      "lines": "62-70"
+      "lines": "62-66"
     }
   ],
   "learn_more": [

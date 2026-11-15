@@ -74,7 +74,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Name three fields the two models share and one only `FileDiff` has.",
     "hint": "The shared ones are the summary's whole content.",
-    "solution": "```text\nShared: path, change, added_spans (also added_line_count, hunk_count, binary).\nOnly FileDiff: hunks (and therefore lines, old_path, new_path).\n```",
+    "solution": "```text\nShared: path, change, added_spans (also added_line_count, binary).\nOnly FileDiff: hunks (and therefore lines, old_path, new_path).\n```",
     "explanation": "The summary is the diff minus the hunks — which is exactly why it can be derived from it."
   },
   "common_mistakes": [

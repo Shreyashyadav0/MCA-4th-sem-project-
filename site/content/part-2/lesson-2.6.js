@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "AnchoredFinding: a model wrapping another model",
       "path": "app/models.py",
-      "lines": "108-130"
+      "lines": "108-122"
     }
   ],
   "learn_more": [

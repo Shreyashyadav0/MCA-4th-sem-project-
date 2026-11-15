@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The regex that recognises the `diff --git` header",
       "path": "app/parser.py",
-      "lines": "61-66"
+      "lines": "61"
     }
   ],
   "learn_more": [

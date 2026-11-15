@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The GitHubError family: one base, four subclasses",
       "path": "app/github_client.py",
-      "lines": "124-160"
+      "lines": "124-155"
     },
     {
       "label": "read_source — raising ReviewInputError with `from exc`",

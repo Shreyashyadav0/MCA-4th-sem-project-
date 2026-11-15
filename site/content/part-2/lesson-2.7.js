@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "Severity: the str-valued Enum with a rank",
       "path": "app/models.py",
-      "lines": "46-61"
+      "lines": "46-57"
     },
     {
       "label": "The provider field typed as a Literal",

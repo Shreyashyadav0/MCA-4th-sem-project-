@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "A parametrised test that asserts on an exit code",
       "path": "tests/test_cli.py",
-      "lines": "62-82"
+      "lines": "62-73"
     },
     {
       "label": "The layers the suite covers",
       "path": "TESTING.md",
-      "lines": "71-110"
+      "lines": "27-75"
     }
   ],
   "learn_more": [

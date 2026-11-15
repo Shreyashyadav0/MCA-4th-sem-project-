@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The OWASP mapping and the gaps",
   "order": 807,
   "duration_min": 30,
-  "concept_md": "### Every rule carries a citation\n\nEach `Rule` has an `owasp` string — `A02:2021-Cryptographic Failures`, `A03:2021-Injection` — and the registry holds nine distinct values across 63 rules. That is a claim a reader can check: this check is an instance of that published category.\n\n### Why it is a string and not an enum\n\nBecause the citation must be quotable in a report and readable in a JSON response without a lookup table. A string also lets a future rule cite something the enum does not yet name.\n\n### The gaps are real\n\nNine values for ten categories, and no rule cites `A04:2021-Insecure Design` — a design flaw is not detectable by a regex over one line, so the tool does not pretend. That is the honest reading: the mapping says what each rule is an instance of, not that the tool covers the OWASP Top Ten.\n\n### What to do with it\n\nIn a report, group by citation to show which class of defect a change introduces. In a review, a rule with a citation is arguable; a rule without one is opinion. If you add a rule, add its citation — and if there is none, say so rather than inventing one.",
+  "concept_md": "### Every rule carries a citation\n\nEach `Rule` has an `owasp` string — `A02:2021-Cryptographic Failures`, `A03:2021-Injection` — and the registry holds nine distinct values across 63 rules. That is a claim a reader can check: this check is an instance of that published category.\n\n### Why it is a string and not an enum\n\nBecause the citation must be quotable in a report and readable in a JSON response without a lookup table. A string also lets a future rule cite something the enum does not yet name.\n\n### The gaps are real\n\nNine of the ten 2021 entries are cited. The one nothing cites is `A06:2021-Vulnerable and Outdated Components` — a dependency pin is not visible on an added line, so no rule can claim it. `A04:2021-Insecure Design` *is* cited, by eleven rules, which is the tool saying a design smell can sometimes be seen in a single line. That is the honest reading: the mapping says what each rule is an instance of, not that the tool covers the OWASP Top Ten.\n\n### What to do with it\n\nIn a report, group by citation to show which class of defect a change introduces. In a review, a rule with a citation is arguable; a rule without one is opinion. If you add a rule, add its citation — and if there is none, say so rather than inventing one.",
   "code_examples": [
     {
       "id": "8.7-ex-0",
@@ -53,22 +53,22 @@ window.LESSONS.push({
       "why": "The report and the API both show the text; a string also lets a new rule cite something the enum has not named."
     },
     {
-      "q": "What does the absence of an `A04` citation tell a reader?",
+      "q": "Which 2021 entry does no rule cite?",
       "options": [
-        "The tool has a bug in the mapping",
-        "A design flaw is not line-local",
-        "A04 was deprecated in the 2021 list",
-        "No rule in the registry is CRITICAL"
+        "A06, vulnerable and outdated components",
+        "A04, insecure design",
+        "A02, cryptographic failures",
+        "A10, server-side request forgery"
       ],
-      "answer": 1,
-      "why": "Insecure design is a property of the whole design; a rule over one added line cannot establish it, so nothing cites it."
+      "answer": 0,
+      "why": "A dependency version is not visible on an added line, so no line-local rule can claim that entry; A04 is cited by eleven rules."
     }
   ],
   "try_it": {
     "prompt": "Print every rule that cites injection.",
     "starter": "",
     "solution": "```python\nfrom app.rules import RULES\n\nfor r in RULES:\n    if \"Injection\" in r.owasp:\n        print(r.id, \"|\", r.owasp)\n```",
-    "explanation": "The injection citation is the largest single group, matching the 14 injection rules."
+    "explanation": "A02 (cryptographic failures) is the largest group with 20 rules; A03 covers 11 of the 14 injection rules, because three of them cite a neighbouring weakness."
   },
   "exercise": {
     "prompt": "Which category maps to the most distinct OWASP citations, and which to the fewest? Check it.",
@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The owasp field on a rule",
       "path": "app/rules.py",
-      "lines": "113-125"
+      "lines": "119"
     },
     {
       "label": "Where the citation is registered",
