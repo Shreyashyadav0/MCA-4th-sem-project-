@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "`re.match` and `re.search` differ in what way?",
       "options": [
         "match is faster because it stops at the first character that fails",
-        "match anchors at the start; search scans the whole string for the pattern",
+        "match anchors at the start",
         "search only ever returns the first capture group it finds",
         "They are the same function, kept under two names for history"
       ],

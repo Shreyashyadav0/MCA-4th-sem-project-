@@ -86,7 +86,7 @@ window.LESSONS.push({
     {
       "label": "The builder and its slots",
       "path": "app/parser.py",
-      "lines": "305-342"
+      "lines": "305-340"
     },
     {
       "label": "Where the hunk header is read",

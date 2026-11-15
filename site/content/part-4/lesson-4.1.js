@@ -15,10 +15,10 @@ window.LESSONS.push({
       "id": "4.1-ex-0",
       "lang": "console",
       "caption": "The banner endpoint, read field by field",
-      "code": "curl -s -i http://127.0.0.1:8000/",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"name\":\"Autonomous AI Code Reviewer & PR Assistant\",\"version\":\"0.1.0\",\"mode\":\"mock\",\"rules\":63,\"endpoints\":[\"/health\",\"/rules\",\"/review\",\"/test-review\",\"/webhook\",\"/docs\"],\"docs\":\"/docs\"}",
+      "expected_output": "{\"name\":\"Autonomous AI Code Reviewer & PR Assistant\",\"version\":\"0.1.0\",\"mode\":\"mock\",\"rules\":63,\"endpoints\":[\"/health\",\"/rules\",\"/review\",\"/test-review\",\"/webhook\",\"/docs\"],\"docs\":\"/docs\"}\n200",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "What does `mode: \"mock\"` in that body tell you?",
       "options": [
-        "That no provider is configured, so the rules answered",
+        "That no provider is configured",
         "That the request failed and was retried once",
         "That the answer was served from a cache",
         "That this endpoint is read-only by design"
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The banner endpoint",
       "path": "app/main.py",
-      "lines": "879-890"
+      "lines": "879-889"
     },
     {
       "label": "What the service says it is",

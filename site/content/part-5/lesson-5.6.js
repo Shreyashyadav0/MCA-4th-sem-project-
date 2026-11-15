@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The flag on FileDiff, and on FileSummary",
       "path": "app/parser.py",
-      "lines": "152-205"
+      "lines": "152-203"
     },
     {
       "label": "Where the summary copies it",

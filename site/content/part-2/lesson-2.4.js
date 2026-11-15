@@ -44,7 +44,7 @@ window.LESSONS.push({
     {
       "q": "A frozen model cannot be changed. How do you produce a valid variant?",
       "options": [
-        "`model_validate({**model.model_dump(), ...})`, so the change is checked",
+        "`model_validate({**model.model_dump(), ...})`",
         "`model_copy(update={...})` and nothing else",
         "`copy.deepcopy` and then assign to the field",
         "Unfreeze the config for that one field"
@@ -85,12 +85,12 @@ window.LESSONS.push({
     {
       "label": "The model_config line, quoted above",
       "path": "app/models.py",
-      "lines": "68-75"
+      "lines": "68-105"
     },
     {
       "label": "A second model with a different config",
       "path": "app/models.py",
-      "lines": "151-160"
+      "lines": "151-194"
     }
   ],
   "learn_more": [

@@ -84,12 +84,12 @@ window.LESSONS.push({
     {
       "label": "The field validator on line",
       "path": "app/models.py",
-      "lines": "82-100"
+      "lines": "68-105"
     },
     {
       "label": "The before-mode model validator",
       "path": "app/models.py",
-      "lines": "168-180"
+      "lines": "166-181"
     }
   ],
   "learn_more": [

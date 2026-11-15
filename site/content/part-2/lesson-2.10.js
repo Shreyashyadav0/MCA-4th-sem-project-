@@ -94,7 +94,7 @@ window.LESSONS.push({
     {
       "label": "InlineComment and ReviewPayload — frozen dataclasses at the posting seam",
       "path": "app/github_client.py",
-      "lines": "162-195"
+      "lines": "154-200"
     }
   ],
   "learn_more": [

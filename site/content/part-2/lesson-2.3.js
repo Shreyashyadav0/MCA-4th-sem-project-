@@ -36,7 +36,7 @@ window.LESSONS.push({
         "Yes, with an empty default",
         "Only when the model is frozen",
         "Yes, if the type is str",
-        "No: the field is still required, and must also be long enough"
+        "No: the field is still required"
       ],
       "answer": 3,
       "why": "A constraint narrows what is acceptable; a default is what makes a field optional. Confusing the two produces a field that is optional and always invalid."

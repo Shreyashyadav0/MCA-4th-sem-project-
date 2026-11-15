@@ -15,10 +15,10 @@ window.LESSONS.push({
       "id": "4.5-ex-0",
       "lang": "console",
       "caption": "A 404 with a sentence that names what was missing",
-      "code": "curl -s -i http://127.0.0.1:8000/rules/nope",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/rules/nope",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 404 Not Found\ncontent-type: application/json\n\n{\"detail\":\"no rule with id 'nope'\"}",
+      "expected_output": "{\"detail\":\"no rule with id 'nope'\"}\n404",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -78,17 +78,17 @@ window.LESSONS.push({
     {
       "label": "The 403 and 404 raises",
       "path": "app/main.py",
-      "lines": "427-429"
+      "lines": "415-430"
     },
     {
       "label": "The unknown-rule 404",
       "path": "app/main.py",
-      "lines": "933-936"
+      "lines": "931-942"
     },
     {
       "label": "The signature 401",
       "path": "app/main.py",
-      "lines": "1174-1179"
+      "lines": "1146-1284"
     }
   ],
   "learn_more": [

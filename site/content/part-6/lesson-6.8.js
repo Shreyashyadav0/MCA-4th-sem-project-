@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The patterns and the severity ladder",
       "path": "app/models.py",
-      "lines": "42-58"
+      "lines": "42-57"
     },
     {
       "label": "The finding and its anchored wrapper",
       "path": "app/models.py",
-      "lines": "68-124"
+      "lines": "68-122"
     },
     {
       "label": "The result and its computed values",

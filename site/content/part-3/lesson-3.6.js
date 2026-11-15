@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "What does an `xpass` mean?",
       "options": [
-        "A test marked `xfail` that passed — usually a stale marker",
+        "A test marked `xfail` that passed",
         "A test that failed twice",
         "A skipped test",
         "A test that errored"
@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Because xfail is deprecated",
         "Because it runs too slowly",
-        "Because nothing is broken — the environment lacks a prerequisite",
+        "Because nothing is broken",
         "Because it is not parametrised"
       ],
       "answer": 2,
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The one skipped test and its marker",
       "path": "tests/test_openai_compat_provider.py",
-      "lines": "1055-1075"
+      "lines": "1037-1078"
     },
     {
       "label": "How a skip differs from a failure",

@@ -27,7 +27,7 @@ window.LESSONS.push({
     {
       "q": "Why pass the command as a list rather than a string?",
       "options": [
-        "Because a shell re-splits a string, so a filename with a space becomes two arguments",
+        "Because a shell re-splits a string",
         "Because a list is shorter to write than a carefully quoted string",
         "Because subprocess refuses to run a string on Linux and macOS",
         "Because a list lets you pass the same argument more than once"
@@ -79,7 +79,7 @@ window.LESSONS.push({
     {
       "label": "read_source — the input path this CLI actually takes",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     },
     {
       "label": "reviewer.py — the entry point that calls it",

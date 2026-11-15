@@ -86,12 +86,12 @@ window.LESSONS.push({
     {
       "label": "The four change kinds",
       "path": "app/parser.py",
-      "lines": "57"
+      "lines": "57-66"
     },
     {
       "label": "The builder and its explicit_change slot",
       "path": "app/parser.py",
-      "lines": "305-342"
+      "lines": "305-340"
     }
   ],
   "learn_more": [

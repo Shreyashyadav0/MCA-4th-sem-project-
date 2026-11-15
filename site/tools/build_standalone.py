@@ -8,6 +8,7 @@ everything inlined has no relative links to break, so it opens correctly from
 file://, from an email attachment, or from any host.
 
     python site/tools/build_standalone.py            # writes site/standalone.html
+    python site/tools/build_standalone.py --check    # exits 1 if it is stale
 """
 
 from __future__ import annotations
@@ -53,7 +54,8 @@ def inline_js(html: str) -> str:
     return pattern.sub(replace, html)
 
 
-def main() -> int:
+def main(argv: list[str]) -> int:
+    check = "--check" in argv
     html = read(SITE / "index.html")
     html = inline_css(html)
     html = inline_js(html)
@@ -62,10 +64,20 @@ def main() -> int:
         print("FAIL: a stylesheet or script link survived inlining", file=sys.stderr)
         return 1
 
+    if check:
+        if not OUT.exists():
+            print("FAIL: %s does not exist; run without --check" % OUT.name, file=sys.stderr)
+            return 1
+        if OUT.read_text(encoding="utf-8") != html:
+            print("FAIL: %s is stale; rebuild it before publishing" % OUT.name, file=sys.stderr)
+            return 1
+        print("OK %s is current" % OUT.name)
+        return 0
+
     OUT.write_text(html, encoding="utf-8")
     print("wrote %s (%d KB)" % (OUT.name, len(html.encode("utf-8")) // 1024))
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))

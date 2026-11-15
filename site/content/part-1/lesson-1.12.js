@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "`min_severity: Severity | None = None` means what?",
       "options": [
         "A severity is required and None is not allowed",
-        "The threshold is optional; None means no threshold",
+        "The threshold is optional",
         "Severity may be passed as a plain string as well",
         "It is a longer spelling of a required parameter"
       ],
@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "PROVIDERS and the selection result",
       "path": "app/engine.py",
-      "lines": "60-100"
+      "lines": "57-67"
     },
     {
       "label": "The Literal aliases this lesson cites",
       "path": "app/parser.py",
-      "lines": "55-60"
+      "lines": "57-66"
     }
   ],
   "learn_more": [

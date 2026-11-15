@@ -84,12 +84,12 @@ window.LESSONS.push({
     {
       "label": "The enum and its rank",
       "path": "app/models.py",
-      "lines": "46-58"
+      "lines": "46-57"
     },
     {
       "label": "The sort that uses it",
       "path": "app/models.py",
-      "lines": "133-139"
+      "lines": "133-138"
     }
   ],
   "learn_more": [

@@ -79,7 +79,7 @@ window.LESSONS.push({
     {
       "label": "How the site is laid out, and what degrades offline",
       "path": "site/README.md",
-      "lines": "1-120"
+      "lines": "1-187"
     },
     {
       "label": "The curriculum this site follows",

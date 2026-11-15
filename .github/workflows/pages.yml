@@ -41,6 +41,12 @@ jobs:
           python site/tools/validate_lessons.py
           python site/tools/embed_sources.py --check
 
+      - name: The single-file build must not be stale
+        # A --check, not a rebuild: if the committed standalone.html does not
+        # match the lessons, the job fails rather than publishing a stale copy.
+        # Rebuilding here would hide the drift instead of reporting it.
+        run: python site/tools/build_standalone.py --check
+
       - name: Explain the failure if Pages is still off
         run: |
           if ! gh api "repos/$GITHUB_REPOSITORY/pages" > /dev/null 2>&1; then

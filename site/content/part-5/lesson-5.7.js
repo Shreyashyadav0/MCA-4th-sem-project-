@@ -101,12 +101,12 @@ window.LESSONS.push({
     {
       "label": "DiffBundle",
       "path": "app/parser.py",
-      "lines": "206-247"
+      "lines": "206-245"
     },
     {
       "label": "parse_diff_file, the I/O wrapper",
       "path": "app/parser.py",
-      "lines": "503-517"
+      "lines": "503-515"
     }
   ],
   "learn_more": [

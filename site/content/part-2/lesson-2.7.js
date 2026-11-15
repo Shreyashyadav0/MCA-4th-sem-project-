@@ -84,12 +84,12 @@ window.LESSONS.push({
     {
       "label": "Severity: the str-valued Enum with a rank",
       "path": "app/models.py",
-      "lines": "46-60"
+      "lines": "46-61"
     },
     {
       "label": "The provider field typed as a Literal",
       "path": "app/main.py",
-      "lines": "190-198"
+      "lines": "152-198"
     }
   ],
   "learn_more": [

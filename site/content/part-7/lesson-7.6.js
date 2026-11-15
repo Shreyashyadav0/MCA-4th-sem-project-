@@ -86,12 +86,12 @@ window.LESSONS.push({
     {
       "label": "anchor_findings",
       "path": "app/parser.py",
-      "lines": "518-574"
+      "lines": "518-572"
     },
     {
       "label": "The anchored wrapper",
       "path": "app/models.py",
-      "lines": "108-124"
+      "lines": "108-122"
     }
   ],
   "learn_more": [

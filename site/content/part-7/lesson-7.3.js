@@ -86,12 +86,12 @@ window.LESSONS.push({
     {
       "label": "FileDiff, with the hunks",
       "path": "app/parser.py",
-      "lines": "152-192"
+      "lines": "152-190"
     },
     {
       "label": "FileSummary, without them",
       "path": "app/parser.py",
-      "lines": "193-205"
+      "lines": "193-203"
     },
     {
       "label": "summaries(), which derives them",

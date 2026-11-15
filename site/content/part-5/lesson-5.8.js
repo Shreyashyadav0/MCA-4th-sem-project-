@@ -88,17 +88,17 @@ window.LESSONS.push({
     {
       "label": "DiffParseError",
       "path": "app/parser.py",
-      "lines": "69-71"
+      "lines": "69-70"
     },
     {
       "label": "The empty check",
       "path": "app/parser.py",
-      "lines": "356-357"
+      "lines": "343-365"
     },
     {
       "label": "Where the API converts it to a 422",
       "path": "app/main.py",
-      "lines": "661-664"
+      "lines": "661-668"
     }
   ],
   "learn_more": [

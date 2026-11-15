@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The response model for a review",
       "path": "app/main.py",
-      "lines": "260-302"
+      "lines": "260-301"
     },
     {
       "label": "A route that declares one",
       "path": "app/main.py",
-      "lines": "892-908"
+      "lines": "892-906"
     }
   ],
   "learn_more": [

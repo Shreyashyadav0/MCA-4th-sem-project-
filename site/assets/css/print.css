@@ -105,6 +105,18 @@
   .code-figure {
     overflow: visible; /* a long line must not be clipped on paper */
     box-shadow: none;
+    /* A short block should not be split across a page. A block taller than the
+     * page cannot be kept whole, so the code itself is allowed to flow — the
+     * card moves as one where it fits, and continues where it cannot. */
+    break-inside: avoid;
+  }
+
+  .code-figure > pre.code {
+    break-inside: auto;
+  }
+
+  .code-caption {
+    break-after: avoid; /* the label never sits alone at the foot of a page */
   }
 
   pre.code,

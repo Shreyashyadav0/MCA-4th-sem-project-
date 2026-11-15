@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "Where the row puts them",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     }
   ],
   "learn_more": [

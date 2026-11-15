@@ -57,7 +57,11 @@ TESTS_SKIPPED = 1
 RULE_COUNT = 63
 RULE_CATEGORIES = 10
 TRACKS = 7
-LOCK_PINS = 36
+def _count_pins() -> int:
+    """Count the '==' pins in the lock. Typed as 36, the lock had 37."""
+    with open(os.path.join(REPO_ROOT, "requirements.lock"), encoding="utf-8") as handle:
+        return sum(1 for line in handle if "==" in line and not line.strip().startswith("#"))
+
 FORMAT_EXAMPLES = 2
 TOTAL_HOURS = 90
 WEEKS = 16
@@ -65,6 +69,9 @@ WEEKS = 16
 # literals, and three of them had drifted from the code they described, which is
 # the one thing a study plan must never do.
 REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+
+# Counted, not typed: it said 36 while the lock had 37.
+LOCK_PINS = _count_pins()
 MODULE_FILES = (
     "models.py", "config.py", "parser.py", "rules.py", "mock_provider.py",
     "sarvam_provider.py", "openai_compat_provider.py", "engine.py",

@@ -29,7 +29,7 @@ window.LESSONS.push({
         "So the subclass can reuse the parent's methods without rewriting them",
         "Because Python requires every custom error to have a parent class",
         "So raising it is faster than raising a plain Exception instance",
-        "So one `except GitHubError` covers every posting failure, and the subclass stays available"
+        "So one `except GitHubError` covers every posting failure"
       ],
       "answer": 3,
       "why": "The hierarchy exists for the granularity of `except`: catch the base for a single handler, catch the subclass when the caller needs to distinguish."
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "What does `raise NewError(...) from exc` add?",
       "options": [
-        "The original exception as `__cause__`, so the traceback shows both failures",
+        "The original exception as `__cause__`",
         "Nothing that a reader of the traceback can actually see",
         "An automatic retry of the operation that raised the first error",
         "A warning line written to the log at WARNING level"
@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "read_source — raising ReviewInputError with `from exc`",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     }
   ],
   "learn_more": [

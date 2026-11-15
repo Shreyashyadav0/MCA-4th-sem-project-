@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "Why is the module importable without side effects?",
       "options": [
         "Because it has no module docstring",
-        "Definitions only — no work happens at import time",
+        "Definitions only",
         "Because pydantic defers validation",
         "Because it opens files lazily"
       ],
@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "Errors and path helpers",
       "path": "app/parser.py",
-      "lines": "69-110"
+      "lines": "69-109"
     },
     {
       "label": "The models",
       "path": "app/parser.py",
-      "lines": "112-300"
+      "lines": "112-302"
     },
     {
       "label": "The entry points",

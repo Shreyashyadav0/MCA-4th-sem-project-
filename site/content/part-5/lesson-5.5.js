@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "normalize_path and its three rules",
       "path": "app/parser.py",
-      "lines": "73-88"
+      "lines": "73-86"
     },
     {
       "label": "The added-file block in the sample",

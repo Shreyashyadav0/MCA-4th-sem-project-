@@ -86,12 +86,12 @@ window.LESSONS.push({
     {
       "label": "normalize_path, all four rules",
       "path": "app/parser.py",
-      "lines": "73-88"
+      "lines": "73-86"
     },
     {
       "label": "The confinement check that rejects an escape",
       "path": "app/main.py",
-      "lines": "425-429"
+      "lines": "415-430"
     }
   ],
   "learn_more": [

@@ -91,7 +91,7 @@ window.LESSONS.push({
     {
       "label": "The I/O wrapper",
       "path": "app/parser.py",
-      "lines": "503-517"
+      "lines": "503-515"
     }
   ],
   "learn_more": [

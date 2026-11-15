@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Try it yourself — AI Code Reviewer</title>
+  <script>
+    /* Applied before first paint: reading localStorage in app.js meant a dark
+     * reader saw a light page for ~300 ms on every navigation. Inline and
+     * synchronous, because a fetch would not run from file://. */
+    (function () {
+      try {
+        var theme = localStorage.getItem("ai-reviewer-learning-theme-v1");
+        if (theme === "dark" || theme === "light") {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      } catch (error) {
+        /* Private mode can throw on localStorage; light is the default. */
+      }
+    })();
+  </script>
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/layout.css">
 <link rel="stylesheet" href="assets/css/components.css">

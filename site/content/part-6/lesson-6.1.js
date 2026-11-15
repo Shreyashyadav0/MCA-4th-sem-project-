@@ -44,7 +44,7 @@ window.LESSONS.push({
       "q": "Why is `frozen=True` on `Finding`?",
       "options": [
         "It makes the model faster to construct",
-        "A finding is a record, and a record that can change is not one",
+        "A finding is a record",
         "It allows the model to be hashed",
         "It prevents the fields from being validated"
       ],
@@ -84,12 +84,12 @@ window.LESSONS.push({
     {
       "label": "The Finding model and its config",
       "path": "app/models.py",
-      "lines": "68-106"
+      "lines": "68-105"
     },
     {
       "label": "The five-field row",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     }
   ],
   "learn_more": [

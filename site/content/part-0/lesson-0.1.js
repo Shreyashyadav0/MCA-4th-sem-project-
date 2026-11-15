@@ -104,7 +104,7 @@ window.LESSONS.push({
     {
       "label": "The honesty ledger: what is real, simulated and deferred",
       "path": "HANDOFF.md",
-      "lines": "1-38"
+      "lines": "1-53"
     },
     {
       "label": "The recovery checklist for picking the project back up",

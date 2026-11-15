@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "You loop over the same generator twice and the second loop is empty. Why?",
       "options": [
         "A bug in Python",
-        "A generator is consumed once; the second loop has nothing left",
+        "A generator is consumed once",
         "The loop variable was reused",
         "The generator needs to be restarted manually"
       ],
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "`parse_diff` returns the whole `DiffBundle` at once rather than yielding files. Why is that the right choice here?",
       "options": [
-        "Because anchoring needs the complete bundle — every file and hunk — before a finding is placed",
+        "Because anchoring needs the complete bundle",
         "Because Python cannot yield from inside a recursive parser",
         "Because generators are slower than lists for inputs this small",
         "Because the diff is always small enough to fit in memory"
@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "parse_diff — the entry point that walks the diff once",
       "path": "app/parser.py",
-      "lines": "343-370"
+      "lines": "343-500"
     }
   ],
   "learn_more": [

@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The seven-case parametrised test quoted above",
       "path": "tests/test_cli.py",
-      "lines": "62-80"
+      "lines": "62-82"
     },
     {
       "label": "A parametrised test over hostile paths",
       "path": "tests/test_api.py",
-      "lines": "205-220"
+      "lines": "205-218"
     }
   ],
   "learn_more": [

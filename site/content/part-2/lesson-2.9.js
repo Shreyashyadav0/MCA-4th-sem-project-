@@ -45,7 +45,7 @@ window.LESSONS.push({
       "options": [
         "So the caller decides what a failed parse means",
         "Because exceptions cost more than a returned None does",
-        "So the caller decides what a failed parse means — skip it, count it, or fall back",
+        "So the caller decides what a failed parse means",
         "So the error is hidden from whoever reads the log"
       ],
       "answer": 2,
@@ -57,7 +57,7 @@ window.LESSONS.push({
         "A traceback line",
         "Only a message string",
         "The model's JSON schema",
-        "`loc`, `msg`, `type` and `input` — data you can filter"
+        "`loc`, `msg`, `type` and `input`"
       ],
       "answer": 3,
       "why": "Entries are dicts, which is what makes \"count the extra-key failures\" a one-liner instead of string parsing."
@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The parse that raises, and the catch that degrades",
       "path": "app/openai_compat_provider.py",
-      "lines": "540-580"
+      "lines": "491-578"
     },
     {
       "label": "Finding, the model being parsed",

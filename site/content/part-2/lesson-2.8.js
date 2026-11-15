@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
         "It makes the dump faster by skipping validation entirely",
-        "It converts values to JSON-safe primitives, so enums become strings",
+        "It converts values to JSON-safe primitives",
         "It makes the dump faster by skipping validation",
         "It sorts the keys so two dumps compare equal"
       ],
@@ -56,7 +56,7 @@ window.LESSONS.push({
       "options": [
         "Because a computed field is in the dump and the model never declared it",
         "Because the dump contains a key whose value is None",
-        "Because the dump contains a computed field the model never declared, and `extra=\"forbid\"` would reject it",
+        "Because the dump contains a computed field the model never declared",
         "Because `extra=\"forbid\"` rejects every field not set explicitly"
       ],
       "answer": 2,
@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The response model FastAPI serialises",
       "path": "app/main.py",
-      "lines": "260-285"
+      "lines": "260-301"
     },
     {
       "label": "The computed verdict field",

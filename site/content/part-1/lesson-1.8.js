@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The /rules handler: a decorator with arguments over an ordinary function",
       "path": "app/main.py",
-      "lines": "909-922"
+      "lines": "909-921"
     }
   ],
   "learn_more": [

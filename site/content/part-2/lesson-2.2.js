@@ -43,7 +43,7 @@ window.LESSONS.push({
         "It is coerced to 2, because the string is unambiguously numeric",
         "It stays the string \"2\" and fails on the next comparison",
         "It silently becomes 0, the field's default value",
-        "It is coerced to 2, because the string is unambiguously an integer"
+        "It is coerced to 2"
       ],
       "answer": 3,
       "why": "Pydantic coerces where the conversion is unambiguous; `\"2\"` is, `\"high\"` is not, which is the line between leniency and guessing."
@@ -86,7 +86,7 @@ window.LESSONS.push({
     {
       "label": "default_factory on a list field",
       "path": "app/models.py",
-      "lines": "155-165"
+      "lines": "151-194"
     }
   ],
   "learn_more": [

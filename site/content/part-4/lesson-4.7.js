@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The TestClient import and the single client",
       "path": "tests/test_api.py",
-      "lines": "17-23"
+      "lines": "17-27"
     },
     {
       "label": "A request asserted on status and body",
       "path": "tests/test_api.py",
-      "lines": "135-150"
+      "lines": "135-152"
     }
   ],
   "learn_more": [

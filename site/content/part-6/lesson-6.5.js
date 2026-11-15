@@ -84,12 +84,12 @@ window.LESSONS.push({
     {
       "label": "The config that sets all three",
       "path": "app/models.py",
-      "lines": "68-72"
+      "lines": "68-105"
     },
     {
       "label": "The fields it applies to",
       "path": "app/models.py",
-      "lines": "73-86"
+      "lines": "68-86"
     }
   ],
   "learn_more": [

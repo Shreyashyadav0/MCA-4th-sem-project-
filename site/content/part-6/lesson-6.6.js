@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "The constraints on file, issue and fix",
       "path": "app/models.py",
-      "lines": "73-86"
+      "lines": "68-86"
     }
   ],
   "learn_more": [

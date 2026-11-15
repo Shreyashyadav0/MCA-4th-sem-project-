@@ -46,7 +46,7 @@ window.LESSONS.push({
       "options": [
         "Lists cannot be used as default values in Python",
         "The list is copied for each call, which is wasteful",
-        "The list is created once, at def time, and shared by every call",
+        "The list is created once, at def time",
         "It raises a SyntaxError the first time the function runs"
       ],
       "answer": 2,
@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The real review entry point: two positional, four keyword-only",
       "path": "app/engine.py",
-      "lines": "320-345"
+      "lines": "320-387"
     }
   ],
   "learn_more": [

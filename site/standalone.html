@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Code Reviewer — learn it from the code</title>
 <meta name="description" content="A W3Schools-style static learning site for the Autonomous AI Code Reviewer. Works offline, opens by double-clicking this file.">
+  <script>
+    /* Applied before first paint: reading localStorage in app.js meant a dark
+     * reader saw a light page for ~300 ms on every navigation. Inline and
+     * synchronous, because a fetch would not run from file://. */
+    (function () {
+      try {
+        var theme = localStorage.getItem("ai-reviewer-learning-theme-v1");
+        if (theme === "dark" || theme === "light") {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      } catch (error) {
+        /* Private mode can throw on localStorage; light is the default. */
+      }
+    })();
+  </script>
 <style>
 /* tokens.css — the design system's only source of colour, type and space.
  *
@@ -1785,6 +1800,18 @@ details.expected-output pre.code code {
   .code-figure {
     overflow: visible; /* a long line must not be clipped on paper */
     box-shadow: none;
+    /* A short block should not be split across a page. A block taller than the
+     * page cannot be kept whole, so the code itself is allowed to flow — the
+     * card moves as one where it fits, and continues where it cannot. */
+    break-inside: avoid;
+  }
+
+  .code-figure > pre.code {
+    break-inside: auto;
+  }
+
+  .code-caption {
+    break-after: avoid; /* the label never sits alone at the foot of a page */
   }
 
   pre.code,
@@ -4849,7 +4876,7 @@ window.LESSONS.push({
     {
       "label": "The honesty ledger: what is real, simulated and deferred",
       "path": "HANDOFF.md",
-      "lines": "1-38"
+      "lines": "1-53"
     },
     {
       "label": "The recovery checklist for picking the project back up",
@@ -4956,7 +4983,7 @@ window.LESSONS.push({
     {
       "label": "How the site is laid out, and what degrades offline",
       "path": "site/README.md",
-      "lines": "1-120"
+      "lines": "1-187"
     },
     {
       "label": "The curriculum this site follows",
@@ -5181,7 +5208,7 @@ window.LESSONS.push({
     {
       "label": "PROVIDERS and the selection result",
       "path": "app/engine.py",
-      "lines": "60-100"
+      "lines": "57-67"
     }
   ],
   "learn_more": [
@@ -5427,7 +5454,7 @@ window.LESSONS.push({
     {
       "label": "The rule registry a comprehension would flatten",
       "path": "app/rules.py",
-      "lines": "125-150"
+      "lines": "113-158"
     }
   ],
   "learn_more": [
@@ -5495,7 +5522,7 @@ window.LESSONS.push({
       "options": [
         "Lists cannot be used as default values in Python",
         "The list is copied for each call, which is wasteful",
-        "The list is created once, at def time, and shared by every call",
+        "The list is created once, at def time",
         "It raises a SyntaxError the first time the function runs"
       ],
       "answer": 2,
@@ -5534,7 +5561,7 @@ window.LESSONS.push({
     {
       "label": "The real review entry point: two positional, four keyword-only",
       "path": "app/engine.py",
-      "lines": "320-345"
+      "lines": "320-387"
     }
   ],
   "learn_more": [
@@ -5694,7 +5721,7 @@ window.LESSONS.push({
         "So the subclass can reuse the parent's methods without rewriting them",
         "Because Python requires every custom error to have a parent class",
         "So raising it is faster than raising a plain Exception instance",
-        "So one `except GitHubError` covers every posting failure, and the subclass stays available"
+        "So one `except GitHubError` covers every posting failure"
       ],
       "answer": 3,
       "why": "The hierarchy exists for the granularity of `except`: catch the base for a single handler, catch the subclass when the caller needs to distinguish."
@@ -5713,7 +5740,7 @@ window.LESSONS.push({
     {
       "q": "What does `raise NewError(...) from exc` add?",
       "options": [
-        "The original exception as `__cause__`, so the traceback shows both failures",
+        "The original exception as `__cause__`",
         "Nothing that a reader of the traceback can actually see",
         "An automatic retry of the operation that raised the first error",
         "A warning line written to the log at WARNING level"
@@ -5748,7 +5775,7 @@ window.LESSONS.push({
     {
       "label": "read_source — raising ReviewInputError with `from exc`",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     }
   ],
   "learn_more": [
@@ -5957,12 +5984,12 @@ window.LESSONS.push({
     {
       "label": "read_source — the repository's pathlib habit instead of `with open`",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     },
     {
       "label": "The rule that recommends `with open(...)` to other people's code",
       "path": "app/rules.py",
-      "lines": "1225-1245"
+      "lines": "1225-1293"
     }
   ],
   "learn_more": [
@@ -6062,7 +6089,7 @@ window.LESSONS.push({
     {
       "label": "The /rules handler: a decorator with arguments over an ordinary function",
       "path": "app/main.py",
-      "lines": "909-922"
+      "lines": "909-921"
     }
   ],
   "learn_more": [
@@ -6122,7 +6149,7 @@ window.LESSONS.push({
       "q": "You loop over the same generator twice and the second loop is empty. Why?",
       "options": [
         "A bug in Python",
-        "A generator is consumed once; the second loop has nothing left",
+        "A generator is consumed once",
         "The loop variable was reused",
         "The generator needs to be restarted manually"
       ],
@@ -6132,7 +6159,7 @@ window.LESSONS.push({
     {
       "q": "`parse_diff` returns the whole `DiffBundle` at once rather than yielding files. Why is that the right choice here?",
       "options": [
-        "Because anchoring needs the complete bundle — every file and hunk — before a finding is placed",
+        "Because anchoring needs the complete bundle",
         "Because Python cannot yield from inside a recursive parser",
         "Because generators are slower than lists for inputs this small",
         "Because the diff is always small enough to fit in memory"
@@ -6167,7 +6194,7 @@ window.LESSONS.push({
     {
       "label": "parse_diff — the entry point that walks the diff once",
       "path": "app/parser.py",
-      "lines": "343-370"
+      "lines": "343-500"
     }
   ],
   "learn_more": [
@@ -6216,7 +6243,7 @@ window.LESSONS.push({
       "q": "`re.match` and `re.search` differ in what way?",
       "options": [
         "match is faster because it stops at the first character that fails",
-        "match anchors at the start; search scans the whole string for the pattern",
+        "match anchors at the start",
         "search only ever returns the first capture group it finds",
         "They are the same function, kept under two names for history"
       ],
@@ -6321,7 +6348,7 @@ window.LESSONS.push({
     {
       "q": "Why pass the command as a list rather than a string?",
       "options": [
-        "Because a shell re-splits a string, so a filename with a space becomes two arguments",
+        "Because a shell re-splits a string",
         "Because a list is shorter to write than a carefully quoted string",
         "Because subprocess refuses to run a string on Linux and macOS",
         "Because a list lets you pass the same argument more than once"
@@ -6373,7 +6400,7 @@ window.LESSONS.push({
     {
       "label": "read_source — the input path this CLI actually takes",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     },
     {
       "label": "reviewer.py — the entry point that calls it",
@@ -6449,7 +6476,7 @@ window.LESSONS.push({
       "q": "`min_severity: Severity | None = None` means what?",
       "options": [
         "A severity is required and None is not allowed",
-        "The threshold is optional; None means no threshold",
+        "The threshold is optional",
         "Severity may be passed as a plain string as well",
         "It is a longer spelling of a required parameter"
       ],
@@ -6478,12 +6505,12 @@ window.LESSONS.push({
     {
       "label": "PROVIDERS and the selection result",
       "path": "app/engine.py",
-      "lines": "60-100"
+      "lines": "57-67"
     },
     {
       "label": "The Literal aliases this lesson cites",
       "path": "app/parser.py",
-      "lines": "55-60"
+      "lines": "57-66"
     }
   ],
   "learn_more": [
@@ -6667,7 +6694,7 @@ window.LESSONS.push({
         "It is coerced to 2, because the string is unambiguously numeric",
         "It stays the string \"2\" and fails on the next comparison",
         "It silently becomes 0, the field's default value",
-        "It is coerced to 2, because the string is unambiguously an integer"
+        "It is coerced to 2"
       ],
       "answer": 3,
       "why": "Pydantic coerces where the conversion is unambiguous; `\"2\"` is, `\"high\"` is not, which is the line between leniency and guessing."
@@ -6710,7 +6737,7 @@ window.LESSONS.push({
     {
       "label": "default_factory on a list field",
       "path": "app/models.py",
-      "lines": "155-165"
+      "lines": "151-194"
     }
   ],
   "learn_more": [
@@ -6767,7 +6794,7 @@ window.LESSONS.push({
         "Yes, with an empty default",
         "Only when the model is frozen",
         "Yes, if the type is str",
-        "No: the field is still required, and must also be long enough"
+        "No: the field is still required"
       ],
       "answer": 3,
       "why": "A constraint narrows what is acceptable; a default is what makes a field optional. Confusing the two produces a field that is optional and always invalid."
@@ -6881,7 +6908,7 @@ window.LESSONS.push({
     {
       "q": "A frozen model cannot be changed. How do you produce a valid variant?",
       "options": [
-        "`model_validate({**model.model_dump(), ...})`, so the change is checked",
+        "`model_validate({**model.model_dump(), ...})`",
         "`model_copy(update={...})` and nothing else",
         "`copy.deepcopy` and then assign to the field",
         "Unfreeze the config for that one field"
@@ -6922,12 +6949,12 @@ window.LESSONS.push({
     {
       "label": "The model_config line, quoted above",
       "path": "app/models.py",
-      "lines": "68-75"
+      "lines": "68-105"
     },
     {
       "label": "A second model with a different config",
       "path": "app/models.py",
-      "lines": "151-160"
+      "lines": "151-194"
     }
   ],
   "learn_more": [
@@ -7036,12 +7063,12 @@ window.LESSONS.push({
     {
       "label": "The field validator on line",
       "path": "app/models.py",
-      "lines": "82-100"
+      "lines": "68-105"
     },
     {
       "label": "The before-mode model validator",
       "path": "app/models.py",
-      "lines": "168-180"
+      "lines": "166-181"
     }
   ],
   "learn_more": [
@@ -7151,7 +7178,7 @@ window.LESSONS.push({
     {
       "label": "AnchoredFinding: a model wrapping another model",
       "path": "app/models.py",
-      "lines": "108-125"
+      "lines": "108-130"
     }
   ],
   "learn_more": [
@@ -7256,12 +7283,12 @@ window.LESSONS.push({
     {
       "label": "Severity: the str-valued Enum with a rank",
       "path": "app/models.py",
-      "lines": "46-60"
+      "lines": "46-61"
     },
     {
       "label": "The provider field typed as a Literal",
       "path": "app/main.py",
-      "lines": "190-198"
+      "lines": "152-198"
     }
   ],
   "learn_more": [
@@ -7319,7 +7346,7 @@ window.LESSONS.push({
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
         "It makes the dump faster by skipping validation entirely",
-        "It converts values to JSON-safe primitives, so enums become strings",
+        "It converts values to JSON-safe primitives",
         "It makes the dump faster by skipping validation",
         "It sorts the keys so two dumps compare equal"
       ],
@@ -7342,7 +7369,7 @@ window.LESSONS.push({
       "options": [
         "Because a computed field is in the dump and the model never declared it",
         "Because the dump contains a key whose value is None",
-        "Because the dump contains a computed field the model never declared, and `extra=\"forbid\"` would reject it",
+        "Because the dump contains a computed field the model never declared",
         "Because `extra=\"forbid\"` rejects every field not set explicitly"
       ],
       "answer": 2,
@@ -7370,7 +7397,7 @@ window.LESSONS.push({
     {
       "label": "The response model FastAPI serialises",
       "path": "app/main.py",
-      "lines": "260-285"
+      "lines": "260-301"
     },
     {
       "label": "The computed verdict field",
@@ -7441,7 +7468,7 @@ window.LESSONS.push({
       "options": [
         "So the caller decides what a failed parse means",
         "Because exceptions cost more than a returned None does",
-        "So the caller decides what a failed parse means — skip it, count it, or fall back",
+        "So the caller decides what a failed parse means",
         "So the error is hidden from whoever reads the log"
       ],
       "answer": 2,
@@ -7453,7 +7480,7 @@ window.LESSONS.push({
         "A traceback line",
         "Only a message string",
         "The model's JSON schema",
-        "`loc`, `msg`, `type` and `input` — data you can filter"
+        "`loc`, `msg`, `type` and `input`"
       ],
       "answer": 3,
       "why": "Entries are dicts, which is what makes \"count the extra-key failures\" a one-liner instead of string parsing."
@@ -7480,7 +7507,7 @@ window.LESSONS.push({
     {
       "label": "The parse that raises, and the catch that degrades",
       "path": "app/openai_compat_provider.py",
-      "lines": "540-580"
+      "lines": "491-578"
     },
     {
       "label": "Finding, the model being parsed",
@@ -7604,7 +7631,7 @@ window.LESSONS.push({
     {
       "label": "InlineComment and ReviewPayload — frozen dataclasses at the posting seam",
       "path": "app/github_client.py",
-      "lines": "162-195"
+      "lines": "154-200"
     }
   ],
   "learn_more": [
@@ -7811,7 +7838,7 @@ window.LESSONS.push({
     {
       "label": "A parametrised test that asserts on an exit code",
       "path": "tests/test_cli.py",
-      "lines": "62-80"
+      "lines": "62-82"
     },
     {
       "label": "The layers the suite covers",
@@ -7863,7 +7890,7 @@ window.LESSONS.push({
     {
       "q": "A test names `client` as a parameter. Where does the value come from?",
       "options": [
-        "A fixture with that name, which pytest calls and injects",
+        "A fixture with that name",
         "A global variable",
         "An import in the test file",
         "conftest.py, always"
@@ -7888,7 +7915,7 @@ window.LESSONS.push({
         "It is slower",
         "It cannot be parametrised",
         "pytest refuses to run it",
-        "State leaks between tests, so order starts to matter"
+        "State leaks between tests"
       ],
       "answer": 3,
       "why": "One shared object across the session means one test's changes are the next test's starting point."
@@ -7915,7 +7942,7 @@ window.LESSONS.push({
     {
       "label": "Real fixtures, one of them autouse",
       "path": "tests/test_auth.py",
-      "lines": "50-75"
+      "lines": "35-73"
     },
     {
       "label": "A function-scoped fixture used by many tests",
@@ -8020,12 +8047,12 @@ window.LESSONS.push({
     {
       "label": "The seven-case parametrised test quoted above",
       "path": "tests/test_cli.py",
-      "lines": "62-80"
+      "lines": "62-82"
     },
     {
       "label": "A parametrised test over hostile paths",
       "path": "tests/test_api.py",
-      "lines": "205-220"
+      "lines": "205-218"
     }
   ],
   "learn_more": [
@@ -8124,12 +8151,12 @@ window.LESSONS.push({
     {
       "label": "monkeypatch.setenv in a real test",
       "path": "tests/test_api.py",
-      "lines": "68-80"
+      "lines": "62-79"
     },
     {
       "label": "The fake-client seam the tests install",
       "path": "tests/test_cli.py",
-      "lines": "50-62"
+      "lines": "48-73"
     }
   ],
   "learn_more": [
@@ -8187,7 +8214,7 @@ window.LESSONS.push({
     {
       "q": "What does an `xpass` mean?",
       "options": [
-        "A test marked `xfail` that passed — usually a stale marker",
+        "A test marked `xfail` that passed",
         "A test that failed twice",
         "A skipped test",
         "A test that errored"
@@ -8200,7 +8227,7 @@ window.LESSONS.push({
       "options": [
         "Because xfail is deprecated",
         "Because it runs too slowly",
-        "Because nothing is broken — the environment lacks a prerequisite",
+        "Because nothing is broken",
         "Because it is not parametrised"
       ],
       "answer": 2,
@@ -8228,7 +8255,7 @@ window.LESSONS.push({
     {
       "label": "The one skipped test and its marker",
       "path": "tests/test_openai_compat_provider.py",
-      "lines": "1055-1075"
+      "lines": "1037-1078"
     },
     {
       "label": "How a skip differs from a failure",
@@ -8281,7 +8308,7 @@ window.LESSONS.push({
     {
       "q": "What does the `578 deselected` in that output tell you?",
       "options": [
-        "578 tests were not run because they did not match `-k`",
+        "578 tests were not run",
         "578 tests failed",
         "578 tests were skipped",
         "Nothing useful"
@@ -8294,7 +8321,7 @@ window.LESSONS.push({
       "options": [
         "In CI, so a single flake cannot hide the later failures",
         "In CI, always, so a run never wastes time on later tests",
-        "While fixing a failure, so the first error is the one you read",
+        "While fixing a failure",
         "Only when the suite is slow enough to time out"
       ],
       "answer": 2,
@@ -8333,7 +8360,7 @@ window.LESSONS.push({
     {
       "label": "The test targets you actually type",
       "path": "Makefile",
-      "lines": "19-30"
+      "lines": "20-38"
     },
     {
       "label": "Running a subset, documented",
@@ -8436,7 +8463,7 @@ window.LESSONS.push({
     {
       "label": "The three patches, and why loopback is exempt",
       "path": "scripts/verify_offline.py",
-      "lines": "1-40"
+      "lines": "1-47"
     },
     {
       "label": "The offline decision this proof protects",
@@ -8481,10 +8508,10 @@ window.LESSONS.push({
       "id": "4.1-ex-0",
       "lang": "console",
       "caption": "The banner endpoint, read field by field",
-      "code": "curl -s -i http://127.0.0.1:8000/",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"name\":\"Autonomous AI Code Reviewer & PR Assistant\",\"version\":\"0.1.0\",\"mode\":\"mock\",\"rules\":63,\"endpoints\":[\"/health\",\"/rules\",\"/review\",\"/test-review\",\"/webhook\",\"/docs\"],\"docs\":\"/docs\"}",
+      "expected_output": "{\"name\":\"Autonomous AI Code Reviewer & PR Assistant\",\"version\":\"0.1.0\",\"mode\":\"mock\",\"rules\":63,\"endpoints\":[\"/health\",\"/rules\",\"/review\",\"/test-review\",\"/webhook\",\"/docs\"],\"docs\":\"/docs\"}\n200",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -8503,7 +8530,7 @@ window.LESSONS.push({
     {
       "q": "What does `mode: \"mock\"` in that body tell you?",
       "options": [
-        "That no provider is configured, so the rules answered",
+        "That no provider is configured",
         "That the request failed and was retried once",
         "That the answer was served from a cache",
         "That this endpoint is read-only by design"
@@ -8544,7 +8571,7 @@ window.LESSONS.push({
     {
       "label": "The banner endpoint",
       "path": "app/main.py",
-      "lines": "879-890"
+      "lines": "879-889"
     },
     {
       "label": "What the service says it is",
@@ -8590,10 +8617,10 @@ window.LESSONS.push({
       "id": "4.2-ex-0",
       "lang": "console",
       "caption": "The /health decorator and the answer it produces",
-      "code": "curl -s -i http://127.0.0.1:8000/health",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/health",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"status\":\"ok\",\"mode\":\"mock\",\"rules\":63,\"categories\":[\"auth\",\"complexity\",\"config\",\"crypto\",\"deserialisation\",\"injection\",\"quality\",\"reliability\",\"secrets\",\"style\"],\"sarvam_key\":\"missing\",\"github_token\":\"missing\",\"webhook_secret\":\"missing\",…[abridged]",
+      "expected_output": "{\"status\":\"ok\",\"mode\":\"mock\",\"rules\":63,\"categories\":[\"auth\",\"complexity\",\"config\",\"crypto\",\"deserialisation\",\"injection\",\"quality\",\"reliability\",\"secrets\",\"style\"],\"sarvam_key\":\"missing\",\"github_token\":\"missing\",\"webhook_secret\":\"missing\",\"provider\":\"mock\",\"database\":\"ok\"}\n200",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -8653,7 +8680,7 @@ window.LESSONS.push({
     {
       "label": "The health decorator and its handler",
       "path": "app/main.py",
-      "lines": "892-908"
+      "lines": "892-906"
     },
     {
       "label": "A decorator spread over several lines",
@@ -8699,20 +8726,20 @@ window.LESSONS.push({
       "id": "4.3-ex-0",
       "lang": "console",
       "caption": "An empty body: valid model, rejected by the handler",
-      "code": "curl -s -i -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d \"{}\"",
+      "code": "curl -s -w '\\n%{http_code}\\n' -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d \"{}\"",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":\"provide either 'diff' or 'code'\"}",
+      "expected_output": "{\"detail\":\"provide either 'diff' or 'code'\"}\n422",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     },
     {
       "id": "4.3-ex-1",
       "lang": "console",
       "caption": "An unknown field: rejected by the model, before any handler runs",
-      "code": "curl -s -i -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\", \"nope\": 1}'",
+      "code": "curl -s -w '\\n%{http_code}\\n' -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\", \"nope\": 1}'",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":[{\"type\":\"extra_forbidden\",\"loc\":[\"body\",\"nope\"],\"msg\":\"Extra inputs are not permitted\",\"input\":1}]}",
+      "expected_output": "{\"detail\":[{\"type\":\"extra_forbidden\",\"loc\":[\"body\",\"nope\"],\"msg\":\"Extra inputs are not permitted\",\"input\":1}]}\n422",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -8744,7 +8771,7 @@ window.LESSONS.push({
       "options": [
         "The body did not match the model",
         "The endpoint path does not exist",
-        "The body was valid; the handler refused",
+        "The body was valid",
         "The request carried no content type"
       ],
       "answer": 2,
@@ -8772,12 +8799,12 @@ window.LESSONS.push({
     {
       "label": "The request model",
       "path": "app/main.py",
-      "lines": "152-207"
+      "lines": "152-206"
     },
     {
       "label": "The review endpoint that consumes it",
       "path": "app/main.py",
-      "lines": "945-1024"
+      "lines": "945-1022"
     }
   ],
   "learn_more": [
@@ -8881,12 +8908,12 @@ window.LESSONS.push({
     {
       "label": "The response model for a review",
       "path": "app/main.py",
-      "lines": "260-302"
+      "lines": "260-301"
     },
     {
       "label": "A route that declares one",
       "path": "app/main.py",
-      "lines": "892-908"
+      "lines": "892-906"
     }
   ],
   "learn_more": [
@@ -8927,10 +8954,10 @@ window.LESSONS.push({
       "id": "4.5-ex-0",
       "lang": "console",
       "caption": "A 404 with a sentence that names what was missing",
-      "code": "curl -s -i http://127.0.0.1:8000/rules/nope",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/rules/nope",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 404 Not Found\ncontent-type: application/json\n\n{\"detail\":\"no rule with id 'nope'\"}",
+      "expected_output": "{\"detail\":\"no rule with id 'nope'\"}\n404",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -8990,17 +9017,17 @@ window.LESSONS.push({
     {
       "label": "The 403 and 404 raises",
       "path": "app/main.py",
-      "lines": "427-429"
+      "lines": "415-430"
     },
     {
       "label": "The unknown-rule 404",
       "path": "app/main.py",
-      "lines": "933-936"
+      "lines": "931-942"
     },
     {
       "label": "The signature 401",
       "path": "app/main.py",
-      "lines": "1174-1179"
+      "lines": "1146-1284"
     }
   ],
   "learn_more": [
@@ -9040,10 +9067,10 @@ window.LESSONS.push({
       "id": "4.6-ex-0",
       "lang": "console",
       "caption": "A signed-capable webhook with no secret configured",
-      "code": "curl -s -i -X POST http://127.0.0.1:8000/webhook \\\n  -H \"content-type: application/json\" -H \"X-GitHub-Event: pull_request\" \\\n  -d '{\"action\": \"opened\"}'",
+      "code": "curl -s -w '\\n%{http_code}\\n' -X POST http://127.0.0.1:8000/webhook \\\n  -H \"content-type: application/json\" -H \"X-GitHub-Event: pull_request\" \\\n  -d '{\"action\": \"opened\"}'",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"source\":\"sample_fixture\",\"notice\":\"the payload carried no usable pull-request number; sample fixture: sample.diff (not posted: the pull-request diff could not be fetched)\",\"review\":{\"mode\":\"mock\",\"target\":\"samples/sample.diff\",…[abridged]",
+      "expected_output": "{\"source\":\"sample_fixture\",\"notice\":\"the payload carried no usable pull-request number; sample fixture: sample.diff (not posted: the pull-request diff could not be fetched)\",\"review\":{\"mode\":\"mock\",\"target\":\"samples/sample.diff\",\"files\":[{\"path\":\"app/db.py\",\"change\":\"modified\",\"added_spans\":[\"3-4\",\"7-8\"],\"added_line_count\":4,\"hunk_count\":1,\"binary\":false},{\"path\":\"app/report.py\",\"change\":\"added\",\"added_spans\":[\"1-5\"],\"added_line_count\":5,\"hunk_count\":1,\"binary\":false}],\"findings\":[{\"file\":\"app/db.py\",\"line\":\"3\",\"severity\":\"CRITICAL\",\"issue\":\"A GitHub token literal is committed here, granting every scope the token holds to anyone who reads the repository. (rule: secret/github-token)\",\"suggested_fix\":\"Revoke the token, then read it at runtime: `token = os.environ[\\\"GITHUB_TOKEN\\\"]`.\"},{\"file\":\"app/db.py\",\"line\":\"3\",\"severity\":\"CRITICAL\",\"issue\":\"`API_TOKEN` is assigned a literal credential, so the secret is committed to git history and stays readable to anyone with repo access even after it is rotated. (rule: secret/hardcoded-credential)\",\"suggested_fix\":\"API_TOKEN = os.environ[\\\"API_TOKEN\\\"]  # load from the environment; fail loudly when it is unset\"},{\"file\":\"app/db.py\",\"line\":\"7\",\"severity\":\"CRITICAL\",\"issue\":\"SQL is assembled by string interpolation, so any value reaching this line can change the statement and read, alter or drop the table. (rule: unsafe/sql-injection)\",\"suggested_fix\":\"Pass parameters instead: `db.execute(\\\"SELECT * FROM users WHERE id = ?\\\", (uid,))` — the driver quotes them, interpolation does not.\"},{\"file\":\"app/report.py\",\"line\":\"1\",\"severity\":\"MEDIUM\",\"issue\":\"`render` is a public function without full annotations, so callers and the reviewer cannot tell what goes in or what comes out. (rule: quality/missing-type-hints)\",\"suggested_fix\":\"Annotate it: `def render(value: str) -> str:` — every parameter and the return type.\"}],\"anchors\":[{\"finding\":{\"file\":\"app/db.py\",\"line\":\"3\",\"severity\":\"CRITICAL\",\"issue\":\"A GitHub token literal is committed here, granting every scope the token holds to anyone who reads the repository. (rule: secret/github-token)\",\"suggested_fix\":\"Revoke the token, then read it at runtime: `token = os.environ[\\\"GITHUB_TOKEN\\\"]`.\"},\"status\":\"anchored\",\"hunk_header\":\"@@ -1,5 +1,8 @@\",\"detail\":\"added line: 3\"},{\"finding\":{\"file\":\"app/db.py\",\"line\":\"3\",\"severity\":\"CRITICAL\",\"issue\":\"`API_TOKEN` is assigned a literal credential, so the secret is committed to git history and stays readable to anyone with repo access even after it is rotated. (rule: secret/hardcoded-credential)\",\"suggested_fix\":\"API_TOKEN = os.environ[\\\"API_TOKEN\\\"]  # load from the environment; fail loudly when it is unset\"},\"status\":\"anchored\",\"hunk_header\":\"@@ -1,5 +1,8 @@\",\"detail\":\"added line: 3\"},{\"finding\":{\"file\":\"app/db.py\",\"line\":\"7\",\"severity\":\"CRITICAL\",\"issue\":\"SQL is assembled by string interpolation, so any value reaching this line can change the statement and read, alter or drop the table. (rule: unsafe/sql-injection)\",\"suggested_fix\":\"Pass parameters instead: `db.execute(\\\"SELECT * FROM users WHERE id = ?\\\", (uid,))` — the driver quotes them, interpolation does not.\"},\"status\":\"anchored\",\"hunk_header\":\"@@ -1,5 +1,8 @@\",\"detail\":\"added line: 7\"},{\"finding\":{\"file\":\"app/report.py\",\"line\":\"1\",\"severity\":\"MEDIUM\",\"issue\":\"`render` is a public function without full annotations, so callers and the reviewer cannot tell what goes in or what comes out. (rule: quality/missing-type-hints)\",\"suggested_fix\":\"Annotate it: `def render(value: str) -> str:` — every parameter and the return type.\"},\"status\":\"anchored\",\"hunk_header\":\"@@ -0,0 +1,5 @@\",\"detail\":\"added line: 1\"}],\"notes\":[\"the payload carried no usable pull-request number; sample fixture: sample.diff (not posted: the pull-request diff could not be fetched)\",\"local rule engine: 63 deterministic rules, no network, no API key\",\"mock mode: no SARVAM_API_KEY or LMSTUDIO_BASE_URL configured; local rule engine used\"],\"verdict\":\"block\"},\"comment\":\"## Autonomous AI Code Review\\n\\n**Mode:** `mock` · **Files:** 2 · **Findings:** 4 (CRITICAL 3, HIGH 0, MEDIUM 1, LOW 0)\\n\\n| File | Change | Added lines |\\n|---|---|---|\\n| `app/db.py` | modified | 3-4, 7-8 |\\n| `app/report.py` | added | 1-5 |\\n\\n### 1. CRITICAL — `app/db.py:3`\\n\\n- **Issue:** A GitHub token literal is committed here, granting every scope the token holds to anyone who reads the repository. (rule: secret/github-token)\\n- **Suggested fix:** Revoke the token, then read it at runtime: `token = os.environ[\\\"GITHUB_TOKEN\\\"]`.\\n- **Anchor:** anchored (`@@ -1,5 +1,8 @@`)\\n\\n### 2. CRITICAL — `app/db.py:3`\\n\\n- **Issue:** `API_TOKEN` is assigned a literal credential, so the secret is committed to git history and stays readable to anyone with repo access even after it is rotated. (rule: secret/hardcoded-credential)\\n- **Suggested fix:** API_TOKEN = os.environ[\\\"API_TOKEN\\\"]  # load from the environment; fail loudly when it is unset\\n- **Anchor:** anchored (`@@ -1,5 +1,8 @@`)\\n\\n### 3. CRITICAL — `app/db.py:7`\\n\\n- **Issue:** SQL is assembled by string interpolation, so any value reaching this line can change the statement and read, alter or drop the table. (rule: unsafe/sql-injection)\\n- **Suggested fix:** Pass parameters instead: `db.execute(\\\"SELECT * FROM users WHERE id = ?\\\", (uid,))` — the driver quotes them, interpolation does not.\\n- **Anchor:** anchored (`@@ -1,5 +1,8 @@`)\\n\\n### 4. MEDIUM — `app/report.py:1`\\n\\n- **Issue:** `render` is a public function without full annotations, so callers and the reviewer cannot tell what goes in or what comes out. (rule: quality/missing-type-hints)\\n- **Suggested fix:** Annotate it: `def render(value: str) -> str:` — every parameter and the return type.\\n- **Anchor:** anchored (`@@ -0,0 +1,5 @@`)\\n\\n**Verdict:** block\\n\",\"stats\":{\"files\":2,\"findings\":4,\"critical\":3,\"high\":0,\"medium\":1,\"low\":0,\"verdict\":\"block\",\"rules_evaluated\":63,\"duration_ms\":5.042},\"provider\":\"mock\",\"model\":\"local-rules\",\"posting\":null}\n200",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -9103,17 +9130,17 @@ window.LESSONS.push({
     {
       "label": "The header parameters",
       "path": "app/main.py",
-      "lines": "1146-1157"
+      "lines": "1146-1284"
     },
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-479"
+      "lines": "467-490"
     },
     {
       "label": "The guard that decides whether to check",
       "path": "app/main.py",
-      "lines": "1174-1179"
+      "lines": "1146-1284"
     }
   ],
   "learn_more": [
@@ -9216,12 +9243,12 @@ window.LESSONS.push({
     {
       "label": "The TestClient import and the single client",
       "path": "tests/test_api.py",
-      "lines": "17-23"
+      "lines": "17-27"
     },
     {
       "label": "A request asserted on status and body",
       "path": "tests/test_api.py",
-      "lines": "135-150"
+      "lines": "135-152"
     }
   ],
   "learn_more": [
@@ -9334,7 +9361,7 @@ window.LESSONS.push({
     {
       "label": "The signature check",
       "path": "app/main.py",
-      "lines": "467-479"
+      "lines": "467-490"
     },
     {
       "label": "The route block, in file order",
@@ -9447,7 +9474,7 @@ window.LESSONS.push({
     {
       "label": "The regex that recognises the `diff --git` header",
       "path": "app/parser.py",
-      "lines": "61"
+      "lines": "61-66"
     }
   ],
   "learn_more": [
@@ -9685,7 +9712,7 @@ window.LESSONS.push({
     {
       "label": "The body walk where the counters move",
       "path": "app/parser.py",
-      "lines": "398-429"
+      "lines": "375-500"
     }
   ],
   "learn_more": [
@@ -9796,12 +9823,12 @@ window.LESSONS.push({
     {
       "label": "The four change kinds",
       "path": "app/parser.py",
-      "lines": "57"
+      "lines": "57-66"
     },
     {
       "label": "The builder and its explicit_change slot",
       "path": "app/parser.py",
-      "lines": "305-342"
+      "lines": "305-340"
     }
   ],
   "learn_more": [
@@ -9904,7 +9931,7 @@ window.LESSONS.push({
     {
       "label": "normalize_path and its three rules",
       "path": "app/parser.py",
-      "lines": "73-88"
+      "lines": "73-86"
     },
     {
       "label": "The added-file block in the sample",
@@ -10011,7 +10038,7 @@ window.LESSONS.push({
     {
       "label": "The flag on FileDiff, and on FileSummary",
       "path": "app/parser.py",
-      "lines": "152-205"
+      "lines": "152-203"
     },
     {
       "label": "Where the summary copies it",
@@ -10142,12 +10169,12 @@ window.LESSONS.push({
     {
       "label": "DiffBundle",
       "path": "app/parser.py",
-      "lines": "206-247"
+      "lines": "206-245"
     },
     {
       "label": "parse_diff_file, the I/O wrapper",
       "path": "app/parser.py",
-      "lines": "503-517"
+      "lines": "503-515"
     }
   ],
   "learn_more": [
@@ -10260,17 +10287,17 @@ window.LESSONS.push({
     {
       "label": "DiffParseError",
       "path": "app/parser.py",
-      "lines": "69-71"
+      "lines": "69-70"
     },
     {
       "label": "The empty check",
       "path": "app/parser.py",
-      "lines": "356-357"
+      "lines": "343-365"
     },
     {
       "label": "Where the API converts it to a 422",
       "path": "app/main.py",
-      "lines": "661-664"
+      "lines": "661-668"
     }
   ],
   "learn_more": [
@@ -10339,7 +10366,7 @@ window.LESSONS.push({
       "q": "Why is `frozen=True` on `Finding`?",
       "options": [
         "It makes the model faster to construct",
-        "A finding is a record, and a record that can change is not one",
+        "A finding is a record",
         "It allows the model to be hashed",
         "It prevents the fields from being validated"
       ],
@@ -10379,12 +10406,12 @@ window.LESSONS.push({
     {
       "label": "The Finding model and its config",
       "path": "app/models.py",
-      "lines": "68-106"
+      "lines": "68-105"
     },
     {
       "label": "The five-field row",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     }
   ],
   "learn_more": [
@@ -10493,7 +10520,7 @@ window.LESSONS.push({
     {
       "label": "The line pattern",
       "path": "app/models.py",
-      "lines": "42"
+      "lines": "42-43"
     },
     {
       "label": "The validator that enforces it",
@@ -10607,12 +10634,12 @@ window.LESSONS.push({
     {
       "label": "The enum and its rank",
       "path": "app/models.py",
-      "lines": "46-58"
+      "lines": "46-57"
     },
     {
       "label": "The sort that uses it",
       "path": "app/models.py",
-      "lines": "133-139"
+      "lines": "133-138"
     }
   ],
   "learn_more": [
@@ -10726,7 +10753,7 @@ window.LESSONS.push({
     {
       "label": "Where the row puts them",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     }
   ],
   "learn_more": [
@@ -10835,12 +10862,12 @@ window.LESSONS.push({
     {
       "label": "The config that sets all three",
       "path": "app/models.py",
-      "lines": "68-72"
+      "lines": "68-105"
     },
     {
       "label": "The fields it applies to",
       "path": "app/models.py",
-      "lines": "73-86"
+      "lines": "68-86"
     }
   ],
   "learn_more": [
@@ -10954,7 +10981,7 @@ window.LESSONS.push({
     {
       "label": "The constraints on file, issue and fix",
       "path": "app/models.py",
-      "lines": "73-86"
+      "lines": "68-86"
     }
   ],
   "learn_more": [
@@ -11063,7 +11090,7 @@ window.LESSONS.push({
     {
       "label": "The row helper",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     },
     {
       "label": "The JSON serialiser and computed fields",
@@ -11171,12 +11198,12 @@ window.LESSONS.push({
     {
       "label": "The patterns and the severity ladder",
       "path": "app/models.py",
-      "lines": "42-58"
+      "lines": "42-57"
     },
     {
       "label": "The finding and its anchored wrapper",
       "path": "app/models.py",
-      "lines": "68-124"
+      "lines": "68-122"
     },
     {
       "label": "The result and its computed values",
@@ -11297,7 +11324,7 @@ window.LESSONS.push({
     {
       "label": "The I/O wrapper",
       "path": "app/parser.py",
-      "lines": "503-517"
+      "lines": "503-515"
     }
   ],
   "learn_more": [
@@ -11408,7 +11435,7 @@ window.LESSONS.push({
     {
       "label": "The builder and its slots",
       "path": "app/parser.py",
-      "lines": "305-342"
+      "lines": "305-340"
     },
     {
       "label": "Where the hunk header is read",
@@ -11524,12 +11551,12 @@ window.LESSONS.push({
     {
       "label": "FileDiff, with the hunks",
       "path": "app/parser.py",
-      "lines": "152-192"
+      "lines": "152-190"
     },
     {
       "label": "FileSummary, without them",
       "path": "app/parser.py",
-      "lines": "193-205"
+      "lines": "193-203"
     },
     {
       "label": "summaries(), which derives them",
@@ -11645,7 +11672,7 @@ window.LESSONS.push({
     {
       "label": "_spans, the compaction",
       "path": "app/parser.py",
-      "lines": "89-105"
+      "lines": "89-103"
     },
     {
       "label": "The added_spans property",
@@ -11761,12 +11788,12 @@ window.LESSONS.push({
     {
       "label": "normalize_path, all four rules",
       "path": "app/parser.py",
-      "lines": "73-88"
+      "lines": "73-86"
     },
     {
       "label": "The confinement check that rejects an escape",
       "path": "app/main.py",
-      "lines": "425-429"
+      "lines": "415-430"
     }
   ],
   "learn_more": [
@@ -11877,12 +11904,12 @@ window.LESSONS.push({
     {
       "label": "anchor_findings",
       "path": "app/parser.py",
-      "lines": "518-574"
+      "lines": "518-572"
     },
     {
       "label": "The anchored wrapper",
       "path": "app/models.py",
-      "lines": "108-124"
+      "lines": "108-122"
     }
   ],
   "learn_more": [
@@ -12072,7 +12099,7 @@ window.LESSONS.push({
       "q": "Why is the module importable without side effects?",
       "options": [
         "Because it has no module docstring",
-        "Definitions only — no work happens at import time",
+        "Definitions only",
         "Because pydantic defers validation",
         "Because it opens files lazily"
       ],
@@ -12101,12 +12128,12 @@ window.LESSONS.push({
     {
       "label": "Errors and path helpers",
       "path": "app/parser.py",
-      "lines": "69-110"
+      "lines": "69-109"
     },
     {
       "label": "The models",
       "path": "app/parser.py",
-      "lines": "112-300"
+      "lines": "112-302"
     },
     {
       "label": "The entry points",

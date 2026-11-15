@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "What does the `578 deselected` in that output tell you?",
       "options": [
-        "578 tests were not run because they did not match `-k`",
+        "578 tests were not run",
         "578 tests failed",
         "578 tests were skipped",
         "Nothing useful"
@@ -39,7 +39,7 @@ window.LESSONS.push({
       "options": [
         "In CI, so a single flake cannot hide the later failures",
         "In CI, always, so a run never wastes time on later tests",
-        "While fixing a failure, so the first error is the one you read",
+        "While fixing a failure",
         "Only when the suite is slow enough to time out"
       ],
       "answer": 2,
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The test targets you actually type",
       "path": "Makefile",
-      "lines": "19-30"
+      "lines": "20-38"
     },
     {
       "label": "Running a subset, documented",

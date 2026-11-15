@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The line pattern",
       "path": "app/models.py",
-      "lines": "42"
+      "lines": "42-43"
     },
     {
       "label": "The validator that enforces it",

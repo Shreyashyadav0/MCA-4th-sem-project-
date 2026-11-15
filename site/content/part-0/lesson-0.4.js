@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "PROVIDERS and the selection result",
       "path": "app/engine.py",
-      "lines": "60-100"
+      "lines": "57-67"
     }
   ],
   "learn_more": [

@@ -96,7 +96,7 @@ window.LESSONS.push({
     {
       "label": "The body walk where the counters move",
       "path": "app/parser.py",
-      "lines": "398-429"
+      "lines": "375-500"
     }
   ],
   "learn_more": [

@@ -77,7 +77,7 @@ window.LESSONS.push({
     {
       "label": "The three patches, and why loopback is exempt",
       "path": "scripts/verify_offline.py",
-      "lines": "1-40"
+      "lines": "1-47"
     },
     {
       "label": "The offline decision this proof protects",

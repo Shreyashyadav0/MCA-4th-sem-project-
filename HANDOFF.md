@@ -7,14 +7,14 @@ This file is the honesty ledger. If any other document disagrees with it, this o
 | What | Evidence |
 |---|---|
 | The 63-rule engine on real diffs | `python reviewer.py samples/sample.diff` → 4 findings, verdict `block` |
-| Diff parsing and anchoring | 638 tests, including anchored/file_only/unanchored cases |
+| Diff parsing and anchoring | 641 collected, including anchored/file_only/unanchored cases |
 | The offline mock path end to end | CLI, API, webhook, all with no credentials |
 | The FastAPI surface | every endpoint exercised in-process through `TestClient`, plus a threaded `uvicorn` server on 127.0.0.1 for the demo checks |
 | The webhook posting state machine | fake `httpx` client at the `_build_github_client` seam: happy path, duplicate skip, 422 demotion, 429 retry, 401/403/500, transport error |
 | One real network rejection | `SARVAM_API_KEY=fake` reached `api.sarvam.ai` and returned a real 403, which degraded correctly |
 | The OpenAI-compatible transport | the real `openai` SDK drove a stub OpenAI-compatible server over HTTP: `mode=live`, `provider=local`, `response_format` sent, hallucinated file dropped |
 | The benchmark harness | `python -m benchmarks.eval --modes rules --dataset benchmarks/golden` writes metrics.csv, summary.json, summary.md, chart.png |
-| Zero-network guarantee | `python scripts/verify_offline.py` → 637 passed, 1 skipped with outbound connections blocked |
+| Zero-network guarantee | `python scripts/verify_offline.py` → 640 passed, 1 skipped with outbound connections blocked |
 
 ## Simulated — the code path is real, the counterpart is a fake
 

@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "A test names `client` as a parameter. Where does the value come from?",
       "options": [
-        "A fixture with that name, which pytest calls and injects",
+        "A fixture with that name",
         "A global variable",
         "An import in the test file",
         "conftest.py, always"
@@ -51,7 +51,7 @@ window.LESSONS.push({
         "It is slower",
         "It cannot be parametrised",
         "pytest refuses to run it",
-        "State leaks between tests, so order starts to matter"
+        "State leaks between tests"
       ],
       "answer": 3,
       "why": "One shared object across the session means one test's changes are the next test's starting point."
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "Real fixtures, one of them autouse",
       "path": "tests/test_auth.py",
-      "lines": "50-75"
+      "lines": "35-73"
     },
     {
       "label": "A function-scoped fixture used by many tests",

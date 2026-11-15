@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The row helper",
       "path": "app/models.py",
-      "lines": "97-106"
+      "lines": "97-105"
     },
     {
       "label": "The JSON serialiser and computed fields",

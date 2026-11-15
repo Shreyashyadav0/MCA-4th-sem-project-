@@ -86,7 +86,7 @@ window.LESSONS.push({
     {
       "label": "_spans, the compaction",
       "path": "app/parser.py",
-      "lines": "89-105"
+      "lines": "89-103"
     },
     {
       "label": "The added_spans property",

@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "read_source — the repository's pathlib habit instead of `with open`",
       "path": "app/cli.py",
-      "lines": "142-168"
+      "lines": "142-166"
     },
     {
       "label": "The rule that recommends `with open(...)` to other people's code",
       "path": "app/rules.py",
-      "lines": "1225-1245"
+      "lines": "1225-1293"
     }
   ],
   "learn_more": [

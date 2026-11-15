@@ -103,10 +103,10 @@ python -m pytest -q tests -k "sql"
 
 ```text
 ..............                                                           [100%]
-14 passed, 569 deselected in 5.06s
+15 passed, 626 deselected in 6.95s
 ```
 
-`14` because the SQL-injection rule is asserted through several layers: the rule
+`15` because the SQL-injection rule is asserted through several layers: the rule
 itself, the parser anchor, the adapter's hallucination filter, the API response
 and the GitHub payload. That is the shape of a good keyword — it crosses layers
 instead of re-testing one.

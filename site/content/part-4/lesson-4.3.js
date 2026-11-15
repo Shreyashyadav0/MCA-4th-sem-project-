@@ -15,20 +15,20 @@ window.LESSONS.push({
       "id": "4.3-ex-0",
       "lang": "console",
       "caption": "An empty body: valid model, rejected by the handler",
-      "code": "curl -s -i -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d \"{}\"",
+      "code": "curl -s -w '\\n%{http_code}\\n' -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d \"{}\"",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":\"provide either 'diff' or 'code'\"}",
+      "expected_output": "{\"detail\":\"provide either 'diff' or 'code'\"}\n422",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     },
     {
       "id": "4.3-ex-1",
       "lang": "console",
       "caption": "An unknown field: rejected by the model, before any handler runs",
-      "code": "curl -s -i -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\", \"nope\": 1}'",
+      "code": "curl -s -w '\\n%{http_code}\\n' -X POST http://127.0.0.1:8000/review -H \"content-type: application/json\" -d '{\"diff\": \"x\", \"nope\": 1}'",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 422 Unprocessable Entity\ncontent-type: application/json\n\n{\"detail\":[{\"type\":\"extra_forbidden\",\"loc\":[\"body\",\"nope\"],\"msg\":\"Extra inputs are not permitted\",\"input\":1}]}",
+      "expected_output": "{\"detail\":[{\"type\":\"extra_forbidden\",\"loc\":[\"body\",\"nope\"],\"msg\":\"Extra inputs are not permitted\",\"input\":1}]}\n422",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -60,7 +60,7 @@ window.LESSONS.push({
       "options": [
         "The body did not match the model",
         "The endpoint path does not exist",
-        "The body was valid; the handler refused",
+        "The body was valid",
         "The request carried no content type"
       ],
       "answer": 2,
@@ -88,12 +88,12 @@ window.LESSONS.push({
     {
       "label": "The request model",
       "path": "app/main.py",
-      "lines": "152-207"
+      "lines": "152-206"
     },
     {
       "label": "The review endpoint that consumes it",
       "path": "app/main.py",
-      "lines": "945-1024"
+      "lines": "945-1022"
     }
   ],
   "learn_more": [

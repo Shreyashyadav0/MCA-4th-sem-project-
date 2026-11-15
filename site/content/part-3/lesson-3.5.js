@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "monkeypatch.setenv in a real test",
       "path": "tests/test_api.py",
-      "lines": "68-80"
+      "lines": "62-79"
     },
     {
       "label": "The fake-client seam the tests install",
       "path": "tests/test_cli.py",
-      "lines": "50-62"
+      "lines": "48-73"
     }
   ],
   "learn_more": [

@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "A parametrised test that asserts on an exit code",
       "path": "tests/test_cli.py",
-      "lines": "62-80"
+      "lines": "62-82"
     },
     {
       "label": "The layers the suite covers",

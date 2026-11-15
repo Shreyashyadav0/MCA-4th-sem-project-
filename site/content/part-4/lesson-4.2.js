@@ -15,10 +15,10 @@ window.LESSONS.push({
       "id": "4.2-ex-0",
       "lang": "console",
       "caption": "The /health decorator and the answer it produces",
-      "code": "curl -s -i http://127.0.0.1:8000/health",
+      "code": "curl -s -w '\\n%{http_code}\\n' http://127.0.0.1:8000/health",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "HTTP/1.1 200 OK\ncontent-type: application/json\n\n{\"status\":\"ok\",\"mode\":\"mock\",\"rules\":63,\"categories\":[\"auth\",\"complexity\",\"config\",\"crypto\",\"deserialisation\",\"injection\",\"quality\",\"reliability\",\"secrets\",\"style\"],\"sarvam_key\":\"missing\",\"github_token\":\"missing\",\"webhook_secret\":\"missing\",…[abridged]",
+      "expected_output": "{\"status\":\"ok\",\"mode\":\"mock\",\"rules\":63,\"categories\":[\"auth\",\"complexity\",\"config\",\"crypto\",\"deserialisation\",\"injection\",\"quality\",\"reliability\",\"secrets\",\"style\"],\"sarvam_key\":\"missing\",\"github_token\":\"missing\",\"webhook_secret\":\"missing\",\"provider\":\"mock\",\"database\":\"ok\"}\n200",
       "why_not": "there is no fastapi in the browser runner and no repository checkout to import from, so the app cannot be built at all."
     }
   ],
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The health decorator and its handler",
       "path": "app/main.py",
-      "lines": "892-908"
+      "lines": "892-906"
     },
     {
       "label": "A decorator spread over several lines",
