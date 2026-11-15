@@ -16,6 +16,7 @@ is the bug.
 | 2a | 2026-11-15 | `3e2eee1` | 0 added, 18 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 2b | 2026-11-15 | `b3924dc` | 0 added, 15 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 | 3 | 2026-11-15 | `f0c83f7` | 24 added, 12 changed | 18 (`2.1`–`2.10`, `3.1`–`3.8`) | `OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,…,3.8` |
+| 4a | 2026-11-15 | `615602d` | 9 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -803,3 +804,38 @@ sidebar, and the header wrapped to three rows at 375px.
 Measured after the fixes: prose link 5.48:1, current-lesson label 17.85:1,
 muted labels 5.16:1, Run pill 3.01:1 at 19px/600 (AA large), output bar 4px
 accent, h3 24px/400, no horizontal scroll at 375px.
+
+## Wave 4a — Part 4, "HTTP and FastAPI"
+
+Eight lessons, `4.1`–`4.8`, filling the part `contracts.js` already declared at
+eight. Nothing was renamed and nothing renumbered; part 5 is untouched.
+
+The part teaches the surface the code actually exposes: one request and one
+response (4.1), the app object and its thirteen decorators (4.2), the request
+model and the two different 422s (4.3), `response_model` and the generated
+schema (4.4), the status codes in use and `HTTPException` (4.5), headers and the
+webhook signature (4.6), `TestClient` in-process (4.7), and a guided read of
+`app/main.py` in file order (4.8).
+
+**Every example is `terminal`.** FastAPI cannot run in the Pyodide runner — a
+request needs a socket — so each example carries `expected_output` and a
+`why_not` that names that. The outputs are not copied from a brief: each was
+reproduced on `615602d` with `TestClient`, including the two shapes of 422
+(a list with `loc` from the framework, a sentence from the handler), the twelve
+`/openapi.json` paths, and the webhook's 200-with-a-notice.
+
+**Two things the writing turned up.** The file has thirteen route decorators for
+twelve paths, because `/webhook` is registered twice (`1086` and `1135`); the
+later one wins, which is why the schema shows one entry. And `{}` is a *valid*
+`ReviewRequest` — both fields are optional — so the "provide either diff or code"
+422 comes from the handler, not the model.
+
+**No lesson states a test count.** The suite will change; the phrasing rule for
+this wave is that a lesson may say the suite is green and point at `make verify`,
+never quote a number.
+
+**Gate.** `validate_lessons.py` → `OK lessons=42 parts_covered=5
+manifest_entries=42`, exit 0. Banned numbers under `site/` → empty. `grep -rn
+'passed' site/content/part-4/` → empty. `pytest -q tests` → `640 passed,
+1 skipped`, unchanged (this wave touches no code). Manifest and all three pages
+list the same eight paths in lesson order.

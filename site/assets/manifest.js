@@ -53,6 +53,14 @@
     "content/part-3/lesson-3.5.js",
     "content/part-3/lesson-3.6.js",
     "content/part-3/lesson-3.7.js",
-    "content/part-3/lesson-3.8.js"
+    "content/part-3/lesson-3.8.js",
+    "content/part-4/lesson-4.1.js",
+    "content/part-4/lesson-4.2.js",
+    "content/part-4/lesson-4.3.js",
+    "content/part-4/lesson-4.4.js",
+    "content/part-4/lesson-4.5.js",
+    "content/part-4/lesson-4.6.js",
+    "content/part-4/lesson-4.7.js",
+    "content/part-4/lesson-4.8.js"
   ];
 })();
