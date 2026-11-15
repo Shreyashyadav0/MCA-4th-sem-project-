@@ -61,8 +61,25 @@ LOCK_PINS = 36
 FORMAT_EXAMPLES = 2
 TOTAL_HOURS = 90
 WEEKS = 16
-APP_LINES = 7528
-APP_FILES = 13
+# The line counts below are read from the files at build time. They used to be
+# literals, and three of them had drifted from the code they described, which is
+# the one thing a study plan must never do.
+REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+MODULE_FILES = (
+    "models.py", "config.py", "parser.py", "rules.py", "mock_provider.py",
+    "sarvam_provider.py", "openai_compat_provider.py", "engine.py",
+    "github_client.py", "cli.py", "main.py", "__main__.py", "__init__.py",
+)
+
+
+def _count_lines(name: str) -> int:
+    with open(os.path.join(REPO_ROOT, "app", name), encoding="utf-8") as handle:
+        return sum(1 for _ in handle)
+
+
+MODULE_LINES = {name: _count_lines(name) for name in MODULE_FILES}
+APP_FILES = len(MODULE_FILES)
+APP_LINES = sum(MODULE_LINES.values())
 DECORATED_CHECKS = 18
 MODEL_CALLS_PER_REVIEW = 2
 
@@ -413,23 +430,24 @@ def section_3():
     s.append(table(
         [
             ["Module", "Lines", "Imports from app/"],
-            ["models.py", "179", "nothing internal"],
-            ["config.py", "92", "nothing internal"],
-            ["parser.py", "583", "models"],
-            ["rules.py", "1618", "models, parser"],
-            ["mock_provider.py", "75", "models, parser, rules"],
-            ["sarvam_provider.py", "991", "models, parser, rules, config, mock_provider"],
-            ["openai_compat_provider.py", "738",
+            ["models.py", str(MODULE_LINES["models.py"]), "nothing internal"],
+            ["config.py", str(MODULE_LINES["config.py"]), "nothing internal"],
+            ["parser.py", str(MODULE_LINES["parser.py"]), "models"],
+            ["rules.py", str(MODULE_LINES["rules.py"]), "models, parser"],
+            ["mock_provider.py", str(MODULE_LINES["mock_provider.py"]), "models, parser, rules"],
+            ["sarvam_provider.py", str(MODULE_LINES["sarvam_provider.py"]),
+             "models, parser, rules, config, mock_provider"],
+            ["openai_compat_provider.py", str(MODULE_LINES["openai_compat_provider.py"]),
              "models, parser, rules, mock_provider, sarvam_provider"],
             ["engine.py", "385", "models, parser, rules, config, "
                                  "openai_compat_provider"],
-            ["github_client.py", "1258", "models, parser, config"],
-            ["cli.py", "549", "models, parser, rules, config, engine, mock_provider, "
+            ["github_client.py", str(MODULE_LINES["github_client.py"]), "models, parser, config"],
+            ["cli.py", str(MODULE_LINES["cli.py"]), "models, parser, rules, config, engine, mock_provider, "
                               "sarvam_provider, github_client"],
-            ["main.py", "1049", "models, parser, rules, config, engine, "
+            ["main.py", str(MODULE_LINES["main.py"]), "models, parser, rules, config, engine, "
                                 "mock_provider, github_client"],
-            ["__main__.py", "8", "cli"],
-            ["__init__.py", "3", "nothing internal"],
+            ["__main__.py", str(MODULE_LINES["__main__.py"]), "cli"],
+            ["__init__.py", str(MODULE_LINES["__init__.py"]), "nothing internal"],
         ],
         [86, 30, TEXT_W - 116],
         mono_cols=(0, 1),
@@ -456,14 +474,19 @@ def section_3():
     s.append(table(
         [
             ["#", "Modules", "Lines", "Hours"],
-            ["1", "models.py", "179", "5"],
-            ["2", "parser.py", "583", "11"],
-            ["3", "rules.py", "1618", "12"],
-            ["4", "mock_provider.py + config.py", "167", "4"],
-            ["5", "sarvam_provider.py + openai_compat_provider.py", "1729", "24"],
-            ["6", "engine.py", "385", "14"],
-            ["7", "cli.py + main.py + github_client.py", "2856", "20"],
-            ["", "total", "7528", "90"],
+            ["1", "models.py", str(MODULE_LINES["models.py"]), "5"],
+            ["2", "parser.py", str(MODULE_LINES["parser.py"]), "11"],
+            ["3", "rules.py", str(MODULE_LINES["rules.py"]), "12"],
+            ["4", "mock_provider.py + config.py",
+             str(MODULE_LINES["mock_provider.py"] + MODULE_LINES["config.py"]), "4"],
+            ["5", "sarvam_provider.py + openai_compat_provider.py",
+             str(MODULE_LINES["sarvam_provider.py"]
+                 + MODULE_LINES["openai_compat_provider.py"]), "24"],
+            ["6", "engine.py", str(MODULE_LINES["engine.py"]), "14"],
+            ["7", "cli.py + main.py + github_client.py",
+             str(MODULE_LINES["cli.py"] + MODULE_LINES["main.py"]
+                 + MODULE_LINES["github_client.py"]), "20"],
+            ["", "total", format(APP_LINES, ","), str(TOTAL_HOURS)],
         ],
         [16, TEXT_W - 106, 50, 40],
         mono_cols=(0, 1, 2, 3),
@@ -489,7 +512,7 @@ def section_3():
 
 TRACK_DETAIL = [
     (
-        "Track 1 - models.py (179 lines, 5 hours)",
+        "Track 1 - models.py (%d lines, 5 hours)" % MODULE_LINES["models.py"],
         "It defines the only shape a review result may take: Severity, AnchorStatus, "
         "the five-field Finding, AnchoredFinding and ReviewResult. It validates "
         "everything arriving from outside at the boundary and exposes three helpers "
@@ -508,7 +531,7 @@ TRACK_DETAIL = [
         "AnchoredFinding, the three helpers, and ReviewResult with a computed verdict.",
     ),
     (
-        "Track 2 - parser.py (583 lines, 11 hours)",
+        "Track 2 - parser.py (%d lines, 11 hours)" % MODULE_LINES["parser.py"],
         "It turns a unified diff into DiffBundle, FileDiff, Hunk and DiffLine, giving "
         "every body line the file line number it maps to on each side. It then places "
         "findings against those numbers with anchor_findings, and wraps a plain "
@@ -527,7 +550,7 @@ TRACK_DETAIL = [
         "and anchor_findings with its three statuses and detail strings.",
     ),
     (
-        "Track 3 - rules.py (1618 lines, 12 hours)",
+        "Track 3 - rules.py (%d lines, 12 hours)" % MODULE_LINES["rules.py"],
         "It is a deterministic, offline, OWASP-mapped engine of %d rules in one "
         "registry, each with an id, title, category, OWASP reference, fixed severity "
         "and a check callable. review_lines runs every rule over one file's added "
@@ -546,7 +569,8 @@ TRACK_DETAIL = [
         "pattern rules), suppression parsing and review_lines.",
     ),
     (
-        "Track 4 - mock_provider.py and config.py (167 lines, 4 hours)",
+        "Track 4 - mock_provider.py and config.py (%d lines, 4 hours)"
+        % (MODULE_LINES["mock_provider.py"] + MODULE_LINES["config.py"]),
         "config.py is the only module that reads the process environment, and it "
         "answers the question is this credential present without ever raising. "
         "mock_provider.py is the deterministic offline path: one source file or a "
@@ -565,7 +589,8 @@ TRACK_DETAIL = [
         "module reads the environment.",
     ),
     (
-        "Track 5 - sarvam_provider.py and openai_compat_provider.py (1729 lines, 24 hours)",
+        "Track 5 - sarvam_provider.py and openai_compat_provider.py (%d lines, 24 hours)"
+        % (MODULE_LINES["sarvam_provider.py"] + MODULE_LINES["openai_compat_provider.py"]),
         "openai_compat_provider.py is one OpenAI chat-completions adapter serving "
         "both Sarvam's hosted endpoint and any self-hosted compatible endpoint, where "
         "the only difference is an OpenAICompatConfig value. It owns the expensive "
@@ -585,7 +610,7 @@ TRACK_DETAIL = [
         "two-call budget, and _mock_outcome calling offline_diff_findings directly.",
     ),
     (
-        "Track 6 - engine.py (385 lines, 14 hours)",
+        "Track 6 - engine.py (%d lines, 14 hours)" % MODULE_LINES["engine.py"],
         "It turns a Settings object plus an optional provider request into exactly "
         "one routing decision, ProviderSelection(provider, config, reason). Its "
         "single entry point review() applies that decision and returns a "
@@ -604,7 +629,8 @@ TRACK_DETAIL = [
         "degrades instead of raising.",
     ),
     (
-        "Track 7 - cli.py, main.py and github_client.py (2856 lines, 20 hours)",
+        "Track 7 - cli.py, main.py and github_client.py (%d lines, 20 hours)"
+        % (MODULE_LINES["cli.py"] + MODULE_LINES["main.py"] + MODULE_LINES["github_client.py"]),
         "cli.py parses the flag surface, calls engine.review() and returns a process "
         "exit code from a fixed set of three. main.py exposes the same engine over "
         "FastAPI, and github_client.py renders findings into one inline comment each "
