@@ -510,6 +510,15 @@ hr {
   list-style-position: inside;
 }
 
+/* the three generated lists carry their own padding; inside positioning put
+ * the bullet flush against the text and orphaned it on wrapped paths */
+.link-list,
+.mistake-list,
+.glossary-list {
+  list-style-position: outside;
+  padding-left: var(--space-5);
+}
+
 /* Their marker colour, used for an aside rather than a warning. */
 mark,
 .aside-note {

@@ -274,15 +274,20 @@ a:hover {
 }
 
 .site-header .btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  /* white on #04AA6D is 3.01:1 — fine for a fill under large text, not for a
+   * 16px label. The darker green carries it at 5.48:1. */
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
   color: var(--accent-contrast);
 }
 
 .site-header-inner,
 .page {
   max-width: 78rem;
-  margin: 0 auto;
+  /* auto margins beat stretch in a grid, so the column shrank to fit and
+   * drifted sideways between lessons; the track should fill instead. */
+  margin-inline: 0;
+  justify-self: stretch;
   padding: 0 var(--space-5);
 }
 
@@ -1346,6 +1351,15 @@ hr {
   list-style-position: inside;
 }
 
+/* the three generated lists carry their own padding; inside positioning put
+ * the bullet flush against the text and orphaned it on wrapped paths */
+.link-list,
+.mistake-list,
+.glossary-list {
+  list-style-position: outside;
+  padding-left: var(--space-5);
+}
+
 /* Their marker colour, used for an aside rather than a warning. */
 mark,
 .aside-note {
@@ -1395,9 +1409,12 @@ mark,
  * label starts after the whole dot row rather than under it. */
 .code-caption::before {
   content: "";
-  flex: 0 0 40px;
+  /* one 12px dot with two shadows: 40px of flex was a 40x12 ellipse, so the
+   * three dots painted as overlapping blobs and ate the caption at 375px. */
+  flex: 0 0 12px;
+  width: 12px;
   height: 12px;
-  margin-right: var(--space-2);
+  margin-right: calc(28px + var(--space-2));
   border-radius: 50%;
   background: var(--code-dot-red);
   box-shadow: 14px 0 0 var(--code-dot-amber), 28px 0 0 var(--code-dot-green);
@@ -1575,7 +1592,8 @@ details.expected-output pre.code {
 .terminal-why {
   margin: var(--space-2) 0 0;
   font-size: 0.875rem;
-  color: var(--muted);
+  /* the terminal panel's ground is grey, where the slate is only 4.21:1 */
+  color: var(--muted-on-surface);
   max-width: var(--measure);
 }
 
@@ -1781,6 +1799,13 @@ details.expected-output pre.code code {
   .split .pane {
     min-height: 12rem;
   }
+}
+
+
+/* The code panel should be as wide as its card, not as wide as the prose
+ * measure — the caption strip and action row already are. */
+.code-figure > pre.code {
+  max-width: none;
 }
 
 </style>
@@ -2884,10 +2909,9 @@ details.expected-output pre.code code {
       var current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
       button.textContent = current === "dark" ? "Light mode" : "Dark mode";
       button.setAttribute("aria-pressed", current === "dark" ? "true" : "false");
-      button.setAttribute(
-        "aria-label",
-        current === "dark" ? "Switch to light theme" : "Switch to dark theme"
-      );
+      /* The name stays "Dark mode" in both states — swapping it broke the
+       * visible-label rule; aria-pressed carries the state instead. */
+      button.setAttribute("aria-label", "Dark mode");
     };
     themeSync = sync;
     if (themeBound) {
@@ -4123,9 +4147,12 @@ details.expected-output pre.code code {
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      /* Every part starts closed. A 66-lesson list with every part expanded is
-       * a wall of links; the reader opens the one part they want. */
-      var openByDefault = collapsed[part.n] === true ? true : false;
+      /* Every part starts closed, except the one being read: with all of them
+       * shut, the only aria-current="page" in the nav sits inside a hidden
+       * body, so nothing visible says where you are. */
+      var openByDefault = collapsed[part.n] === true
+        ? true
+        : (currentPart !== null && String(part.n) === String(currentPart));
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
       /* Both numbers are real: done/written, with the planned total named
@@ -10872,7 +10899,7 @@ window.LESSONS.push({
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
     },
     {
-      "label": "docs/decisions/0001-five-field-finding.md",
+      "label": "ADR 0001 — strict Pydantic v2",
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
@@ -11327,7 +11354,7 @@ window.LESSONS.push({
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
     },
     {
-      "label": "docs/decisions/0001-five-field-finding.md",
+      "label": "ADR 0001 — strict Pydantic v2",
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
@@ -13648,7 +13675,7 @@ window.LESSONS.push({
   "id": "9.3",
   "part": 9,
   "part_title": "Configuration and offline-first",
-  "title": "Secrets: three keys that must never be printed",
+  "title": "Secrets: five keys that must never be printed",
   "order": 903,
   "duration_min": 25,
   "concept_md": "### Five keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `LMSTUDIO_API_KEY` and `DB_SEED_ADMIN_KEY`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
@@ -13731,6 +13758,16 @@ window.LESSONS.push({
       "label": "The webhook secret field",
       "path": "app/config.py",
       "lines": "52-56"
+    },
+    {
+      "label": "The local-model key field",
+      "path": "app/config.py",
+      "lines": "73-77"
+    },
+    {
+      "label": "The seed admin key field",
+      "path": "app/config.py",
+      "lines": "99-106"
     }
   ],
   "learn_more": [
@@ -13872,7 +13909,7 @@ window.LESSONS.push({
   "title": "The zero-network proof",
   "order": 905,
   "duration_min": 30,
-  "concept_md": "### A claim needs a test\n\n\"Works offline\" is easy to say and easy to break. `scripts/verify_offline.py` proves it: it patches the socket layer so any outbound connection raises, then runs the suite. If a test secretly calls the network, it fails.\n\n### How the block works\n\n`block_network()` replaces the connect functions on `socket.socket` and `socket.create_connection` with a refusal that records what was attempted. Loopback is exempt — `localhost`, `127.0.0.1` and `::1` are allowed, because a local model server and an in-process test client both need it.\n\n### Why loopback is exempt\n\nBecause \"offline\" means \"no internet\", not \"no sockets\". A test that binds an ephemeral port to check a webhook signature is still offline. Refusing loopback would make the proof impossible to run rather than stronger.\n\n### What it does not prove\n\nThat the code makes no HTTP call at all — only that it makes none when the suite runs. A code path no test reaches could still call out, which is why the coverage of the suite is part of the argument.",
+  "concept_md": "### A claim needs a test\n\n\"Works offline\" is easy to say and easy to break. `scripts/verify_offline.py` proves it: it patches the socket layer so any outbound connection raises, then runs the suite. If a test secretly calls the network, it fails.\n\n### How the block works\n\n`block_network()` patches three seams: it replaces the `socket.socket` class, `socket.create_connection` and `socket.getaddrinfo`, each with a refusal that records what was attempted. Lesson 3.8 names the same three. Loopback is exempt — the set holds five spellings, including `localhost`, `127.0.0.1`, `::1` and the empty string — because a local model server and an in-process test client both need it.\n\n### Why loopback is exempt\n\nBecause \"offline\" means \"no internet\", not \"no sockets\". A test that binds an ephemeral port to check a webhook signature is still offline. Refusing loopback would make the proof impossible to run rather than stronger.\n\n### What it does not prove\n\nThat the code makes no HTTP call at all — only that it makes none when the suite runs. A code path no test reaches could still call out, which is why the coverage of the suite is part of the argument.",
   "code_examples": [
     {
       "id": "9.5-ex-0",
@@ -14047,9 +14084,9 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The ranges a human reads",
+      "label": "The direct pins a human reads",
       "path": "requirements.txt",
-      "lines": "1-6"
+      "lines": "1-8"
     },
     {
       "label": "The pins CI installs",
@@ -14069,7 +14106,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "pin — an exact version recorded in the lock",
-    "range — a compatible span a human reads",
+    "direct dependency — a package the project names itself",
     "lock file — the record of what was installed"
   ]
 });
@@ -14285,7 +14322,7 @@ window.LESSONS.push({
     {
       "label": "The rebuild suite",
       "path": "rebuild/tests/test_rebuild_offline.py",
-      "lines": "1-30"
+      "lines": "1-36"
     }
   ],
   "learn_more": [

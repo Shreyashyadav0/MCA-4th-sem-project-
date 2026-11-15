@@ -205,9 +205,12 @@
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      /* Every part starts closed. A 66-lesson list with every part expanded is
-       * a wall of links; the reader opens the one part they want. */
-      var openByDefault = collapsed[part.n] === true ? true : false;
+      /* Every part starts closed, except the one being read: with all of them
+       * shut, the only aria-current="page" in the nav sits inside a hidden
+       * body, so nothing visible says where you are. */
+      var openByDefault = collapsed[part.n] === true
+        ? true
+        : (currentPart !== null && String(part.n) === String(currentPart));
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
       /* Both numbers are real: done/written, with the planned total named

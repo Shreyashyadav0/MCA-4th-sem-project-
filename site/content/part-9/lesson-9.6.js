@@ -76,9 +76,9 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The ranges a human reads",
+      "label": "The direct pins a human reads",
       "path": "requirements.txt",
-      "lines": "1-6"
+      "lines": "1-8"
     },
     {
       "label": "The pins CI installs",
@@ -98,7 +98,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "pin — an exact version recorded in the lock",
-    "range — a compatible span a human reads",
+    "direct dependency — a package the project names itself",
     "lock file — the record of what was installed"
   ]
 });

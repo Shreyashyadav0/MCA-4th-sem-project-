@@ -72,15 +72,20 @@ a:hover {
 }
 
 .site-header .btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  /* white on #04AA6D is 3.01:1 — fine for a fill under large text, not for a
+   * 16px label. The darker green carries it at 5.48:1. */
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
   color: var(--accent-contrast);
 }
 
 .site-header-inner,
 .page {
   max-width: 78rem;
-  margin: 0 auto;
+  /* auto margins beat stretch in a grid, so the column shrank to fit and
+   * drifted sideways between lessons; the track should fill instead. */
+  margin-inline: 0;
+  justify-self: stretch;
   padding: 0 var(--space-5);
 }
 

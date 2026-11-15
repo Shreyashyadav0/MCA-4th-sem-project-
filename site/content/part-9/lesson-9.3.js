@@ -6,7 +6,7 @@ window.LESSONS.push({
   "id": "9.3",
   "part": 9,
   "part_title": "Configuration and offline-first",
-  "title": "Secrets: three keys that must never be printed",
+  "title": "Secrets: five keys that must never be printed",
   "order": 903,
   "duration_min": 25,
   "concept_md": "### Five keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `LMSTUDIO_API_KEY` and `DB_SEED_ADMIN_KEY`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
@@ -89,6 +89,16 @@ window.LESSONS.push({
       "label": "The webhook secret field",
       "path": "app/config.py",
       "lines": "52-56"
+    },
+    {
+      "label": "The local-model key field",
+      "path": "app/config.py",
+      "lines": "73-77"
+    },
+    {
+      "label": "The seed admin key field",
+      "path": "app/config.py",
+      "lines": "99-106"
     }
   ],
   "learn_more": [

@@ -55,11 +55,7 @@ def bad_start(lines: list[str], start: int) -> str | None:
     return None
 
 
-def start_of(lines: list[str], end: int) -> int:
-    return end
-
-
-def bad_end(lines: list[str], end: int) -> str | None:
+def bad_end(lines: list[str], end: int, start: int | None = None) -> str | None:
     """Why this line cannot end a range, or None.
 
     A range ends correctly where its construct ends: at end of file, before a
@@ -71,9 +67,11 @@ def bad_end(lines: list[str], end: int) -> str | None:
         return "blank line"
     if stripped.endswith((",", "(", "[", "{", "= Field(")):
         return "mid-call"
+    if stripped.endswith((")", "]", "}")):
+        return None  # a closing bracket ends the construct it opened
     if end == len(lines) - 1:
         return None
-    if end == start_of(lines, end):
+    if start is not None and end == start:
         return None  # a one-line range whose line does not dangle
     nxt = lines[end + 1]
     if not nxt.strip():
@@ -136,7 +134,7 @@ def main(argv: list[str]) -> int:
             python_file = target.suffix == ".py"
             if python_file:
                 why_start = bad_start(lines, start) if start != end else None
-                why_end = bad_end(lines, end)
+                why_end = bad_end(lines, end, start)
             else:
                 # Prose and Makefiles have no def to align to: only a blank or
                 # dangling line is a defect there.
@@ -153,7 +151,7 @@ def main(argv: list[str]) -> int:
                 first, last = construct_bounds(lines, start)
                 if end > last:
                     last = end
-                    while last < len(lines) - 1 and lines[last].strip() and bad_end(lines, last):
+                    while last < len(lines) - 1 and lines[last].strip() and bad_end(lines, last, start):
                         last += 1
                     while last > first and not lines[last].strip():
                         last -= 1

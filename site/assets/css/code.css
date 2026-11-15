@@ -31,9 +31,12 @@
  * label starts after the whole dot row rather than under it. */
 .code-caption::before {
   content: "";
-  flex: 0 0 40px;
+  /* one 12px dot with two shadows: 40px of flex was a 40x12 ellipse, so the
+   * three dots painted as overlapping blobs and ate the caption at 375px. */
+  flex: 0 0 12px;
+  width: 12px;
   height: 12px;
-  margin-right: var(--space-2);
+  margin-right: calc(28px + var(--space-2));
   border-radius: 50%;
   background: var(--code-dot-red);
   box-shadow: 14px 0 0 var(--code-dot-amber), 28px 0 0 var(--code-dot-green);
@@ -211,7 +214,8 @@ details.expected-output pre.code {
 .terminal-why {
   margin: var(--space-2) 0 0;
   font-size: 0.875rem;
-  color: var(--muted);
+  /* the terminal panel's ground is grey, where the slate is only 4.21:1 */
+  color: var(--muted-on-surface);
   max-width: var(--measure);
 }
 
@@ -417,4 +421,11 @@ details.expected-output pre.code code {
   .split .pane {
     min-height: 12rem;
   }
+}
+
+
+/* The code panel should be as wide as its card, not as wide as the prose
+ * measure — the caption strip and action row already are. */
+.code-figure > pre.code {
+  max-width: none;
 }

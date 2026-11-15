@@ -97,7 +97,7 @@ window.LESSONS.push({
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/models.py"
     },
     {
-      "label": "docs/decisions/0001-five-field-finding.md",
+      "label": "ADR 0001 — strict Pydantic v2",
       "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0001-strict-pydantic-v2.md"
     }
   ],
