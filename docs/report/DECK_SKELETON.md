@@ -8,7 +8,7 @@ Conventions:
 
 - Placeholders use the exact token `[SPEAKER NOTE PLACEHOLDER` so they are
   searchable: `grep -rn "SPEAKER NOTE PLACEHOLDER" docs/report`.
-- Numbers already established and safe to show: 582 tests passing with 1 skipped,
+- Numbers already established and safe to show: 640 tests passing with 1 skipped,
   63 rules, 10 categories, 6 build phases. These were produced by the code and can
   be shown without qualification.
 - Numbers that do not yet exist: anything from the benchmark. Those are
@@ -80,7 +80,7 @@ Conventions:
 - Phase 5.5 — one OpenAI-compatible adapter, two providers, one selector.
 - Test suite: 637 passed, 1 skipped. The skip is the live local-model test.
 
-`[SPEAKER NOTE PLACEHOLDER: 90 seconds. Do not read all six phases. Say that the project was built in six phases, each with a fixed interface and its own tests, and that the suite is the evidence: 582 tests, all offline, one skip that needs a local model to run. Point out that every rule has a firing sample, so a broken pattern fails the suite rather than silently under-reporting.]`
+`[SPEAKER NOTE PLACEHOLDER: 90 seconds. Do not read all six phases. Say that the project was built in six phases, each with a fixed interface and its own tests, and that the suite is the evidence: 640 tests, all offline, one skip that needs a local model to run. Point out that every rule has a firing sample, so a broken pattern fails the suite rather than silently under-reporting.]`
 
 ---
 
