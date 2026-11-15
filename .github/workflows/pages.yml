@@ -4,12 +4,18 @@ name: Publish the learning site
 # proxies GitHub's raw files as text/plain with nosniff, and browsers then
 # refuse to apply the stylesheets at all. This publishes site/ properly.
 
+# Manual only, deliberately. Pages is not enabled on this repository and the
+# GitHub App token cannot enable it ("Resource not accessible by integration"),
+# so a push trigger just emailed a failure in twelve seconds on every push.
+#
+# To turn publishing on, once:
+#   Settings -> Pages -> Source: GitHub Actions
+# then either press Run workflow here, or restore the push trigger below:
+#   on:
+#     push:
+#       branches: [main]
+#       paths: ["site/**"]
 on:
-  push:
-    branches: [main]
-    paths:
-      - "site/**"
-      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,12 +41,16 @@ jobs:
           python site/tools/validate_lessons.py
           python site/tools/embed_sources.py --check
 
+      - name: Explain the failure if Pages is still off
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/pages" > /dev/null 2>&1; then
+            echo "::error::Pages is not enabled. Settings -> Pages -> Source: GitHub Actions, then re-run."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/configure-pages@v5
-        with:
-          # The repository had Pages switched off, so this step failed with
-          # "Get Pages site failed: Not Found" and emailed a failure on every
-          # push. enablement turns Pages on with the Actions source if it is off.
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
