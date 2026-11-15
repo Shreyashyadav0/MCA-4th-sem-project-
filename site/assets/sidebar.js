@@ -205,7 +205,9 @@
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      var openByDefault = lessons.length > 0 && collapsed[part.n] !== true;
+      /* Every part starts closed. A 66-lesson list with every part expanded is
+       * a wall of links; the reader opens the one part they want. */
+      var openByDefault = collapsed[part.n] === true ? true : false;
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
       /* Both numbers are real: done/written, with the planned total named
@@ -257,21 +259,8 @@
 
     container.appendChild(scroller);
 
-    /* The current part opens itself once; after that the reader's collapse wins. */
-    if (currentPart !== null && collapsed[currentPart] !== true) {
-      var active = container.querySelector('.side-part[data-part="' + currentPart + '"]');
-      if (active) {
-        var activeToggle = active.querySelector(".side-toggle");
-        var activeBody = active.querySelector(".side-body");
-        if (activeToggle) {
-          activeToggle.setAttribute("aria-expanded", "true");
-        }
-        if (activeBody) {
-          activeBody.hidden = false;
-        }
-      }
-    }
-
+    /* No part opens itself. Every part starts closed and the reader's click is
+     * the only thing that opens one; the active lesson is still marked inside. */
     root = container;
     bindDrawer(container);
     if (bound) {
