@@ -18,6 +18,7 @@ is the bug.
 | 3 | 2026-11-15 | `f0c83f7` | 24 added, 12 changed | 18 (`2.1`–`2.10`, `3.1`–`3.8`) | `OK lessons=34 parts_covered=4 manifest_entries=34 ids=0.1,…,3.8` |
 | 4a | 2026-11-15 | `615602d` | 8 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
 | 4b | 2026-11-15 | `451c822` | 9 added, 4 changed | 8 (`5.1`–`5.8`) | `OK lessons=50 parts_covered=6 manifest_entries=50 ids=0.1,…,5.8` |
+| 5 | 2026-11-15 | `66006dd` | 17 added, 4 changed | 16 (`6.1`–`6.8`, `7.1`–`7.8`) | `OK lessons=66 parts_covered=8 manifest_entries=66 ids=0.1,…,7.8` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -881,3 +882,38 @@ manifest_entries=50`, exit 0. Manifest and all three pages carry the same eight
 paths in order. Banned numbers under `site/` empty; `grep -rn 'passed'
 site/content/part-5/` empty; `embed_sources --check` OK; suite still green. This
 wave touches no code.
+
+## Wave 5 — Parts 6 and 7, "The five-field contract" and "The parser"
+
+Sixteen lessons, the site at 66 across eight parts. Part 5 taught the diff
+*format*; Part 7 teaches the *code* that reads it, and links back rather than
+repeating a format lesson.
+
+Part 6 walks the contract: why five fields (6.1), `line` as a string that holds a
+range (6.2), the severity ladder and its rank (6.3), the two prose fields (6.4),
+`extra="forbid"` and the boundary (6.5), constraints versus validators (6.6),
+serialising to JSON and to a row (6.7), and a guided read of `app/models.py`
+(6.8). Part 7 walks the parser: purity and the wrapper (7.1), the `_Builder`
+two-pass design (7.2), `FileDiff` against `FileSummary` (7.3), `_spans` (7.4),
+`normalize_path` and confinement (7.5), `anchor_findings` (7.6),
+`bundle_from_source` (7.7), and a guided read (7.8).
+
+**Fourteen of the sixteen examples run in the browser.** Every one was executed
+at build time and its stdout became `expected_output`, so a capture cannot drift
+from its code — the generator fails rather than writing a wrong output. That
+caught three of my own errors before they shipped: `ReviewResult` requires
+`target`, the severity enum rejects `"low"` rather than coercing it, and
+`str(Severity.HIGH)` is `Severity.HIGH`, not `HIGH`.
+
+The two guided reads are terminal: they are `grep` commands, and the runner has
+no shell.
+
+**Deferred, measured, not hidden.** Twenty-four of the 48 quiz questions still
+have the correct option as the unique longest by more than 8 characters. The
+answer *indices* are even (12/12/12/12) and no two options duplicate, but the
+length tell is a real guessing channel and needs a hand pass per question.
+
+**Gate.** `validate_lessons.py` → `OK lessons=66 parts_covered=8
+manifest_entries=66`, exit 0. Manifest and all three pages carry the same sixteen
+paths in order. No banned number as a word under `site/`. No "passed" in either
+new part. Suite green. No code touched.
