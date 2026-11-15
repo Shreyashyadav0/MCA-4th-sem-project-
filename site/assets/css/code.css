@@ -390,3 +390,13 @@ details.expected-output pre.code {
   background: var(--code-bg);
   color: var(--code-text);
 }
+
+/* The terminal panel's output wraps: a 96-character line must not need a
+ * sideways scroll inside a 298px box on a phone. */
+pre.code.terminal-output,
+pre.code.terminal-output code,
+pre.code.terminal-command,
+pre.code.terminal-command code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
