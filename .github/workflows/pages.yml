@@ -1,0 +1,45 @@
+name: Publish the learning site
+
+# GitHub Pages serves .css as text/css, which raw.githack does not — raw
+# proxies GitHub's raw files as text/plain with nosniff, and browsers then
+# refuse to apply the stylesheets at all. This publishes site/ properly.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the lesson gate before publishing
+        run: |
+          python site/tools/validate_lessons.py
+          python site/tools/embed_sources.py --check
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
