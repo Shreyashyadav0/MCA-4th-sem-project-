@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "make verify, then a guided read and rebuild",
   "order": 908,
   "duration_min": 30,
-  "concept_md": "### One command\n\n`make verify` runs `bash scripts/verify.sh`, which installs from the lock, runs the suite with outbound connections blocked, and validates the learning site. It is the acceptance test: if it prints a green summary, the tree is as good as it claims.\n\n### What it protects\n\nThree things at once — that the suite passes, that it passes with no network, and that the site's lessons are still coherent. Running them separately is how one of the three silently rots.\n\n### Reading `app/config.py` in order\n\nFour blocks: the class and its `model_config`, the credential fields, the local-model fields, and the persistence and auth fields. Every field has a default, every secret has `repr=False`, and the descriptions carry the reasoning that would otherwise live in a wiki.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_offline.py` asks you to reimplement the settings object and the network blocker against a small suite. Start with `Settings` and its defaults; then the loopback set; then the blocker. The tests name the behaviour, not the line.\n\n### What the guided read should leave you with\n\nThat configuration is data, not code — one class, every field defaulted, secrets unprintable, and one command that proves the whole thing runs without a network.",
+  "concept_md": "### One command\n\n`make verify` runs `bash scripts/verify.sh`, which installs from the lock, runs the suite with outbound connections blocked, and validates the learning site. It is the acceptance test: if it prints a green summary, the tree is as good as it claims.\n\n### What it protects\n\nThree things at once — that the suite passes, that it passes with no network, and that the site's lessons are still coherent. Running them separately is how one of the three silently rots.\n\n### Reading `app/config.py` in order\n\nFour blocks: the class and its `model_config`, the credential fields, the local-model fields, and the persistence and auth fields. Every field has a default, every secret has `repr=False`, and the descriptions carry the reasoning that would otherwise live in a wiki.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_offline.py` asks you to reimplement the settings object and the mock/offline path against a small suite. The blocker itself lives in `scripts/verify_offline.py`; the suite tests the degradation that happens when no provider is configured. The tests name the behaviour, not the line.\n\n### What the guided read should leave you with\n\nThat configuration is data, not code — one class, every field defaulted, secrets unprintable, and one command that proves the whole thing runs without a network.",
   "code_examples": [
     {
       "id": "9.8-ex-0",
@@ -29,7 +29,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
-      "expected_output": "sssss                                                                    [100%]\n5 skipped"
+      "expected_output": "sssss                                                                    [100%]\nall tests skip until rebuild/offline.py exists"
     }
   ],
   "quiz": [
@@ -47,23 +47,23 @@ window.LESSONS.push({
     {
       "q": "Which three things does it protect at once?",
       "options": [
-        "Suite, offline, site coherence",
         "Lint, types, and test coverage",
+        "Suite, offline, site coherence",
         "Build, image, and deployment",
         "Config, secrets, and auth"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Running them separately is how one of the three silently rots while the others stay green."
     },
     {
       "q": "What does the guided read conclude?",
       "options": [
-        "Configuration is data, not code",
-        "Config must be read at import",
         "Secrets belong in the repo",
+        "Config must be read at import",
+        "Configuration is data, not code",
         "Timeouts should be hardcoded in code"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "One class, every field defaulted, secrets unprintable, and one command that proves it offline."
     }
   ],

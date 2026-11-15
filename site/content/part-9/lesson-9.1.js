@@ -26,34 +26,34 @@ window.LESSONS.push({
     {
       "q": "How many modules read the environment directly?",
       "options": [
-        "Only app/config.py itself",
         "Two: config and the CLI",
+        "Only app/config.py itself",
         "Three: config, CLI, engine",
         "Every module needing a value"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "`Settings` is the only reader; everything else takes a settings object, so absence has one meaning per field."
     },
     {
       "q": "What does `extra=\"ignore\"` do to an unknown key?",
       "options": [
-        "Skips it without raising",
-        "Raises on start, naming it in the error",
         "Stores it in a catch-all",
+        "Raises on start, naming it in the error",
+        "Skips it without raising",
         "Warns once, then ignores"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A hand-edited `.env` should not stop the application, so an unknown name is skipped rather than fatal."
     },
     {
       "q": "Why does every field carry a default?",
       "options": [
-        "So a fresh checkout starts",
+        "So Pydantic infers types",
         "So tests skip validation",
         "So the class subclasses well",
-        "So Pydantic infers types"
+        "So a fresh checkout starts"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A required field would make the tool refuse to start, contradicting the offline-first promise."
     }
   ],

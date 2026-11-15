@@ -4,7 +4,8 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Stage 1 complete — quiz length tell 0 of 252, all four within 3 chars 0.
+Stage 1 done (quiz tell 0 of 252). Stage 2 partially done: Wave 6b audited
+by five of nine lanes, every HIGH fixed.
 
 ## Validator
 
@@ -27,12 +28,22 @@ parts complete (0–9 minus the last), 26 lessons to go to 110.
 
 ## Next stage
 
-**Stage 2 — Wave 6b's nine-auditor round.** The wave is written, gated and committed
-as unaudited; it needs its auditors before Stage 3.
+**Stage 2, second half — four more auditors on Part 9, then re-audit the fixes with
+three.** Five lanes ran (facts, quiz, prose, schema, honesty) and returned 33
+findings; every CRITICAL and HIGH is fixed.
 
-First concrete action: package the tree and run five auditors (anchors, claims,
-schema, quiz, prose) over `site/content/part-9/`, then four more, then fix every
-CRITICAL and HIGH and re-audit the fixes with three.
+Still owed from that round, recorded rather than dropped:
+- the four remaining lanes: links, accessibility, layout at 375/1440, consistency
+- the three-auditor re-audit of the fixes
+- MEDIUMs deferred: five Part 9 concepts are 175-190 words (floor is 200); 9.6's
+  exercise repeats its own try_it; 9.4's and 9.2's exercises are answerable from
+  their concept; 9.3 cites a README sentence that does not exist; 9.5's why_not
+  was copied from 9.1 and names the wrong blocker; 9.8's rebuild-suite link ends
+  mid-literal at 1-30
+- the validator's LINES_PATTERN still accepts a spaced range like "30 - 32"
+
+First concrete action: run the four remaining lanes over `site/content/part-9/`,
+fix what they return, then re-audit with three.
 
 ## Blocked
 

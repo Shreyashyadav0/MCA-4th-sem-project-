@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Docker: the pinned environment as an image",
   "order": 907,
   "duration_min": 30,
-  "concept_md": "### Two stages\n\nThe `Dockerfile` builds in one stage and runs in another. The builder installs from the lock into a virtual environment; the runtime copies that environment and nothing else. The compiler toolchain never reaches the final image.\n\n### What the runtime stage guarantees\n\nIt runs as `USER 10001:10001` — not root — and starts `uvicorn app.main:app` on port 8000. A container that runs as root turns any file-write bug into a host-write bug, which is why the non-root user is in the image rather than in a deployment note.\n\n### The compose file and the local model\n\n`docker-compose.yml` defines one service, `app`. Its comments document the LM Studio passthrough: on Desktop, `host.docker.internal` resolves and `LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1` works. On Linux it does not resolve by default, so the file shows the `host.docker.internal:host-gateway` mapping that makes the same value work.\n\n### Why the passthrough is documented rather than automated\n\nBecause it cannot be automated portably. A mapping that works on Desktop and a mapping that works on Linux are different, and guessing wrong produces a container that cannot reach a model with no error that explains why.",
+  "concept_md": "### Two stages\n\nThe `Dockerfile` builds in one stage and runs in another. The builder turns the lock into a wheelhouse with `pip wheel`; the runtime copies those wheels, installs them with `--no-index`, deletes the wheelhouse and copies the source. No virtual environment exists and the compiler toolchain never reaches the final image.\n\n### What the runtime stage guarantees\n\nIts instructions set `USER 10001:10001` — not root — and starts `uvicorn app.main:app` on port 8000. A container that runs as root turns any file-write bug into a host-write bug, which is why the non-root user is in the image rather than in a deployment note.\n\n### The compose file and the local model\n\n`docker-compose.yml` defines one service, `app`. Its comments document the LM Studio passthrough: on Desktop, `host.docker.internal` resolves and `LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1` works. On Linux it does not resolve by default, so the file shows the `host.docker.internal:host-gateway` mapping that makes the same value work.\n\n### Why the passthrough is documented rather than automated\n\nBecause it cannot be automated portably. A mapping that works on Desktop and a mapping that works on Linux are different, and guessing wrong produces a container that cannot reach a model with no error that explains why.",
   "code_examples": [
     {
       "id": "9.7-ex-0",
@@ -26,12 +26,12 @@ window.LESSONS.push({
     {
       "q": "What does the runtime stage copy?",
       "options": [
-        "The built environment only",
+        "The source, not the env",
         "The whole build context, including the source",
         "The compiler toolchain too",
-        "The source, not the env"
+        "The wheelhouse, then the source"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The builder's virtual environment is copied and the toolchain is left behind, which keeps the image small."
     },
     {
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "Why is the LM Studio mapping documented, not automated?",
       "options": [
-        "Desktop and Linux need different maps",
         "Compose cannot set environment",
+        "Desktop and Linux need different maps",
         "The mapping needs a paid Docker tier plan",
         "LM Studio refuses all containers"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "A mapping that works on one host does not work on the other, and a wrong guess fails without explaining."
     }
   ],

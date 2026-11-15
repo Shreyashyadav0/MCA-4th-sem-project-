@@ -13457,34 +13457,34 @@ window.LESSONS.push({
     {
       "q": "How many modules read the environment directly?",
       "options": [
-        "Only app/config.py itself",
         "Two: config and the CLI",
+        "Only app/config.py itself",
         "Three: config, CLI, engine",
         "Every module needing a value"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "`Settings` is the only reader; everything else takes a settings object, so absence has one meaning per field."
     },
     {
       "q": "What does `extra=\"ignore\"` do to an unknown key?",
       "options": [
-        "Skips it without raising",
-        "Raises on start, naming it in the error",
         "Stores it in a catch-all",
+        "Raises on start, naming it in the error",
+        "Skips it without raising",
         "Warns once, then ignores"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A hand-edited `.env` should not stop the application, so an unknown name is skipped rather than fatal."
     },
     {
       "q": "Why does every field carry a default?",
       "options": [
-        "So a fresh checkout starts",
+        "So Pydantic infers types",
         "So tests skip validation",
         "So the class subclasses well",
-        "So Pydantic infers types"
+        "So a fresh checkout starts"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A required field would make the tool refuse to start, contradicting the offline-first promise."
     }
   ],
@@ -13548,7 +13548,7 @@ window.LESSONS.push({
   "title": "The LMSTUDIO_* variables and what each changes",
   "order": 902,
   "duration_min": 20,
-  "concept_md": "### Four variables, one local server\n\n`LMSTUDIO_BASE_URL`, `LMSTUDIO_MODEL`, `LMSTUDIO_API_KEY` and `LMSTUDIO_TIMEOUT` describe a chat-completions server on your own machine. LM Studio speaks the OpenAI-compatible protocol, so the adapter that talks to a hosted endpoint talks to it.\n\n### What each one does\n\n`LMSTUDIO_BASE_URL` is the address, typically `http://localhost:1234/v1`. It is optional: when empty, the local provider is not selected. `LMSTUDIO_MODEL` names the model the server should load. `LMSTUDIO_API_KEY` is usually a placeholder, because a local server does not authenticate — but the field exists so the adapter has one shape. `LMSTUDIO_TIMEOUT` bounds the request and is larger than the hosted default, because a laptop model is slower.\n\n### Absence is a mode, not an error\n\nAn empty `LMSTUDIO_BASE_URL` does not raise. The selector sees no local endpoint and moves on, which is what lets the tool start on a machine that never installed a model.\n\n### The trap\n\nSetting the URL and forgetting the model gives a request the server rejects. Both are needed for a local run; the URL alone is not a configuration.",
+  "concept_md": "### Four variables, one local server\n\n`LMSTUDIO_BASE_URL`, `LMSTUDIO_MODEL`, `LMSTUDIO_API_KEY` and `LMSTUDIO_TIMEOUT` describe a chat-completions server on your own machine. LM Studio speaks the OpenAI-compatible protocol, so the adapter that talks to a hosted endpoint talks to it.\n\n### What each one does\n\n`LMSTUDIO_BASE_URL` is the address, typically `http://localhost:1234/v1`. It is optional: when empty, the local provider is not selected. `LMSTUDIO_MODEL` names the model the server should load, and it has a default — so forgetting it is silent rather than fatal. `LMSTUDIO_API_KEY` is usually a placeholder, because a local server does not authenticate — but the field exists so the adapter has one shape. `LMSTUDIO_TIMEOUT` bounds the request and is larger than the hosted default, because a laptop model is slower.\n\n### Absence is a mode, not an error\n\nAn empty `LMSTUDIO_BASE_URL` does not raise. The selector sees no local endpoint and moves on, which is what lets the tool start on a machine that never installed a model.\n\n### The trap\n\nSetting the URL and forgetting the model does not fail: `lmstudio_model` has a default id, so the request goes out naming a model your server may never have loaded. The failure arrives from the server as a 404 rather than from configuration.",
   "code_examples": [
     {
       "id": "9.2-ex-0",
@@ -13565,23 +13565,23 @@ window.LESSONS.push({
     {
       "q": "What happens when `LMSTUDIO_BASE_URL` is empty?",
       "options": [
-        "Local is simply not selected",
-        "The application will not start at all",
         "The Sarvam key is used instead",
+        "The application will not start at all",
+        "Local is simply not selected",
         "The timeout falls back to zero"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Absence is a mode: the selector sees no endpoint and moves on, which keeps a fresh checkout startable."
     },
     {
       "q": "Why does a local server still have an API-key field?",
       "options": [
-        "So the adapter has one shape",
+        "Because Pydantic demands a secret",
         "Because LM Studio requires auth",
         "So the key can be rotated",
-        "Because Pydantic demands a secret"
+        "So the adapter has one shape"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A local server does not authenticate, but keeping the field means the adapter needs no special case."
     },
     {
@@ -13605,7 +13605,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Which two LMSTUDIO fields must both be set for a local run to work?",
     "hint": "One is the address, one names the model.",
-    "solution": "```text\nLMSTUDIO_BASE_URL and LMSTUDIO_MODEL.\n\nThe URL alone leaves the server without a model to load; the model alone leaves\nthe adapter without an address to call.\n```",
+    "solution": "```text\nLMSTUDIO_BASE_URL must be set; LMSTUDIO_MODEL falls back to a default id.\n\nThe URL selects the local provider. The model is never absent, which is why\nforgetting it produces a server-side 404 rather than a configuration error.\n```",
     "explanation": "Both are needed, and neither is required for the tool to start — that is the difference between a mode and an error."
   },
   "common_mistakes": [
@@ -13651,7 +13651,7 @@ window.LESSONS.push({
   "title": "Secrets: three keys that must never be printed",
   "order": 903,
   "duration_min": 25,
-  "concept_md": "### Three keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN` and `GITHUB_WEBHOOK_SECRET`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
+  "concept_md": "### Five keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `LMSTUDIO_API_KEY` and `DB_SEED_ADMIN_KEY`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
   "code_examples": [
     {
       "id": "9.3-ex-0",
@@ -13668,12 +13668,12 @@ window.LESSONS.push({
     {
       "q": "What keeps a secret out of a traceback?",
       "options": [
-        "`repr=False` on the field",
+        "A validator that redacts",
         "Encrypting it at rest",
         "Keeping it in a file only",
-        "A validator that redacts"
+        "`repr=False` on the field"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The value is removed from the object's representation, so a printed object or a settings dump cannot show it."
     },
     {
@@ -13690,12 +13690,12 @@ window.LESSONS.push({
     {
       "q": "Which secret is outside this code's protection?",
       "options": [
-        "One pasted in a shell",
         "One in an env variable, never in a file",
+        "One pasted in a shell",
         "One loaded from a .env",
         "One held in Settings"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Shell history, screenshots and chat logs are outside the program, which is why the example file ships empty."
     }
   ],
@@ -13706,7 +13706,7 @@ window.LESSONS.push({
     "explanation": "It prints `False`, which is the guarantee the field declaration buys."
   },
   "exercise": {
-    "prompt": "Which three fields are declared with `repr=False`? Check rather than assume.",
+    "prompt": "Which fields are declared with `repr=False`? Count them rather than trusting the heading.",
     "hint": "Read the field metadata for each secret.",
     "solution": "```python\nfrom app.config import Settings\n\nfor name, f in Settings.model_fields.items():\n    if f.repr is False:\n        print(name)\n```",
     "explanation": "The list is the answer, derived from the class rather than from the documentation."
@@ -13792,23 +13792,23 @@ window.LESSONS.push({
     {
       "q": "What does `request_timeout_s` refuse?",
       "options": [
-        "Zero and negative values",
         "Values above sixty seconds, which are refused",
+        "Zero and negative values",
         "Non-integer values only",
         "Nothing; it is unbounded"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "The field carries `gt=0`, so an unusable timeout fails at construction rather than at request time."
     },
     {
       "q": "Is authentication on by default?",
       "options": [
-        "No, it is off for the demo",
-        "Yes, with a seeded key",
         "Only when a database exists",
+        "Yes, with a seeded key",
+        "No, it is off for the demo",
         "Only in live review mode"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Open management endpoints keep the demo answerable without a key; `api_auth_enabled` exists for deployments."
     }
   ],
@@ -13889,34 +13889,34 @@ window.LESSONS.push({
     {
       "q": "What does the proof patch?",
       "options": [
-        "The socket connect functions",
         "The HTTP client library",
+        "The socket connect functions",
         "The DNS resolver alone",
         "The pytest collection stage here"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Patching connect at the socket layer catches every client, rather than one library's calls."
     },
     {
       "q": "Why is loopback exempt?",
       "options": [
-        "Offline means no internet, not no sockets",
-        "Because tests need a real server",
         "Because pytest binds a local port",
+        "Because tests need a real server",
+        "Offline means no internet, not no sockets",
         "Because the patch cannot ever see it at all"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A local model and an in-process test client both use loopback, and neither is a network call."
     },
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That unreached code never calls out",
+        "That a call would be recorded",
         "That the suite passes offline",
         "That loopback still works fine for tests",
-        "That a call would be recorded"
+        "That unreached code never calls out"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "It only proves the paths the suite exercises; an untested branch could still reach the network."
     }
   ],
@@ -13980,11 +13980,11 @@ window.LESSONS.push({
   "title": "Pinned dependencies: ranges versus a lock",
   "order": 906,
   "duration_min": 25,
-  "concept_md": "### Two files, two jobs\n\n`requirements.txt` carries ranges — `fastapi>=0.110,<1` — and is what a human reads to know what the project needs. `requirements.lock` carries exact pins, one per line with `==`, and is what CI installs.\n\n### Why both\n\nA range says what is compatible; a pin says what was tested. Installing from ranges means today's install can differ from yesterday's, which is how a suite that passed on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
+  "concept_md": "### Two files, two jobs\n\n`requirements.txt` lists the eight direct dependencies, each pinned exactly with `==`. `requirements.lock` adds the transitive and development pins — thirty-seven in all — and is what CI installs. There are no ranges in either file.\n\n### Why both\n\nTwo pins in two files answer two questions: the direct list says what the project asks for, and the lock says what was installed. Installing without the lock means today's install can differ from yesterday's, which is how a suite that was green on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### Why the lock is the longer file\n\nThe lock is longer because it is transitive: the eight direct pins pull in twenty-nine more. That is why CI installs the lock and a reader reads the list.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
   "code_examples": [
     {
       "id": "9.6-ex-0",
-      "lang": "console",
+      "lang": "python",
       "caption": "Count the pins, and show the first range",
       "code": "import pathlib\n\nlock = pathlib.Path(\"requirements.lock\").read_text().splitlines()\npins = [l for l in lock if \"==\" in l and not l.strip().startswith(\"#\")]\nprint(\"pins:\", len(pins))\nprint(\"first range:\", pathlib.Path(\"requirements.txt\").read_text().splitlines()[0])",
       "runnable": false,
@@ -13997,23 +13997,23 @@ window.LESSONS.push({
     {
       "q": "What does the lock file record?",
       "options": [
-        "Exactly what was tested",
-        "What would be compatible with the range",
         "The project's direct needs",
+        "What would be compatible with the range",
+        "Exactly what was tested",
         "The Python version only"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A pin says what ran; a range says what is allowed, and the two answer different questions."
     },
     {
       "q": "How is a version in the lock changed?",
       "options": [
-        "Regenerate it from the range",
+        "Add a second pin beside it",
         "Edit the version by hand",
         "Delete the line and reinstall",
-        "Add a second pin beside it"
+        "Regenerate it from the range"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A hand-edited lock lies about what was tested, so the range changes first and the lock is regenerated."
     },
     {
@@ -14088,7 +14088,7 @@ window.LESSONS.push({
   "title": "Docker: the pinned environment as an image",
   "order": 907,
   "duration_min": 30,
-  "concept_md": "### Two stages\n\nThe `Dockerfile` builds in one stage and runs in another. The builder installs from the lock into a virtual environment; the runtime copies that environment and nothing else. The compiler toolchain never reaches the final image.\n\n### What the runtime stage guarantees\n\nIt runs as `USER 10001:10001` — not root — and starts `uvicorn app.main:app` on port 8000. A container that runs as root turns any file-write bug into a host-write bug, which is why the non-root user is in the image rather than in a deployment note.\n\n### The compose file and the local model\n\n`docker-compose.yml` defines one service, `app`. Its comments document the LM Studio passthrough: on Desktop, `host.docker.internal` resolves and `LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1` works. On Linux it does not resolve by default, so the file shows the `host.docker.internal:host-gateway` mapping that makes the same value work.\n\n### Why the passthrough is documented rather than automated\n\nBecause it cannot be automated portably. A mapping that works on Desktop and a mapping that works on Linux are different, and guessing wrong produces a container that cannot reach a model with no error that explains why.",
+  "concept_md": "### Two stages\n\nThe `Dockerfile` builds in one stage and runs in another. The builder turns the lock into a wheelhouse with `pip wheel`; the runtime copies those wheels, installs them with `--no-index`, deletes the wheelhouse and copies the source. No virtual environment exists and the compiler toolchain never reaches the final image.\n\n### What the runtime stage guarantees\n\nIts instructions set `USER 10001:10001` — not root — and starts `uvicorn app.main:app` on port 8000. A container that runs as root turns any file-write bug into a host-write bug, which is why the non-root user is in the image rather than in a deployment note.\n\n### The compose file and the local model\n\n`docker-compose.yml` defines one service, `app`. Its comments document the LM Studio passthrough: on Desktop, `host.docker.internal` resolves and `LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1` works. On Linux it does not resolve by default, so the file shows the `host.docker.internal:host-gateway` mapping that makes the same value work.\n\n### Why the passthrough is documented rather than automated\n\nBecause it cannot be automated portably. A mapping that works on Desktop and a mapping that works on Linux are different, and guessing wrong produces a container that cannot reach a model with no error that explains why.",
   "code_examples": [
     {
       "id": "9.7-ex-0",
@@ -14105,12 +14105,12 @@ window.LESSONS.push({
     {
       "q": "What does the runtime stage copy?",
       "options": [
-        "The built environment only",
+        "The source, not the env",
         "The whole build context, including the source",
         "The compiler toolchain too",
-        "The source, not the env"
+        "The wheelhouse, then the source"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The builder's virtual environment is copied and the toolchain is left behind, which keeps the image small."
     },
     {
@@ -14127,12 +14127,12 @@ window.LESSONS.push({
     {
       "q": "Why is the LM Studio mapping documented, not automated?",
       "options": [
-        "Desktop and Linux need different maps",
         "Compose cannot set environment",
+        "Desktop and Linux need different maps",
         "The mapping needs a paid Docker tier plan",
         "LM Studio refuses all containers"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "A mapping that works on one host does not work on the other, and a wrong guess fails without explaining."
     }
   ],
@@ -14201,7 +14201,7 @@ window.LESSONS.push({
   "title": "make verify, then a guided read and rebuild",
   "order": 908,
   "duration_min": 30,
-  "concept_md": "### One command\n\n`make verify` runs `bash scripts/verify.sh`, which installs from the lock, runs the suite with outbound connections blocked, and validates the learning site. It is the acceptance test: if it prints a green summary, the tree is as good as it claims.\n\n### What it protects\n\nThree things at once — that the suite passes, that it passes with no network, and that the site's lessons are still coherent. Running them separately is how one of the three silently rots.\n\n### Reading `app/config.py` in order\n\nFour blocks: the class and its `model_config`, the credential fields, the local-model fields, and the persistence and auth fields. Every field has a default, every secret has `repr=False`, and the descriptions carry the reasoning that would otherwise live in a wiki.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_offline.py` asks you to reimplement the settings object and the network blocker against a small suite. Start with `Settings` and its defaults; then the loopback set; then the blocker. The tests name the behaviour, not the line.\n\n### What the guided read should leave you with\n\nThat configuration is data, not code — one class, every field defaulted, secrets unprintable, and one command that proves the whole thing runs without a network.",
+  "concept_md": "### One command\n\n`make verify` runs `bash scripts/verify.sh`, which installs from the lock, runs the suite with outbound connections blocked, and validates the learning site. It is the acceptance test: if it prints a green summary, the tree is as good as it claims.\n\n### What it protects\n\nThree things at once — that the suite passes, that it passes with no network, and that the site's lessons are still coherent. Running them separately is how one of the three silently rots.\n\n### Reading `app/config.py` in order\n\nFour blocks: the class and its `model_config`, the credential fields, the local-model fields, and the persistence and auth fields. Every field has a default, every secret has `repr=False`, and the descriptions carry the reasoning that would otherwise live in a wiki.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_offline.py` asks you to reimplement the settings object and the mock/offline path against a small suite. The blocker itself lives in `scripts/verify_offline.py`; the suite tests the degradation that happens when no provider is configured. The tests name the behaviour, not the line.\n\n### What the guided read should leave you with\n\nThat configuration is data, not code — one class, every field defaulted, secrets unprintable, and one command that proves the whole thing runs without a network.",
   "code_examples": [
     {
       "id": "9.8-ex-0",
@@ -14221,7 +14221,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
-      "expected_output": "sssss                                                                    [100%]\n5 skipped"
+      "expected_output": "sssss                                                                    [100%]\nall tests skip until rebuild/offline.py exists"
     }
   ],
   "quiz": [
@@ -14239,23 +14239,23 @@ window.LESSONS.push({
     {
       "q": "Which three things does it protect at once?",
       "options": [
-        "Suite, offline, site coherence",
         "Lint, types, and test coverage",
+        "Suite, offline, site coherence",
         "Build, image, and deployment",
         "Config, secrets, and auth"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Running them separately is how one of the three silently rots while the others stay green."
     },
     {
       "q": "What does the guided read conclude?",
       "options": [
-        "Configuration is data, not code",
-        "Config must be read at import",
         "Secrets belong in the repo",
+        "Config must be read at import",
+        "Configuration is data, not code",
         "Timeouts should be hardcoded in code"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "One class, every field defaulted, secrets unprintable, and one command that proves it offline."
     }
   ],

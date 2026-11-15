@@ -37,23 +37,23 @@ window.LESSONS.push({
     {
       "q": "What does `request_timeout_s` refuse?",
       "options": [
-        "Zero and negative values",
         "Values above sixty seconds, which are refused",
+        "Zero and negative values",
         "Non-integer values only",
         "Nothing; it is unbounded"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "The field carries `gt=0`, so an unusable timeout fails at construction rather than at request time."
     },
     {
       "q": "Is authentication on by default?",
       "options": [
-        "No, it is off for the demo",
-        "Yes, with a seeded key",
         "Only when a database exists",
+        "Yes, with a seeded key",
+        "No, it is off for the demo",
         "Only in live review mode"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Open management endpoints keep the demo answerable without a key; `api_auth_enabled` exists for deployments."
     }
   ],

@@ -9,11 +9,11 @@ window.LESSONS.push({
   "title": "Pinned dependencies: ranges versus a lock",
   "order": 906,
   "duration_min": 25,
-  "concept_md": "### Two files, two jobs\n\n`requirements.txt` carries ranges — `fastapi>=0.110,<1` — and is what a human reads to know what the project needs. `requirements.lock` carries exact pins, one per line with `==`, and is what CI installs.\n\n### Why both\n\nA range says what is compatible; a pin says what was tested. Installing from ranges means today's install can differ from yesterday's, which is how a suite that passed on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
+  "concept_md": "### Two files, two jobs\n\n`requirements.txt` lists the eight direct dependencies, each pinned exactly with `==`. `requirements.lock` adds the transitive and development pins — thirty-seven in all — and is what CI installs. There are no ranges in either file.\n\n### Why both\n\nTwo pins in two files answer two questions: the direct list says what the project asks for, and the lock says what was installed. Installing without the lock means today's install can differ from yesterday's, which is how a suite that was green on Monday fails on Tuesday with no code change.\n\n### The lock is generated, never edited\n\nEditing a version by hand in the lock makes the file a lie about what was tested. The regeneration procedure lives in `docs/REPRODUCIBILITY.md`, and the rule is simple: change the range, regenerate the lock, commit both.\n\n### What the pin count means\n\nThirty-seven pins at this commit. The count is a fact about the lock, not a target — and the guide now computes it from the file rather than carrying a typed number, because a typed one had already drifted.\n\n### Why the lock is the longer file\n\nThe lock is longer because it is transitive: the eight direct pins pull in twenty-nine more. That is why CI installs the lock and a reader reads the list.\n\n### The cost\n\nA lock has to be regenerated when a dependency needs a security bump, and that regeneration can surface an incompatibility at an inconvenient time. That is the trade: an inconvenient moment now instead of an unexplained failure later.",
   "code_examples": [
     {
       "id": "9.6-ex-0",
-      "lang": "console",
+      "lang": "python",
       "caption": "Count the pins, and show the first range",
       "code": "import pathlib\n\nlock = pathlib.Path(\"requirements.lock\").read_text().splitlines()\npins = [l for l in lock if \"==\" in l and not l.strip().startswith(\"#\")]\nprint(\"pins:\", len(pins))\nprint(\"first range:\", pathlib.Path(\"requirements.txt\").read_text().splitlines()[0])",
       "runnable": false,
@@ -26,23 +26,23 @@ window.LESSONS.push({
     {
       "q": "What does the lock file record?",
       "options": [
-        "Exactly what was tested",
-        "What would be compatible with the range",
         "The project's direct needs",
+        "What would be compatible with the range",
+        "Exactly what was tested",
         "The Python version only"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A pin says what ran; a range says what is allowed, and the two answer different questions."
     },
     {
       "q": "How is a version in the lock changed?",
       "options": [
-        "Regenerate it from the range",
+        "Add a second pin beside it",
         "Edit the version by hand",
         "Delete the line and reinstall",
-        "Add a second pin beside it"
+        "Regenerate it from the range"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A hand-edited lock lies about what was tested, so the range changes first and the lock is regenerated."
     },
     {

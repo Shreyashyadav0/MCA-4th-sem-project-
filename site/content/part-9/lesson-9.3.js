@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Secrets: three keys that must never be printed",
   "order": 903,
   "duration_min": 25,
-  "concept_md": "### Three keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN` and `GITHUB_WEBHOOK_SECRET`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
+  "concept_md": "### Five keys, one rule\n\n`SARVAM_API_KEY`, `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `LMSTUDIO_API_KEY` and `DB_SEED_ADMIN_KEY`. The rule is short: none of them appears in a log, a repr, an error message or a response.\n\n### `repr=False` is the mechanism\n\nEach secret field is declared with `repr=False`. That removes it from the object's representation, so `print(settings)` and a traceback showing the object cannot leak it. It is one word per field, and it is the difference between a careful codebase and one that leaks on the first exception.\n\n### Where the secret is used, and what is shown instead\n\nThe GitHub client takes the token, uses it in a header, and never puts it in a finding or a comment. The webhook secret is compared against a signature and the comparison result is a boolean. The Sarvam key goes into an HTTP header and nothing else.\n\n### What is not protected\n\nThe `.env` file itself. It is gitignored, but a key pasted into a shell history or a screenshot is outside anything this code can do. That is why `.env.example` ships with empty values and why the README says to prefer environment variables for a live key.",
   "code_examples": [
     {
       "id": "9.3-ex-0",
@@ -26,12 +26,12 @@ window.LESSONS.push({
     {
       "q": "What keeps a secret out of a traceback?",
       "options": [
-        "`repr=False` on the field",
+        "A validator that redacts",
         "Encrypting it at rest",
         "Keeping it in a file only",
-        "A validator that redacts"
+        "`repr=False` on the field"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The value is removed from the object's representation, so a printed object or a settings dump cannot show it."
     },
     {
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "Which secret is outside this code's protection?",
       "options": [
-        "One pasted in a shell",
         "One in an env variable, never in a file",
+        "One pasted in a shell",
         "One loaded from a .env",
         "One held in Settings"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Shell history, screenshots and chat logs are outside the program, which is why the example file ships empty."
     }
   ],
@@ -64,7 +64,7 @@ window.LESSONS.push({
     "explanation": "It prints `False`, which is the guarantee the field declaration buys."
   },
   "exercise": {
-    "prompt": "Which three fields are declared with `repr=False`? Check rather than assume.",
+    "prompt": "Which fields are declared with `repr=False`? Count them rather than trusting the heading.",
     "hint": "Read the field metadata for each secret.",
     "solution": "```python\nfrom app.config import Settings\n\nfor name, f in Settings.model_fields.items():\n    if f.repr is False:\n        print(name)\n```",
     "explanation": "The list is the answer, derived from the class rather than from the documentation."

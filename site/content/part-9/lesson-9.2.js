@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The LMSTUDIO_* variables and what each changes",
   "order": 902,
   "duration_min": 20,
-  "concept_md": "### Four variables, one local server\n\n`LMSTUDIO_BASE_URL`, `LMSTUDIO_MODEL`, `LMSTUDIO_API_KEY` and `LMSTUDIO_TIMEOUT` describe a chat-completions server on your own machine. LM Studio speaks the OpenAI-compatible protocol, so the adapter that talks to a hosted endpoint talks to it.\n\n### What each one does\n\n`LMSTUDIO_BASE_URL` is the address, typically `http://localhost:1234/v1`. It is optional: when empty, the local provider is not selected. `LMSTUDIO_MODEL` names the model the server should load. `LMSTUDIO_API_KEY` is usually a placeholder, because a local server does not authenticate — but the field exists so the adapter has one shape. `LMSTUDIO_TIMEOUT` bounds the request and is larger than the hosted default, because a laptop model is slower.\n\n### Absence is a mode, not an error\n\nAn empty `LMSTUDIO_BASE_URL` does not raise. The selector sees no local endpoint and moves on, which is what lets the tool start on a machine that never installed a model.\n\n### The trap\n\nSetting the URL and forgetting the model gives a request the server rejects. Both are needed for a local run; the URL alone is not a configuration.",
+  "concept_md": "### Four variables, one local server\n\n`LMSTUDIO_BASE_URL`, `LMSTUDIO_MODEL`, `LMSTUDIO_API_KEY` and `LMSTUDIO_TIMEOUT` describe a chat-completions server on your own machine. LM Studio speaks the OpenAI-compatible protocol, so the adapter that talks to a hosted endpoint talks to it.\n\n### What each one does\n\n`LMSTUDIO_BASE_URL` is the address, typically `http://localhost:1234/v1`. It is optional: when empty, the local provider is not selected. `LMSTUDIO_MODEL` names the model the server should load, and it has a default — so forgetting it is silent rather than fatal. `LMSTUDIO_API_KEY` is usually a placeholder, because a local server does not authenticate — but the field exists so the adapter has one shape. `LMSTUDIO_TIMEOUT` bounds the request and is larger than the hosted default, because a laptop model is slower.\n\n### Absence is a mode, not an error\n\nAn empty `LMSTUDIO_BASE_URL` does not raise. The selector sees no local endpoint and moves on, which is what lets the tool start on a machine that never installed a model.\n\n### The trap\n\nSetting the URL and forgetting the model does not fail: `lmstudio_model` has a default id, so the request goes out naming a model your server may never have loaded. The failure arrives from the server as a 404 rather than from configuration.",
   "code_examples": [
     {
       "id": "9.2-ex-0",
@@ -26,23 +26,23 @@ window.LESSONS.push({
     {
       "q": "What happens when `LMSTUDIO_BASE_URL` is empty?",
       "options": [
-        "Local is simply not selected",
-        "The application will not start at all",
         "The Sarvam key is used instead",
+        "The application will not start at all",
+        "Local is simply not selected",
         "The timeout falls back to zero"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Absence is a mode: the selector sees no endpoint and moves on, which keeps a fresh checkout startable."
     },
     {
       "q": "Why does a local server still have an API-key field?",
       "options": [
-        "So the adapter has one shape",
+        "Because Pydantic demands a secret",
         "Because LM Studio requires auth",
         "So the key can be rotated",
-        "Because Pydantic demands a secret"
+        "So the adapter has one shape"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A local server does not authenticate, but keeping the field means the adapter needs no special case."
     },
     {
@@ -66,7 +66,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Which two LMSTUDIO fields must both be set for a local run to work?",
     "hint": "One is the address, one names the model.",
-    "solution": "```text\nLMSTUDIO_BASE_URL and LMSTUDIO_MODEL.\n\nThe URL alone leaves the server without a model to load; the model alone leaves\nthe adapter without an address to call.\n```",
+    "solution": "```text\nLMSTUDIO_BASE_URL must be set; LMSTUDIO_MODEL falls back to a default id.\n\nThe URL selects the local provider. The model is never absent, which is why\nforgetting it produces a server-side 404 rather than a configuration error.\n```",
     "explanation": "Both are needed, and neither is required for the tool to start — that is the difference between a mode and an error."
   },
   "common_mistakes": [

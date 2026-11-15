@@ -26,34 +26,34 @@ window.LESSONS.push({
     {
       "q": "What does the proof patch?",
       "options": [
-        "The socket connect functions",
         "The HTTP client library",
+        "The socket connect functions",
         "The DNS resolver alone",
         "The pytest collection stage here"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Patching connect at the socket layer catches every client, rather than one library's calls."
     },
     {
       "q": "Why is loopback exempt?",
       "options": [
-        "Offline means no internet, not no sockets",
-        "Because tests need a real server",
         "Because pytest binds a local port",
+        "Because tests need a real server",
+        "Offline means no internet, not no sockets",
         "Because the patch cannot ever see it at all"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A local model and an in-process test client both use loopback, and neither is a network call."
     },
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That unreached code never calls out",
+        "That a call would be recorded",
         "That the suite passes offline",
         "That loopback still works fine for tests",
-        "That a call would be recorded"
+        "That unreached code never calls out"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "It only proves the paths the suite exercises; an untested branch could still reach the network."
     }
   ],
