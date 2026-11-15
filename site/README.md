@@ -1,7 +1,7 @@
 # The learning site
 
 A static, offline-first W3Schools-style site for the Autonomous AI Code Reviewer.
-Thirteen parts, 110 lessons planned; forty-two are written (0.1–0.4, 1.1–1.12, 2.1–2.10, 3.1–3.8, 4.1–4.8).
+Thirteen parts, 110 lessons planned; sixty-six are written across eight parts (0.1–7.8).
 
 **This site is a learning aid.** For what the code does, `HANDOFF.md` is the ledger and it wins any disagreement; `docs/learning/` is the curriculum this site follows.
 

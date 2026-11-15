@@ -158,8 +158,15 @@
     display: none;
   }
 
+  /* The label stays on paper: without it the expected output prints as a bare
+   * grey box that looks like real program output. */
   details.expected-output > summary {
-    display: none;
+    display: block;
+    font-weight: 700;
+  }
+
+  details.expected-output > summary::marker {
+    content: "";
   }
 
   p,
@@ -199,5 +206,13 @@
 
   .lesson-section {
     break-inside: auto;
+  }
+}
+
+/* The terminal panel already prints the command, so the code figure above it
+ * must not print it a second time. */
+@media print {
+  pre.code.terminal-command {
+    display: none;
   }
 }

@@ -1226,6 +1226,12 @@
       if (tag === "input" || tag === "textarea" || tag === "select" || (node && node.isContentEditable)) {
         return;
       }
+      /* An arrow pressed while a control has focus belongs to that control — a
+       * quiz radio, a pager link, the drawer toggle. Navigating away from it
+       * silently discarded the answers the reader had just given. */
+      if (node && node.closest && node.closest("button, a[href], summary, [role='separator'], [role='button']")) {
+        return;
+      }
       var link = document.getElementById(event.key === "ArrowLeft" ? "prev-link" : "next-link");
       if (!link || !link.getAttribute("href")) {
         return;

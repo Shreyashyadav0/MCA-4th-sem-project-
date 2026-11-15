@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "A provider returns prose instead of JSON. What does `model_validate_json` raise?",
       "options": [
         "`ValidationError`, with the entry type `json_invalid`",
-        "`json.JSONDecodeError`",
+        "Because a raised exception cannot cross a function boundary",
         "`ValueError` from the JSON module",
         "Nothing, it returns None"
       ],

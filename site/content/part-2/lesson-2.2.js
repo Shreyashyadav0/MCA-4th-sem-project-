@@ -29,7 +29,7 @@ window.LESSONS.push({
     {
       "q": "`priority: int = 0` — what does the `= 0` change?",
       "options": [
-        "It makes the field required",
+        "It raises ValidationError, because int fields refuse strings",
         "It restricts the field to positive numbers",
         "It gives the field a default, so it may be omitted",
         "It makes the field read-only"

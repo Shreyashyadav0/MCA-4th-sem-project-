@@ -17,6 +17,7 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
+  --skip-bg: #047857;
 
   /* --- surfaces ---------------------------------------------------------- */
   --bg: #ffffff;
@@ -106,6 +107,7 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
+  --skip-bg: #047857;   /* the skip link keeps the AA green in both themes */
 
   --bg: #282a35;
   --surface: #1f2229;

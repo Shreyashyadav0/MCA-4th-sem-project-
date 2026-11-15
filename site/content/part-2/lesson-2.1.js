@@ -34,7 +34,7 @@ window.LESSONS.push({
       "q": "What does a plain dict give you that a BaseModel does not?",
       "options": [
         "Nothing — it accepts any key and any value",
-        "Type checking on every read",
+        "Because Pydantic refuses to validate the same model twice",
         "A default for missing keys",
         "JSON serialisation for free"
       ],

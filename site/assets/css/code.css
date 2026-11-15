@@ -92,8 +92,10 @@
   background: var(--accent);
   color: var(--accent-contrast);
   border-color: var(--accent);
-  font-weight: 600;
-  font-size: 1.1875rem; /* 19px: 14.25pt bold clears the large-text line */
+  /* 19px at weight 700 is 14.25pt bold, which is WCAG's large text — the one
+   * reason white on the brand green's 3.01:1 is allowed. At 600 it is not. */
+  font-weight: 700;
+  font-size: 1.1875rem;
   padding-inline: var(--space-6);
 }
 

@@ -32,7 +32,7 @@ window.LESSONS.push({
     {
       "q": "`findings: list[Finding]` — what does the annotation validate?",
       "options": [
-        "Only that the value is a list",
+        "Because a bare [] default raises a TypeError at import",
         "That the list is not empty",
         "That it is a list and that every element is a Finding",
         "Nothing until the list is read"

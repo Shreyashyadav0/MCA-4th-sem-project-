@@ -251,7 +251,9 @@
         var open = toggle.getAttribute("aria-expanded") === "true";
         toggle.setAttribute("aria-expanded", open ? "false" : "true");
         body.hidden = open;
-        collapsed[part.n] = open;
+        /* Store the state we are moving TO. Storing `open` recorded the previous
+         * state, so the next render inverted every part the reader had touched. */
+        collapsed[part.n] = !open;
       });
 
       scroller.appendChild(group);

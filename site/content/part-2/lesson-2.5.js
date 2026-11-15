@@ -33,7 +33,7 @@ window.LESSONS.push({
       "q": "A rule that compares two fields of the same model belongs where?",
       "options": [
         "A `@model_validator`, which can see both",
-        "A `@field_validator` on the first field",
+        "TypeError, which aborts validation before any field is checked",
         "A `Field(...)` constraint",
         "A separate function called by the caller"
       ],
