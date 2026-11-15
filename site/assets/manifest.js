@@ -85,6 +85,16 @@
     "content/part-7/lesson-7.5.js",
     "content/part-7/lesson-7.6.js",
     "content/part-7/lesson-7.7.js",
-    "content/part-7/lesson-7.8.js"
+    "content/part-7/lesson-7.8.js",
+    "content/part-8/lesson-8.1.js",
+    "content/part-8/lesson-8.2.js",
+    "content/part-8/lesson-8.3.js",
+    "content/part-8/lesson-8.4.js",
+    "content/part-8/lesson-8.5.js",
+    "content/part-8/lesson-8.6.js",
+    "content/part-8/lesson-8.7.js",
+    "content/part-8/lesson-8.8.js",
+    "content/part-8/lesson-8.9.js",
+    "content/part-8/lesson-8.10.js"
   ];
 })();

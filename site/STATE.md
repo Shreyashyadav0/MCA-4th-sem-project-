@@ -19,6 +19,7 @@ is the bug.
 | 4a | 2026-11-15 | `615602d` | 8 added, 4 changed | 8 (`4.1`–`4.8`) | `OK lessons=42 parts_covered=5 manifest_entries=42 ids=0.1,…,4.8` |
 | 4b | 2026-11-15 | `451c822` | 9 added, 4 changed | 8 (`5.1`–`5.8`) | `OK lessons=50 parts_covered=6 manifest_entries=50 ids=0.1,…,5.8` |
 | 5 | 2026-11-15 | `66006dd` | 17 added, 4 changed | 16 (`6.1`–`6.8`, `7.1`–`7.8`) | `OK lessons=66 parts_covered=8 manifest_entries=66 ids=0.1,…,7.8` |
+| 6a | 2026-11-15 | `423fd33` | 11 added, 4 changed | 10 (`8.1`–`8.10`) | `OK lessons=76 parts_covered=9 manifest_entries=76 ids=0.1,…,8.10` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -938,3 +939,20 @@ rewrite that teaches the code rather than the format.
 manifest_entries=66`, exit 0. Manifest and all three pages carry the same sixteen
 paths in order. No banned number as a word under `site/`. No "passed" in either
 new part. Suite green. No code touched.
+
+## Wave 6a — Part 8, "The rule engine"
+
+Ten lessons, the site at 76 across nine parts. Every example runs in the browser
+except 8.10's two, which are shell commands; all eleven were executed at build
+time and their stdout became `expected_output`.
+
+Three errors the generator caught before they shipped, all mine: `_suppressed_ids`
+is the helper's name, not `_suppression_for`; the registry is a dict called
+`RULES_BY_ID`, not a function called `rule_by_id`; and there is no
+`injection/eval-string` rule — the injection ids begin `unsafe/`.
+
+`site/tools/check_ranges.py` reports 164 ranges and 0 problems, and
+`check_quiz.py` reports the tell on 120 of 228 questions, 7 of them in this part.
+Both checkers exist because these two defects have recurred in every wave.
+
+**Not done:** the nine-auditor round. This wave is built and gated, not audited.
