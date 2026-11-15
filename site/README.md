@@ -3,7 +3,7 @@
 A static, offline-first W3Schools-style site for the Autonomous AI Code Reviewer.
 Thirteen parts, 108 lessons planned; sixteen are written (0.1–0.4 and 1.1–1.12).
 
-**This site is a learning aid; `docs/learning/` is the source of truth.**
+**This site is a learning aid.** For what the code does, `HANDOFF.md` is the ledger and it wins any disagreement; `docs/learning/` is the curriculum this site follows.
 
 ## Open it
 
@@ -136,8 +136,8 @@ Standard library only. It reads `assets/manifest.js` for the path list, parses t
 pushed object out of each lesson file, and checks the frozen schema, the id/order arithmetic, the `part_title`
 against `CONTRACTS.PARTS`, that every `project_links` path exists (and its line
 range fits), that no `concept_md` contains raw HTML, that `content/` and the
-manifest list the same files, that both pages load the manifest's lessons in
-manifest order, and that each page carries exactly the ids the DOM contract
+manifest list the same files, that the manifest is in ascending lesson order, that
+all three pages load the manifest's lessons in manifest order, and that each page carries exactly the ids the DOM contract
 names — no missing id, no extra one. It also checks that every example carries a
 unique, well-formed `id` and that any `quiz` has 3 to 5 questions with a valid
 answer index and a non-empty `why`. It also checks that every example declares

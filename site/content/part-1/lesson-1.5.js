@@ -26,10 +26,10 @@ window.LESSONS.push({
     {
       "q": "Why does `GitHubAuthError` subclass `GitHubError`?",
       "options": [
-        "To reuse code",
-        "To make it faster to raise",
-        "Because Python requires it",
-        "So one `except GitHubError` covers every posting failure while the subclass stays available"
+        "So the subclass can reuse the parent's methods without rewriting them",
+        "Because Python requires every custom error to have a parent class",
+        "So raising it is faster than raising a plain Exception instance",
+        "So one `except GitHubError` covers every posting failure, and the subclass stays available"
       ],
       "answer": 3,
       "why": "The hierarchy exists for the granularity of `except`: catch the base for a single handler, catch the subclass when the caller needs to distinguish."
@@ -37,10 +37,10 @@ window.LESSONS.push({
     {
       "q": "What is wrong with `except Exception: pass`?",
       "options": [
-        "Nothing",
-        "It swallows every failure including bugs in your own code, and the review silently continues",
-        "It is slower",
-        "It only catches one error"
+        "Nothing, as long as the block it guards is short enough",
+        "It swallows every failure, including bugs in your own code",
+        "It is measurably slower than naming a specific exception class",
+        "It only catches the first exception raised inside the block"
       ],
       "answer": 1,
       "why": "The degraded path must degrade for known reasons and log exactly one WARNING; a bare pass turns an unknown failure into a silent wrong answer."
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "What does `raise NewError(...) from exc` add?",
       "options": [
-        "The original exception as __cause__, so the traceback shows both",
-        "Nothing visible",
-        "A retry",
-        "A warning"
+        "The original exception as `__cause__`, so the traceback shows both failures",
+        "Nothing that a reader of the traceback can actually see",
+        "An automatic retry of the operation that raised the first error",
+        "A warning line written to the log at WARNING level"
       ],
       "answer": 0,
       "why": "`from` chains the cause, which is the difference between a readable traceback and a mystery when a decode error becomes a ReviewInputError."

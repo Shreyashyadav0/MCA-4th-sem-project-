@@ -38,10 +38,10 @@ window.LESSONS.push({
     {
       "q": "You configure neither a Sarvam key nor a local endpoint. What happens?",
       "options": [
-        "The review fails with an error",
+        "The review fails with an error telling you to configure a key",
         "The rule engine runs and the response says mock in its note lines",
-        "It waits for a key",
-        "It silently returns an empty result"
+        "It waits for a key and then gives up after a timeout",
+        "It silently returns an empty result with no note at all"
       ],
       "answer": 1,
       "why": "With nothing configured the selector chooses mock and the response reports it, which is why the offline path is the default rather than a special case."

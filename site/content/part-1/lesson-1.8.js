@@ -26,10 +26,10 @@ window.LESSONS.push({
     {
       "q": "`@logged` above a function is shorthand for what?",
       "options": [
-        "A comment",
-        "A subclass",
+        "A comment that the interpreter skips at import time",
+        "A subclass of the decorated function, built at runtime",
         "`severity_rank = logged(severity_rank)`",
-        "A type annotation"
+        "A type annotation checked by the interpreter at call time"
       ],
       "answer": 2,
       "why": "The decorator is called with the function and its return value takes the name, which is why the wrapper becomes the function callers see."
@@ -37,9 +37,9 @@ window.LESSONS.push({
     {
       "q": "What does `@functools.wraps(function)` change?",
       "options": [
-        "It speeds up the call",
-        "It makes the function async",
-        "It removes the wrapper",
+        "It speeds up the wrapped call by caching its arguments",
+        "It removes the wrapper and returns the original function",
+        "It makes the decorated function run asynchronously",
         "It copies __name__, __doc__ and annotations onto the wrapper"
       ],
       "answer": 3,
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "In `@app.get(\"/rules\")` over a handler, what does the decorator return?",
       "options": [
-        "A new function that calls the handler",
+        "A new function that calls the handler on each request",
         "Usually the same function, after registering it against the path",
-        "A JSON string",
-        "A route object the handler must return"
+        "A JSON string built from the handler's annotations",
+        "A route object the handler must return to be registered"
       ],
       "answer": 1,
       "why": "FastAPI records the function at import time and calls it later; that is why the body looks like ordinary Python with no HTTP in it."

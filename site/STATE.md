@@ -13,6 +13,8 @@ is the bug.
 | 1.6a | 2026-11-14 | `346619e` | 0 added, 8 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 1.6b | 2026-11-14 | `8e36944` | 0 added, 6 changed | 0 | `OK lessons=2 parts_covered=2 manifest_entries=2 ids=0.1,1.1` |
 | 2 | 2026-11-14 | `ade2c8d` | 14 added, 5 changed | 14 (`0.2`–`0.4`, `1.2`–`1.12`) | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
+| 2a | 2026-11-15 | `3e2eee1` | 0 added, 18 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
+| 2b | 2026-11-15 | `b3924dc` | 0 added, 15 changed | 0 | `OK lessons=16 parts_covered=2 manifest_entries=16 ids=0.1,…,1.12` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -511,8 +513,8 @@ manifest order), `STATE.md`.
 
 **Tiers, as declared and as verified.** Thirteen examples are `browser` and were
 executed twice — once under CPython and once in the browser through the real
-runner; three are `terminal` (`0.2`, `0.3`, `0.4`, `1.11`) and carry both
-`expected_output` and `why_not`.
+runner; five are `terminal` (`0.1` ex1, `0.2`, `0.3`, `0.4`, `1.11`) and carry
+both `expected_output` and `why_not`.
 
 **Gate results, verbatim.**
 
@@ -551,7 +553,7 @@ re-checked in the page for 1.2):
 
 **Browser checks.** Index: 16 lessons loaded, Part 0 `0/4`, Part 1 `0/12`,
 Part 2 `0/8 planned`, 16 sidebar links. Search: `Protocol` → 1.12 and 1.7,
-`f-string` → 1.1, `comprehension` → 1.2, `zzzz` → 0. Lesson 1.2 pressed Run and
+`f-string` → 1.1, `comprehension` → 1.2 and 1.9, `zzzz` → 0. Lesson 1.2 pressed Run and
 printed its stated output from the real `app.models` import; position line
 "Part 1 · Lesson 2 of 12"; three quiz questions; try-it link
 `tryit.html?id=1.2&ex=0`. Lesson 1.11 shows no Run button, a visible terminal
@@ -570,8 +572,68 @@ preloads that lesson's snippet.
   pattern to other people's code.
 - `tryit.html` had to change too: it loads every lesson so it can address an
   example, and the brief named only `manifest.js` and the PARTS array.
-- Lesson 1.9's first draft called `added_lines` a property; it is a method
-  (`app/parser.py:144`), while `added_line_count` is a property. Corrected before
-  the commit.
+- Lesson 1.9's wording about the parser's derived values was wrong twice over
+  before the audit rounds: `Hunk.added_lines` is a property (`app/parser.py:143-144`)
+  and `FileDiff.added_line_count` / `added_line_numbers` are properties too. The
+  lesson now says exactly that.
 - Word counts of the new lessons run 221–306; `1.1` is 537 words and was left
   alone because Wave 2 must not re-author it.
+
+## Waves 2a and 2b — two audit rounds on the lessons
+
+Two rounds of independent audit over the fourteen new lessons, each followed by
+fixes. Round one: six auditors, 69 findings (3 blockers). Round two: six
+auditors, 63 findings (3 blockers). Both rounds are fixed in place.
+
+**Round one — the blockers.**
+
+1. Lesson 0.2's terminal example grepped `site/content/`, and by Wave 2 the
+   lesson file itself contained the string, so the command printed two paths
+   where the lesson claimed one. It now greps `site/content/part-1/`.
+2. Lesson 1.2's dedupe exercise claimed two distinct positions from findings at
+   `db.py:3`, `db.py:7` and `report.py:1` — three. The example's second finding
+   now shares line 3, and the solution is self-contained.
+3. Every Part 1 quiz put the correct answer at index 1 (38 of 42). The answers
+   were rotated across all four indices, and the fifteen questions where the key
+   was also the longest option by a wide margin were rewritten so length is no
+   longer a tell.
+
+**Round one — the rest.** Practice answers written as prose were rendering as
+Python code blocks and would `SyntaxError` if pasted; they are fenced as text.
+The 1.3 signature now matches `app/engine.py`, the 1.4 exercise builds and runs
+instead of asking for an explanation, 1.7's try-it stopped duplicating 1.8's,
+1.9 stopped claiming the parser walks hunks lazily (it has no `yield`), 1.10
+parses the real `{"findings": [...]}` shape, 1.11 names the script that actually
+shells out, and 1.12 marks Protocol as a general technique rather than repository
+practice. The sidebar gained a real scroll container, the gate learned to reject
+a consistently mis-ordered site, and the gate is now run by CI and by
+`make site`.
+
+**Round two — the blockers.**
+
+1. Lesson 0.2 called `docs/learning/` "the source of truth", but `HANDOFF.md`
+   says it is the ledger that wins, and `docs/learning/README.md:161` still
+   quotes a stale `597 passed`. The lesson and the site README now name
+   `HANDOFF.md` as the ledger and describe `docs/learning/` as the curriculum.
+2. Lesson 1.7 used `@contextlib.contextmanager` and `yield` four lessons before
+   either is taught, with no pointer forward. It now says so explicitly.
+3. Lesson 1.3's exercise solution imported `app.models` while its example
+   declared no `files`, so the practice failed in the browser. The example now
+   declares the file.
+
+**Round two — the rest.** 1.11 said `learning_progress.py` runs `git`; it runs
+pytest per track through `subprocess.run`. 1.4's quiz stopped claiming the
+benchmark's `MatchResult` is hashable (it holds a dict). 0.3's "which file"
+question had two right answers (`requirements-dev.txt` also installs pytest) and
+now asks which file pins all 37. 1.6's "the file has no guard" distractor was
+also true. 1.12 now uses the repository's real four-value Literal from
+`app/main.py`. The sidebar's duplicate `overflow-y` went, and the focus-ring
+padding moved onto the scroller that actually clips. `scripts/verify.sh` runs the
+gate, so `make verify` can no longer go green while CI fails.
+
+**Measured, not fixed.** After the rewrites, "pick the longest option" still
+names the right answer more often than chance (the correct option remains the
+longest in 35 of 48 questions, but the median gap to the next-longest is now
+under 10 characters, against a maximum of 71 before). Removing the last of that
+signal means rewriting every distractor by hand; it is recorded here rather than
+claimed as done.

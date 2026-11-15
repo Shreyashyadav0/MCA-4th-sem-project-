@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Typing: Optional, Union, Literal, TypedDict, Protocol",
   "order": 112,
   "duration_min": 25,
-  "concept_md": "### Four tools, four jobs\n\n- **`X | None`** (the modern `Optional[X]`) — the value may be absent. `min_severity: Severity | None = None` in `app/engine.py` means \"no threshold\".\n- **`Union[A, B]` / `A | B`** — one of a fixed set of *types*. Useful when the shapes differ.\n- **`Literal[\"a\", \"b\"]`** — one of a fixed set of *values*. `ChangeKind = Literal[\"added\", \"modified\", \"deleted\", \"renamed\"]` in `app/parser.py` says a string, but only these four.\n- **`Protocol`** — structural typing: \"anything with this method\". No inheritance required.\n\n### Why Literal beats str\n\n`provider: str` accepts `\"sarvam\"`, `\"SARVAM\"`, `\"openai\"` and a typo. `provider: Literal[\"mock\", \"local\", \"sarvam\"]` accepts three, and a checker rejects the fourth before it runs. A closed set written as a type is documentation the tools enforce.\n\n### Why Protocol is the interesting one\n\n```python\nclass Provider(Protocol):\n    name: str\n    def review(self, diff: str) -> list[str]: ...\n```\n\nAny class with `name` and `review` satisfies it. The caller does not import the implementation, and the implementation does not inherit from anything. This repository does not declare a `Protocol` itself — Sarvam and LM Studio enter through one OpenAI-compatible adapter by convention rather than by a declared interface — but the property it relies on is the same one: two providers, one shape, no shared base class.\n\n### TypedDict, briefly (a general technique, not used here)\n\n`TypedDict` describes a dict with fixed keys and value types — the JSON payload case. It is a dict at runtime, so it costs nothing, and a checker catches `payload[\"sevrity\"]`.\n\n### Two rules of thumb\n\nPick one spelling for \"may be absent\" and keep it: `X | None` everywhere, not a mix with `Optional`. And reach for `Protocol` when two things share behaviour but not ancestry — that is the decoupling, not the type itself.",
+  "concept_md": "### Four tools, four jobs\n\n- **`X | None`** (the modern `Optional[X]`) — the value may be absent. `min_severity: Severity | None = None` in `app/engine.py` means \"no threshold\".\n- **`Union[A, B]` / `A | B`** — one of a fixed set of *types*. Useful when the shapes differ.\n- **`Literal[\"a\", \"b\"]`** — one of a fixed set of *values*. `ChangeKind = Literal[\"added\", \"modified\", \"deleted\", \"renamed\"]` in `app/parser.py` says a string, but only these four.\n- **`Protocol`** — structural typing: \"anything with this method\". No inheritance required.\n\n### Why Literal beats str\n\n`provider: str` accepts `\"sarvam\"`, `\"SARVAM\"`, `\"openai\"` and a typo. `app/main.py` types its request field as `Literal[\"auto\", \"local\", \"sarvam\", \"mock\"]` — four values, one of which (`auto`) asks the engine to choose rather than naming a provider. A closed set written as a type is documentation the tools enforce.\n\n### Why Protocol is the interesting one\n\n```python\nclass Provider(Protocol):\n    name: str\n    def review(self, diff: str) -> list[str]: ...\n```\n\nAny class with `name` and `review` satisfies it. The caller does not import the implementation, and the implementation does not inherit from anything. This repository does not declare a `Protocol` itself — Sarvam and LM Studio enter through one OpenAI-compatible adapter by convention rather than by a declared interface — but the property it relies on is the same one: two providers, one shape, no shared base class.\n\n### TypedDict, briefly (a general technique, not used here)\n\n`TypedDict` describes a dict with fixed keys and value types — the JSON payload case. It is a dict at runtime, so it costs nothing, and a checker catches `payload[\"sevrity\"]`.\n\n### Two rules of thumb\n\nPick one spelling for \"may be absent\" and keep it: `X | None` everywhere, not a mix with `Optional`. And reach for `Protocol` when two things share behaviour but not ancestry — that is the decoupling, not the type itself.",
   "code_examples": [
     {
       "id": "1.12-ex-0",
@@ -26,35 +26,35 @@ window.LESSONS.push({
     {
       "q": "What does `Protocol` give you that inheritance does not?",
       "options": [
-        "Faster dispatch",
-        "Runtime validation",
-        "Structural typing: any class with the right methods fits, without importing or subclassing",
-        "Multiple inheritance"
+        "Multiple inheritance, which a plain class cannot otherwise use",
+        "Faster method dispatch, because no lookup table has to be built",
+        "Structural typing: any class with the right methods fits, without importing it",
+        "Runtime validation of every argument that a method receives"
       ],
       "answer": 2,
       "why": "The caller depends on a shape, not a name, which is why a provider can be swapped without either side importing the other."
     },
     {
-      "q": "Why is `Literal[\"mock\", \"local\", \"sarvam\"]` better than `str` here?",
+      "q": "`app/main.py` types the provider field as `Literal[\"auto\", \"local\", \"sarvam\", \"mock\"]` rather than `str`. What does that buy?",
       "options": [
-        "It is shorter",
-        "It allows more values",
-        "It runs faster",
-        "It makes the closed set a type, so a checker rejects a fourth value before it runs"
+        "It runs faster, because the value is validated only once",
+        "A checker rejects any other string before the request is served",
+        "It allows more values than a plain string field would",
+        "It makes the field optional in the request body"
       ],
-      "answer": 3,
-      "why": "`str` accepts every string including typos; the Literal turns the documentation into something the tools enforce."
+      "answer": 1,
+      "why": "`str` accepts every string including a typo; the Literal turns the closed set into something the tools check, which is the difference between a comment and a constraint."
     },
     {
       "q": "`min_severity: Severity | None = None` means what?",
       "options": [
-        "A severity is required",
+        "A severity is required and None is not allowed",
         "The threshold is optional; None means no threshold",
-        "Severity may be a string",
-        "It is a typo for Optional"
+        "Severity may be passed as a plain string as well",
+        "It is a longer spelling of a required parameter"
       ],
       "answer": 1,
-      "why": "Without it every caller has to re-check for None and decide what a missing threshold means; the annotation moves that decision to one place and lets a checker flag the call that forgets."
+      "why": "The repository gets that decoupling by convention — one OpenAI-compatible adapter both providers speak — so a Protocol is how you would state the same property in the type system, not a class the code already declares."
     }
   ],
   "try_it": {

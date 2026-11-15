@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "subprocess, enough to read the CLI",
   "order": 111,
   "duration_min": 15,
-  "concept_md": "### run, not Popen\n\n```python\nresult = subprocess.run([\"python\", \"--version\"], capture_output=True, text=True)\nprint(result.returncode, result.stdout.strip())\n```\n\n`subprocess.run` waits for the process, collects its output when you ask, and returns an object with `returncode`, `stdout` and `stderr`. `Popen` is for the cases `run` cannot express: streaming output while it happens, feeding stdin, or several processes at once.\n\nPass the command as a **list**, never a string with `shell=True`, unless you actually need a shell. A list cannot be word-split by surprise, and a filename with a space in it does not become two arguments.\n\n### The four arguments that matter\n\n- `capture_output=True` — collect stdout and stderr instead of letting them hit the terminal.\n- `text=True` — decode to `str` rather than bytes.\n- `check=True` — raise `CalledProcessError` on a non-zero exit, instead of returning quietly.\n- `timeout=` — kill it after N seconds. A test suite that hangs forever is worse than one that fails.\n\n### Why this repository barely uses it\n\nThe CLI reads a `.diff` file directly rather than shelling out to `git diff`. That is a deliberate choice with a concrete payoff: a CI runner with no repository checkout and no git binary can still review a diff, and the review does not depend on a subprocess's exit code.\n\nThe places it *does* shell out are the scripts — `scripts/learning_progress.py` runs `git` to measure progress — not the library. `scripts/verify_offline.py` runs pytest in-process, with no subprocess at all.",
+  "concept_md": "### run, not Popen\n\n```python\nresult = subprocess.run([\"python\", \"--version\"], capture_output=True, text=True)\nprint(result.returncode, result.stdout.strip())\n```\n\n`subprocess.run` waits for the process, collects its output when you ask, and returns an object with `returncode`, `stdout` and `stderr`. `Popen` is for the cases `run` cannot express: streaming output while it happens, feeding stdin, or several processes at once.\n\nPass the command as a **list**, never a string with `shell=True`, unless you actually need a shell. A list cannot be word-split by surprise, and a filename with a space in it does not become two arguments.\n\n### The four arguments that matter\n\n- `capture_output=True` — collect stdout and stderr instead of letting them hit the terminal.\n- `text=True` — decode to `str` rather than bytes.\n- `check=True` — raise `CalledProcessError` on a non-zero exit, instead of returning quietly.\n- `timeout=` — kill it after N seconds. A test suite that hangs forever is worse than one that fails.\n\n### Why this repository barely uses it\n\nThe CLI reads a `.diff` file directly rather than shelling out to `git diff`. That is a deliberate choice with a concrete payoff: a CI runner with no repository checkout and no git binary can still review a diff, and the review does not depend on a subprocess's exit code.\n\nThe places it *does* shell out are the scripts, not the library: `scripts/learning_progress.py` runs `pytest` per learning track through `subprocess.run` and reads the exit code. `scripts/verify_offline.py` runs pytest in-process, with no subprocess at all.",
   "code_examples": [
     {
       "id": "1.11-ex-0",
@@ -27,10 +27,10 @@ window.LESSONS.push({
     {
       "q": "Why pass the command as a list rather than a string?",
       "options": [
-        "A list cannot be re-split by a shell, so a filename with a space stays one argument",
-        "It is shorter",
-        "Strings are not allowed",
-        "Lists are faster"
+        "Because a shell re-splits a string, so a filename with a space becomes two arguments",
+        "Because a list is shorter to write than a carefully quoted string",
+        "Because subprocess refuses to run a string on Linux and macOS",
+        "Because a list lets you pass the same argument more than once"
       ],
       "answer": 0,
       "why": "With a string and a shell, quoting rules decide your arguments; a list removes the shell from the question entirely."
@@ -38,10 +38,10 @@ window.LESSONS.push({
     {
       "q": "What does `check=True` do?",
       "options": [
-        "Verifies the command exists",
-        "Prints the output",
+        "It prints the command's output to the terminal as it runs",
+        "It retries the command once if the first attempt fails",
         "Raises CalledProcessError when the exit code is non-zero",
-        "Retries once"
+        "It captures stderr only and discards stdout entirely"
       ],
       "answer": 2,
       "why": "Without it a failing command returns quietly with a non-zero returncode, which is easy to ignore and hard to debug later."
@@ -49,9 +49,9 @@ window.LESSONS.push({
     {
       "q": "Why does the CLI read a .diff file instead of running `git diff`?",
       "options": [
-        "Because git is slow",
-        "Because diffs cannot be piped",
-        "Because subprocess is deprecated",
+        "Because git is too slow to run inside a test suite",
+        "Because diffs cannot be piped between two processes",
+        "So the review never depends on a git binary or a checkout",
         "So it works in a CI runner with no repository and no git binary"
       ],
       "answer": 3,
@@ -66,8 +66,8 @@ window.LESSONS.push({
   },
   "exercise": {
     "prompt": "Run `grep -rn \"subprocess\" app/ scripts/` and report what you find: which module actually starts a process, and what the other hits are.",
-    "hint": "Two of the hits are strings inside rule definitions, not calls.",
-    "solution": "```text\nThe only real caller is `scripts/learning_progress.py`, which imports subprocess and runs `git` to count commits for the progress page. The hits in `app/rules.py` are pattern strings inside rules that detect subprocess use in *other people's* code. `app/` itself never starts a process, which is what makes the CLI runnable in a sandbox with no git.\n```",
+    "hint": "Most of the hits are pattern strings and suggested-fix text inside rule definitions, not calls.",
+    "solution": "```text\nThe only real caller is `scripts/learning_progress.py`, which imports subprocess and runs `pytest` once per learning track, reading each exit code. The hits in `app/rules.py` are pattern strings inside rules that detect subprocess use in *other people's* code. `app/` itself never starts a process, which is what makes the CLI runnable in a sandbox with no git.\n```",
     "explanation": "Reading the hits rather than counting them is the skill: a rule that detects `subprocess.run` is not a call to `subprocess.run`."
   },
   "common_mistakes": [

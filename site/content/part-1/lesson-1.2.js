@@ -44,10 +44,10 @@ window.LESSONS.push({
     {
       "q": "Why does `severity_counts` in app/models.py return a dict?",
       "options": [
-        "So the verdict can be computed from counts instead of rescanning the findings",
-        "Because dicts are faster than lists",
-        "Because JSON requires dicts",
-        "Because findings are stored in a dict"
+        "So the verdict reads counts instead of rescanning the findings list",
+        "Because a dict is faster to build than a list of findings",
+        "Because JSON cannot encode a list of counts without keys",
+        "Because the findings were already stored in a dict shape"
       ],
       "answer": 0,
       "why": "Counts are computed once and the verdict reads them; rescanning the list for each threshold would be the same work twice."
@@ -65,10 +65,10 @@ window.LESSONS.push({
     }
   ],
   "try_it": {
-    "prompt": "Add two more findings to the list and count them per **file** instead of per severity. Use the same `setdefault` shape, then rewrite it as a dict comprehension.",
+    "prompt": "Add one more finding to the list and count them per **file** instead of per severity. Use the same `setdefault` shape, then rewrite it as a dict comprehension.",
     "starter": "from app.models import Finding\n\nfindings = [\n    Finding(file=\"app/db.py\", line=\"3\", severity=\"CRITICAL\", issue=\"a\", suggested_fix=\"b\"),\n    Finding(file=\"app/report.py\", line=\"1\", severity=\"MEDIUM\", issue=\"c\", suggested_fix=\"d\"),\n]\n\nper_file = {}\nfor finding in findings:\n    per_file.setdefault(finding.file, 0)\n    per_file[finding.file] += 1\nprint(per_file)\n",
     "solution": "from app.models import Finding\n\nfindings = [\n    Finding(file=\"app/db.py\", line=\"3\", severity=\"CRITICAL\", issue=\"a\", suggested_fix=\"b\"),\n    Finding(file=\"app/db.py\", line=\"7\", severity=\"CRITICAL\", issue=\"c\", suggested_fix=\"d\"),\n    Finding(file=\"app/report.py\", line=\"1\", severity=\"MEDIUM\", issue=\"e\", suggested_fix=\"f\"),\n]\n\nper_file = {}\nfor finding in findings:\n    per_file.setdefault(finding.file, 0)\n    per_file[finding.file] += 1\nprint(per_file)\n\nnames = {finding.file for finding in findings}\ncounts = {name: sum(1 for f in findings if f.file == name) for name in names}\nprint(counts)\n",
-    "explanation": "Both print `{'app/db.py': 2, 'app/report.py': 1}`. The second is the dict comprehension the prompt asked for: the set of names drives it, and `sum(1 for ...)` counts the matches. `Counter` from `collections` is the same thing with a name."
+    "explanation": "Both print the same counts — `{'app/db.py': 2, 'app/report.py': 1}` — though not necessarily in the same order: the comprehension is driven by a set, so key order is unspecified. The second form is the dict comprehension the prompt asked for; `Counter` from `collections` is the same thing with a name."
   },
   "exercise": {
     "prompt": "Deduplicate the findings by `(file, line)` — two rules can fire on the same line, and the CLI reports both — and print how many distinct positions survive. Use a set of tuples.",

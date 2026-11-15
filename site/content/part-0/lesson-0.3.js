@@ -36,26 +36,26 @@ window.LESSONS.push({
       "why": "The lock pins all 37 distributions including the test tooling; requirements.txt lists runtime dependencies only, so pytest would be missing."
     },
     {
-      "q": "The suite reports 640 passed, 1 skipped. How many tests were collected?",
+      "q": "Which file pins all 37 distributions, including the test tooling?",
       "options": [
-        "639",
-        "640",
-        "642",
-        "641"
+        "requirements.txt",
+        "requirements.lock",
+        "requirements-dev.txt",
+        ".python-version"
       ],
-      "answer": 3,
-      "why": "Discovery runs first and the marker is evaluated second: a skipped test was still found, so it is collected — 640 executed passes plus the one skip is 641."
+      "answer": 1,
+      "why": "The lock is a full `pip freeze`: runtime dependencies, their transitive pins and pytest. requirements-dev.txt adds only pytest to the runtime list, and .python-version names an interpreter, not a package."
     },
     {
       "q": "`python -m pytest` says there is no module named pytest. What is the likely cause?",
       "options": [
-        "The repository is corrupt",
-        "The virtual environment is not active or was installed from the wrong file",
-        "The tests were deleted",
-        "Python is too old"
+        "The repository is corrupt and needs to be cloned again",
+        "The environment is not active, or came from the wrong requirements file",
+        "The test files were deleted by the last run of the suite",
+        "The installed Python is too old to run this test suite"
       ],
       "answer": 1,
-      "why": "The suite has no runtime dependency on pytest, so a missing pytest means the environment was built from requirements.txt rather than the lock."
+      "why": "pytest is a development dependency: it is in the lock and in requirements-dev.txt, but not in requirements.txt, so an environment built from the runtime file alone cannot even collect the suite."
     }
   ],
   "try_it": {
@@ -94,7 +94,7 @@ window.LESSONS.push({
     {
       "label": "The targets you will actually type: verify, test, lint, run",
       "path": "Makefile",
-      "lines": "1-30"
+      "lines": "1-36"
     }
   ],
   "learn_more": [

@@ -21,8 +21,9 @@ What it checks
  7. No `concept_md` contains a raw HTML tag. Every example declares a valid
     `run_tier`, agrees with its `runnable` flag, carries `expected_output` and a
     `why_not` when it is `terminal`, and asks only for embedded source files.
- 8. Every file under content/ is listed in the manifest exactly once.
- 9. index.html and lesson.html load the manifest's paths, in manifest order,
+ 8. Every file under content/ is listed in the manifest exactly once, and the
+    manifest is in ascending lesson order.
+ 9. index.html, lesson.html and tryit.html load the manifest's paths, in order,
     after manifest.js — so the three lists cannot drift apart.
 10. Each page carries exactly the ids the DOM contract names: none missing, and
     no extra id that would let a later wave invent a parallel hook.

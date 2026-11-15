@@ -87,6 +87,11 @@ PIP_USER=0 "${VENV_PY}" -m pip install --disable-pip-version-check -q -r "${LOCK
 echo "Running test suite ..."
 "${VENV_PY}" -m pytest -q tests || fail "test suite failed"
 
+# The learning site has its own gate; CI runs it too, so `make verify` must not
+# go green while CI would fail on it.
+echo "Validating the learning site ..."
+"${VENV_PY}" site/tools/validate_lessons.py || fail "learning-site gate failed"
+
 echo "Running zero-network proof ..."
 "${VENV_PY}" scripts/verify_offline.py || fail "offline (zero-network) run failed"
 

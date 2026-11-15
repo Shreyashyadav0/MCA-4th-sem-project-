@@ -26,10 +26,10 @@ window.LESSONS.push({
     {
       "q": "`re.match` and `re.search` differ in what way?",
       "options": [
-        "match is faster",
-        "match anchors at the start of the string; search scans for the pattern anywhere",
-        "search only returns the first group",
-        "They are the same"
+        "match is faster because it stops at the first character that fails",
+        "match anchors at the start; search scans the whole string for the pattern",
+        "search only ever returns the first capture group it finds",
+        "They are the same function, kept under two names for history"
       ],
       "answer": 1,
       "why": "A hunk header must be matched at position 0, which is why the parser compiles `^@@ ...` and calls match rather than search."
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "Why does `read_source` check the path before reading it?",
       "options": [
-        "For speed",
-        "Because pathlib requires it",
-        "So a missing path or a directory raises ReviewInputError with a sentence rather than a raw OSError",
-        "To count the files"
+        "Because checking first is faster than reading and failing",
+        "Because pathlib refuses to read a file it has not stat'ed first",
+        "So a missing path or a directory becomes one typed error, not a raw OSError",
+        "To count how many files the CLI was given on the command line"
       ],
       "answer": 2,
       "why": "`exists()` and `is_file()` turn two low-level failures into one typed error the CLI can print — which is what makes the message readable instead of a traceback."

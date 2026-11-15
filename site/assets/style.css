@@ -815,7 +815,7 @@ details.solution[open] summary {
 /* ----------------------------------------------------------------- layout */
 
 /* Sidebar column plus content. The sidebar is sticky and scrolls on its own, so
- * a 104-lesson tree never pushes the lesson down the page. */
+ * a 108-lesson tree never pushes the lesson down the page. */
 .layout {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -827,12 +827,11 @@ details.solution[open] summary {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
   overscroll-behavior: contain;
   border-right: 1px solid var(--border);
   background: var(--surface);
   /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
-  padding: var(--space-3) var(--space-2) var(--space-6);
+  padding: var(--space-3) 0 var(--space-6);
   /* The head stays put and the tree scrolls under it: at 16 lessons the list is
    * taller than the viewport, and a title that scrolls away is a lost anchor. */
   display: flex;
@@ -844,6 +843,9 @@ details.solution[open] summary {
   overflow-y: auto;
   overscroll-behavior: contain;
   min-height: 0;
+  /* The ring padding belongs to the scroller, not the column: a 3px outline plus
+   * its halo has to fit inside the box that clips. */
+  padding-inline: var(--space-2);
 }
 
 .sidebar-toggle {

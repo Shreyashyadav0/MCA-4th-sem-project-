@@ -26,9 +26,9 @@ window.LESSONS.push({
     {
       "q": "When does the body of a generator function run?",
       "options": [
-        "When the function is called",
-        "All at once, then cached",
-        "When the module is imported",
+        "When the function is called, all at once, like any other call",
+        "When the module is imported, before anything calls it",
+        "When the generator object is finally garbage collected",
         "One step at a time, each time the consumer asks for the next value"
       ],
       "answer": 3,
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "`parse_diff` returns the whole `DiffBundle` at once rather than yielding files. Why is that the right choice here?",
       "options": [
-        "Because anchoring needs the complete structure: every file, every hunk, before a finding can be placed",
-        "Because Python cannot yield from a recursive parser",
-        "Because generators are slower",
-        "Because the diff is always small"
+        "Because anchoring needs the complete bundle — every file and hunk — before a finding is placed",
+        "Because Python cannot yield from inside a recursive parser",
+        "Because generators are slower than lists for inputs this small",
+        "Because the diff is always small enough to fit in memory"
       ],
       "answer": 0,
       "why": "A finding is anchored by looking up a line across the finished bundle, so the bundle has to exist before anchoring starts — laziness would buy nothing and cost a second pass."

@@ -38,9 +38,9 @@ window.LESSONS.push({
       "q": "Why must the commands be run from the repository root?",
       "options": [
         "Because the imports are absolute and start at the `app` package",
-        "Because git requires it",
-        "Because pytest is installed there",
-        "It does not matter"
+        "Because git refuses to run anywhere else in the tree",
+        "Because pytest is installed into that directory only",
+        "Because the tests import each other by absolute path"
       ],
       "answer": 0,
       "why": "`from app.models import Finding` resolves only if the directory containing `app/` is on sys.path, which the root is and a subdirectory is not."
@@ -48,10 +48,10 @@ window.LESSONS.push({
     {
       "q": "You run `python tests/test_rules.py` and see no test output. Why?",
       "options": [
-        "The tests are broken",
-        "pytest is missing",
-        "Running the file executes it as __main__; test functions are defined, not run",
-        "The file has no guard"
+        "The tests are broken and the environment needs reinstalling",
+        "pytest is missing from the environment you are running in",
+        "Running the file executes it as __main__: the test functions are defined, not called",
+        "The file was never saved after the last edit was made"
       ],
       "answer": 2,
       "why": "pytest is the thing that discovers and calls test functions. Running the file directly only defines them — and it puts tests/ on sys.path, not the root."

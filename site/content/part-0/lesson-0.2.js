@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "How to use this site",
   "order": 2,
   "duration_min": 10,
-  "concept_md": "### The shape of the site\n\nEvery page carries the same left sidebar: thirteen parts, each collapsible, each showing how many of its lessons exist and how many you have done. A tick means done. Parts that are dimmed have no lessons yet — they are planned, not locked, and the sidebar says so rather than hiding them.\n\n### Three ways to see code\n\n| Button | What it does | When it appears |\n|---|---|---|\n| **Run** | executes the snippet in this page | `browser` and `browser-pkg` examples |\n| **Copy code** | puts the snippet on your clipboard | every example |\n| **Run in terminal** | shows the command and what it prints | `terminal` examples, and any example when the Python runtime cannot load |\n\nThe tiers are honest. An example that needs a shell, a network socket or a package the browser does not have is marked `terminal` and tells you why. Pressing Run on it is not offered, because a button that cannot work teaches the wrong thing.\n\n### Finding things\n\nOn the parts page, press `/` to jump to the search box. It searches lesson titles and concept text — not code, so a hit means \"this lesson explains it\". Escape clears the box.\n\n### Progress and theme\n\n**Mark done** at the foot of each lesson writes to your browser's `localStorage`; nothing leaves your machine and there is no account. The same store remembers light or dark. Both survive a reload.\n\n### Where the answers are\n\nEvery lesson ends with **In the repository** — real paths and line ranges — and **Glossary**. The exercise and quiz answers are behind a disclosure so you can try first.\n\nThis site is a learning aid. `docs/learning/` is the source of truth: when the two disagree, the document wins and the lesson is the bug.",
+  "concept_md": "### The shape of the site\n\nEvery page carries the same left sidebar: thirteen parts, each collapsible, each showing how many of its lessons exist and how many you have done. A tick means done. Parts that are dimmed have no lessons yet — they are planned, not locked, and the sidebar says so rather than hiding them.\n\n### Three ways to see code\n\n| Button | What it does | When it appears |\n|---|---|---|\n| **Run** | executes the snippet in this page | `browser` and `browser-pkg` examples |\n| **Copy code** | puts the snippet on your clipboard | every example |\n| **Run in terminal** | the panel that shows the command and what it prints | `terminal` examples, and any example when the runtime cannot load |\n\nThe tiers are honest. An example that needs a shell, a network socket or a package the browser does not have is marked `terminal`: it shows the command and its expected output instead of a Run button, because a button that cannot work teaches the wrong thing.\n\n### Finding things\n\nOn the parts page, press `/` to jump to the search box. It searches lesson titles and concept text — not code, so a hit means \"this lesson explains it\". Escape clears the box.\n\n### Progress and theme\n\n**Mark done** at the foot of each lesson writes to your browser's `localStorage`; nothing leaves your machine and there is no account. The same store remembers light or dark. Both survive a reload.\n\n### Where the answers are\n\nEvery lesson ends with **In the repository** — real paths and line ranges — and **Glossary**. The exercise and quiz answers are behind a disclosure so you can try first.\n\nThis site is a learning aid. For what the code does, `HANDOFF.md` is the ledger: if another document disagrees with it, the ledger wins. `docs/learning/` is the curriculum this site follows, and it is not always in step with the code — one of its pages still quotes an older test count, which is why every number here is checked against the suite instead.",
   "code_examples": [
     {
       "id": "0.2-ex-0",
@@ -25,12 +25,12 @@ window.LESSONS.push({
   ],
   "quiz": [
     {
-      "q": "You press Run on an example and no Run button exists. What does that tell you?",
+      "q": "You open an example and find no Run button. What does that tell you?",
       "options": [
         "The example is marked terminal: it needs something a browser does not have",
-        "The page is broken",
-        "Your browser is too old",
-        "The example has no output"
+        "The page failed to render and should be reloaded once",
+        "Your browser is too old to run WebAssembly in a page",
+        "The example was written before the runner existed at all"
       ],
       "answer": 0,
       "why": "The tier is declared in the lesson data; a terminal example shows its command and expected output instead of a Run button."
@@ -55,7 +55,7 @@ window.LESSONS.push({
         "In this browser's localStorage"
       ],
       "answer": 3,
-      "why": "Mark done writes to localStorage under a versioned key; nothing is sent anywhere and there is no account."
+      "why": "Progress lives in this browser only: two keys, one per concern, so a later wave can change the progress format without losing the theme choice."
     }
   ],
   "try_it": {

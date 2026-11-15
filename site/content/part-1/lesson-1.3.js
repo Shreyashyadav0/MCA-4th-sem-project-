@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Functions, args, kwargs, type hints",
   "order": 103,
   "duration_min": 20,
-  "concept_md": "### Four ways to pass arguments\n\n```python\ndef rule(line, severity=\"MEDIUM\"): ...      # positional + default\ndef total(*numbers): ...                    # any number of positionals\ndef make_finding(**fields): ...             # any number of keywords\ndef review(bundle, *, provider=\"auto\"): ...  # keyword-only after the star\n```\n\nThe star is the important one. Everything after `*` must be passed by name, which is how a function with six options stays readable: `review(bundle, settings, provider=\"local\")` says what it means; passing the same values positionally does not.\n\n### Defaults are evaluated once\n\nA default is built when the `def` runs, not per call. `def add(f, acc=[])` shares one list across every call. Use `None` and build inside.\n\n### Type hints are documentation the tools can check\n\n```python\ndef make_finding(**kw) -> dict[str, str]:\n```\n\nThe return annotation is not decoration: `-> dict[str, str]` tells a reader the values are strings, and a type checker can prove it. `*args: int` and `**kw: str` annotate the element type, not the tuple or dict.\n\n### On a real signature\n\n`app/engine.py` defines the review entry point with two positional parameters and four keyword-only ones — `provider`, `force_offline`, `min_severity`, `categories` — all defaulted. That is the pattern this lesson teaches, used where it matters: a call site cannot silently pass the wrong option positionally.\n\n### Keyword arguments make boundaries explicit\n\n`make_finding(**kw)` accepts whatever the caller passes, which is convenient and dangerous: an unknown field would sail through. The example below closes that hole by checking the keys against an allow-list — the same discipline `Finding` enforces with `extra=\"forbid\"`, one layer earlier.",
+  "concept_md": "### Four ways to pass arguments\n\nYou will write all four in this lesson's exercises. The shapes are:\n\n```python\ndef rule(line, severity=\"MEDIUM\"): ...      # positional + default\ndef total(*numbers): ...                    # any number of positionals\ndef make_finding(**fields): ...             # any number of keywords\ndef review(bundle, *, provider=\"auto\"): ...  # keyword-only after the star\n```\n\nThe star is the one that will save you. Everything after `*` must be passed by name, which is how a function with six options stays readable: `review(bundle, settings, provider=\"local\")` says what it means; passing the same values positionally does not.\n\n### Defaults are evaluated once\n\nA default is built when the `def` runs, not per call. `def add(f, acc=[])` shares one list across every call. Use `None` and build inside.\n\n### Type hints are documentation the tools can check\n\n```python\ndef make_finding(**kw) -> dict[str, str]:\n```\n\nThe return annotation is not decoration: `-> dict[str, str]` tells a reader the values are strings, and a type checker can prove it. `*args: int` and `**kw: str` annotate the element type, not the tuple or dict.\n\n### On a real signature\n\n`app/engine.py` defines the review entry point with two positional parameters and four keyword-only ones — `provider`, `force_offline`, `min_severity`, `categories` — all defaulted. That is the pattern this lesson teaches, used where it matters: a call site cannot silently pass the wrong option positionally.\n\n### Keyword arguments make boundaries explicit\n\n`make_finding(**kw)` accepts whatever the caller passes, which is convenient and dangerous: an unknown field would sail through. The example below closes that hole by checking the keys against an allow-list — the same discipline `Finding` enforces with `extra=\"forbid\"`, one layer earlier.",
   "code_examples": [
     {
       "id": "1.3-ex-0",
@@ -19,7 +19,14 @@ window.LESSONS.push({
       "code": "def make_finding(**kw) -> dict[str, str]:\n    \"\"\"Build a finding-shaped dict, refusing anything that is not a field.\"\"\"\n    allowed = {\"file\", \"line\", \"severity\", \"issue\", \"suggested_fix\"}\n    unknown = set(kw) - allowed\n    if unknown:\n        raise TypeError(f\"unexpected field(s): {sorted(unknown)}\")\n    return {key: str(value) for key, value in kw.items()}\n\n\nfinding = make_finding(file=\"app/db.py\", line=\"3\", severity=\"CRITICAL\", issue=\"Token literal\")\nprint(finding)\nprint(make_finding.__annotations__)\n",
       "runnable": true,
       "run_tier": "browser",
-      "expected_output": "{'file': 'app/db.py', 'line': '3', 'severity': 'CRITICAL', 'issue': 'Token literal'}\n{'return': dict[str, str]}"
+      "expected_output": "{'file': 'app/db.py', 'line': '3', 'severity': 'CRITICAL', 'issue': 'Token literal'}\n{'return': dict[str, str]}",
+      "packages": [
+        "pydantic"
+      ],
+      "files": [
+        "app/__init__.py",
+        "app/models.py"
+      ]
     }
   ],
   "quiz": [
@@ -37,10 +44,10 @@ window.LESSONS.push({
     {
       "q": "Why is `def add(f, acc=[])` a bug waiting to happen?",
       "options": [
-        "Lists cannot be default values",
-        "It fails on the first call",
+        "Lists cannot be used as default values in Python",
+        "The list is copied for each call, which is wasteful",
         "The list is created once, at def time, and shared by every call",
-        "It copies the list on each call"
+        "It raises a SyntaxError the first time the function runs"
       ],
       "answer": 2,
       "why": "Defaults are evaluated when the def runs, so every call appends to the same list and findings leak between reviews."
