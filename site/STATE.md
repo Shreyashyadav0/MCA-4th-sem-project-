@@ -855,14 +855,14 @@ change kinds and why a pure rename has no hunk (5.4), `/dev/null` and
 examined" (5.6), `parse_diff` / `parse_diff_file` / `DiffBundle` (5.7), and
 `DiffParseError` becoming a 422 (5.8).
 
-**Four examples run in the browser.** The wave brief said Pyodide has no pydantic
+**Ten examples, four of them in the browser.** The wave brief said Pyodide has no pydantic
 and that every example would therefore be terminal. The brief is wrong: Wave 1.5
 above records pydantic 2.10.6 as present, lesson 0.1 already runs `parse_diff` on
 the sample in the runner, and `embed_sources.py` embeds `app/parser.py`. So 5.2,
 5.3, 5.4 and 5.7 are `run_tier: "browser"` with `packages: ["pydantic"]` and the
 four embedded files — they actually run.
 
-The other five stay terminal for real reasons: three are shell commands (`head`,
+The other six stay terminal for real reasons: three are shell commands (`head`,
 `sed`, `grep`) and the runner has no shell; 5.8's first raises, and the runner
 reports stdout rather than tracebacks; its second needs fastapi, which the runner
 does not have. Every `why_not` names the actual blocker. Every output was produced by running the command shown —

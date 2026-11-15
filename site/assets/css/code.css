@@ -400,3 +400,19 @@ pre.code.terminal-command code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* The folded "Expected output" on a browser-tier example holds the same long
+ * lines as the terminal panel, so it wraps the same way. */
+details.expected-output pre.code,
+details.expected-output pre.code code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  /* A 16rem minimum inside a fixed row overflowed the split and clipped the
+   * bottom of the output pane. */
+  .split .pane {
+    min-height: 12rem;
+  }
+}

@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "Where the summary copies it",
       "path": "app/parser.py",
-      "lines": "239-244"
+      "lines": "234-245"
     }
   ],
   "learn_more": [

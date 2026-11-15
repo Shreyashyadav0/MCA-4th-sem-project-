@@ -559,4 +559,16 @@ figure {
   .header-actions {
     gap: var(--space-1);
   }
+
+  /* The toggle and the progress counter are the two items that still wrapped,
+   * which made the header 83px tall and pushed the actions out of line. */
+  .site-header-inner .sidebar-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  #progress-total {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
 }
