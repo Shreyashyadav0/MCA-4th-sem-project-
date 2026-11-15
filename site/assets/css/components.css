@@ -240,17 +240,7 @@ pre.code code {
   font-size: inherit;
 }
 
-pre.code[data-lang]::after {
-  content: attr(data-lang);
-  position: absolute;
-  top: var(--space-1);
-  right: var(--space-2);
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+
 
 blockquote {
   margin: var(--space-4) 0;
@@ -400,11 +390,11 @@ details.solution[open] summary {
 }
 
 .quiz-verdict.is-right {
-  border-left-color: var(--sev-low);
+  border-left-color: var(--ok);
 }
 
 .quiz-verdict.is-wrong {
-  border-left-color: var(--sev-critical);
+  border-left-color: var(--bad);
 }
 
 .quiz-verdict.is-unanswered {
@@ -424,12 +414,12 @@ details.solution[open] summary {
 
 .quiz-question.is-right .quiz-legend::after {
   content: " ✓";
-  color: var(--sev-low);
+  color: var(--ok);
 }
 
 .quiz-question.is-wrong .quiz-legend::after {
   content: " ✗";
-  color: var(--sev-critical);
+  color: var(--bad);
 }
 
 .quiz-actions {
@@ -454,3 +444,11 @@ details.solution[open] summary {
   overflow-wrap: anywhere;
 }
 
+
+/* The narrow override has to live in this sheet, after the rule it overrides:
+ * layout.css loads first, so an equal-specificity rule there would lose. */
+@media (max-width: 40rem) {
+  .lesson-item .lesson-meta {
+    margin-left: 0;
+  }
+}

@@ -73,7 +73,7 @@ window.LESSONS.push({
     "prompt": "Rewrite one real field's annotation using `Literal`. Pick `ReviewResult.mode` (currently `str` plus a validator) and show what changes.",
     "hint": "With a Literal you can drop the validator — the type now carries the rule.",
     "solution": "from typing import Literal\n\nfrom pydantic import BaseModel\n\n\nclass Result(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n\n\nprint(Result(mode=\"mock\").mode)\ntry:\n    Result(mode=\"offline\")\nexcept Exception as error:\n    print(\"refused:\", error.errors()[0][\"type\"])\n",
-    "explanation": "The `_check_mode` validator becomes unnecessary: `literal_error` replaces it, and the rule is visible in the annotation. The repository keeps `str` there because the validator's message is the one its tests assert."
+    "explanation": "The `_check_mode` validator becomes unnecessary: `literal_error` replaces it, and the rule is visible in the annotation."
   },
   "common_mistakes": [
     "Using a bare `str` for a closed set, then validating it in a function nobody calls on the new path.",
@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "The provider field typed as a Literal",
       "path": "app/main.py",
-      "lines": "188-195"
+      "lines": "190-198"
     }
   ],
   "learn_more": [

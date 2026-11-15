@@ -76,14 +76,14 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "How to run the suite, and what the README promises",
+      "label": "How to run the suite",
       "path": "README.md",
       "lines": "59-80"
     },
     {
-      "label": "How to run the suite",
-      "path": "README.md",
-      "lines": "59-80"
+      "label": "The testing document: what the suite covers",
+      "path": "TESTING.md",
+      "lines": "71-110"
     }
   ],
   "learn_more": [

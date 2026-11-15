@@ -154,6 +154,10 @@
     --sev-low: #1c5d86;
     --scrim: #0b1220;
     --divider: #6b7688;
+    --surface-raised: #ffffff;
+    --surface-2: #ffffff;
+    --ok-soft: #eefaf2;
+    --bad-soft: #fdeff3;
     --code-header: #eeeeee;
     --code-muted: #333333;
     --code-border: #cccccc;

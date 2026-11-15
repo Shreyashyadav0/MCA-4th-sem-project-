@@ -64,7 +64,7 @@ window.LESSONS.push({
     }
   ],
   "try_it": {
-    "prompt": "Add a second field to the bad payload so two errors appear, and print both paths.",
+    "prompt": "Add a `line` and a `severity` to the bad payload so three errors appear, and print each path.",
     "starter": "from app.models import Finding\n\ntry:\n    Finding.model_validate_json('{\"file\": \"a.py\"}')\nexcept Exception as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n",
     "solution": "from app.models import Finding\n\ntry:\n    Finding.model_validate_json('{\"file\": \"a.py\", \"line\": \"nope\", \"severity\": \"LOW\"}')\nexcept Exception as error:\n    for entry in error.errors():\n        print(entry[\"loc\"], entry[\"type\"])\n",
     "explanation": "It prints the line validator's failure and the two missing fields — one entry per problem, each with its own path. Note both failure modes are `ValidationError`: Pydantic converts a JSON syntax error into an entry of type `json_invalid`."

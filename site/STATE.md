@@ -717,3 +717,54 @@ both use as the example of why the type has to match the contract.
 **Left for Wave 4.** Parts 4 and 5. The sidebar's collapsed state is still
 per-session, `tryit.html` still prints only its output pane, and the CSS has no
 syntax highlighting yet — code is one colour, which is honest but plain.
+
+## Waves 3a and 3b — two audit rounds on Wave 3
+
+Six auditors over the Wave 3 tree (87 findings, 4 blockers), then three more over
+the fixed tree (28 findings, 1 blocker). Both rounds are fixed in place.
+
+**Round one — the blockers.**
+
+1. Lesson 2.9 taught that `model_validate_json` raises `json.JSONDecodeError` for
+   prose. It raises `ValidationError` with type `json_invalid` — one exception
+   type for bad syntax and bad shape alike. The concept, the hint, the
+   common_mistakes and the quiz key all said the wrong thing; all four are fixed.
+2. Every Wave 3 quiz put the correct answer at index 1 (49 of 54). Answers now
+   spread evenly across all four indices, and the twelve questions where the key
+   was the longest option by 30 characters or more were rebalanced.
+3. `site/README.md` still said 108 lessons planned and sixteen written.
+4. The ≤900px editor rules lived in `layout.css`, but `code.css` loads later and
+   re-declares `.split` at the same specificity — so the stacked layout never
+   applied and the divider was a vertical bar on a horizontal split. The rules
+   moved into `code.css`, after the base rule.
+
+**Round one — the rest.** `model_copy` does not validate (2.4 already said so;
+2.2 and 2.6 claimed the opposite of Pydantic's default-copying), `MatchResult` is
+not hashable, the enum repr is `<Severity.LOW: 'LOW'>`, a constrained default is
+never validated, `pattern` is a search, 2.9's parse path is the real one
+(raise → catch → one repair retry → empty list with a WARNING), `-x` is for a
+cascade rather than a broken import, `tests_cli.py` fails on its prefix, 3.3's
+try-it no longer needs `tmp_path`, 3.4's try-it tests what its name says, and
+three TESTING.md links stopped pointing at ranges that quote a stale count.
+
+**Round two — the blocker.** The skip-link fix hid the link permanently: the
+off-screen `transform` was never cleared on focus, so the one control meant to
+help keyboard users was unreachable. `.skip-link:focus` now resets it.
+
+**Round two — the rest.** The duplicate language label survived the first fix
+(a second rule painted it at 2.87:1) and is gone; `.btn-tryit` and the narrow
+`.lesson-meta` lost their cascade fights to later sheets and were moved; pager and
+drawer-close borders moved to `--border-control` (3.29:1); quiz marks stopped
+borrowing the severity ramp for `--ok`/`--bad`; print now wraps long code lines,
+opens every `<details>` before printing (a closed one renders nothing on paper),
+and re-declares the soft surface tokens so a lesson printed from the dark theme
+does not keep dark quiz cards. `common_mistakes`, `glossary_terms`, quiz verdicts
+and fence-less solutions render inline markdown instead of printing literal
+backticks, and the quiz's own question and option text render `<code>`.
+
+**Measured, not fixed.** "Pick the longest option" still names the right answer
+more often than chance (the key remains the longest in 85 of 102 questions, but
+the median gap to the next-longest is 12 characters, against a maximum of 78
+before). Two lessons still open on an abstract paragraph rather than a snippet
+(3.1, 3.5), and six lessons never address the reader in the second person. All
+three are recorded rather than claimed as done.

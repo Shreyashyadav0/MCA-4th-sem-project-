@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "When is `-x` the right flag?",
       "options": [
-        "While fixing, so the first error is the one you read",
+        "In CI, so a single flake cannot hide the later failures",
         "In CI, always, so a run never wastes time on later tests",
         "While fixing a failure, so the first error is the one you read",
         "Only when the suite is slow enough to time out"

@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
-        "That annotations are not enforced at runtime without a validator",
+        "That a frozen dataclass cannot be compared for equality",
         "That frozen dataclasses cannot be compared for equality",
         "That a dataclass is always faster than a BaseModel",
         "That annotations are not enforced at runtime without a validator"
@@ -72,7 +72,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "Classify three shapes — `Finding`, `MatchResult`, `ReviewResponse` — as dataclass or BaseModel, and justify each in one line.",
     "hint": "Ask where the data comes from, not what it looks like.",
-    "solution": "```text\nFinding        BaseModel   — built from a rule's dict or a model's JSON; untrusted.\nMatchResult    dataclass   — computed inside benchmarks from validated values; frozen for hashing.\nReviewResponse BaseModel   — assembled for the HTTP layer and serialised to JSON on the way out.\n```",
+    "solution": "```text\nFinding        BaseModel   — built from a rule's dict or a model's JSON; untrusted.\nMatchResult    dataclass   — computed inside benchmarks from validated values; frozen for immutability; not hashable because `per_category` is a dict.\nReviewResponse BaseModel   — assembled for the HTTP layer and serialised to JSON on the way out.\n```",
     "explanation": "Two of the three cross a boundary and are validated there; the third never leaves the process, so it is a plain frozen shape."
   },
   "common_mistakes": [

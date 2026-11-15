@@ -78,7 +78,7 @@ window.LESSONS.push({
   },
   "common_mistakes": [
     "Writing `Field(min_length=1)` and expecting an optional field — constraints never supply a default.",
-    "Giving a constrained field a default that violates its own constraint, so it fails only when used.",
+    "Giving a constrained field a default that violates its own constraint: the default is not validated, so the bad value is accepted silently until something reads it.",
     "Reaching for a validator where `pattern` would do, and losing the schema entry that comes free with a constraint."
   ],
   "project_links": [
@@ -96,7 +96,7 @@ window.LESSONS.push({
   ],
   "glossary_terms": [
     "constraint — a rule declared on a field and checked with the type",
-    "pattern — a regex the string must match; anchor with `^...$` for a full match",
+    "pattern — a regex the string must contain a match of; anchor with `^...$` for a full match",
     "loc — the path to a failing field, as a tuple"
   ]
 });

@@ -39,6 +39,7 @@
 }
 
 .skip-link:focus {
+  transform: none; /* the off-screen transform must be cleared, not just the offset */
   top: var(--space-3);
 }
 
@@ -105,6 +106,17 @@
   .code-figure {
     overflow: visible; /* a long line must not be clipped on paper */
     box-shadow: none;
+  }
+
+  pre.code,
+  pre.code code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* A closed <details> prints nothing; the expected output must be on paper. */
+  details.expected-output > *:not(summary) {
+    display: block;
   }
 
   .pane-right .example-output {

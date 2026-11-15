@@ -47,7 +47,7 @@ window.LESSONS.push({
     {
       "q": "What does the proof not establish?",
       "options": [
-        "That no test would reach the network without the patches",
+        "That the suite passed while the patches were installed",
         "That no test would use the network on a machine without the patches",
         "That the patches were applied before pytest started",
         "That the suite passed while the patches were in place"

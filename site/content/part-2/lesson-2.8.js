@@ -32,7 +32,7 @@ window.LESSONS.push({
     {
       "q": "What does `mode=\"json\"` change in `model_dump`?",
       "options": [
-        "It converts values to JSON-safe primitives, so enums become strings",
+        "It makes the dump faster by skipping validation entirely",
         "It converts values to JSON-safe primitives, so enums become strings",
         "It makes the dump faster by skipping validation",
         "It sorts the keys so two dumps compare equal"

@@ -810,7 +810,11 @@
       /* A solution that carries its own fenced block is markdown — that is how a
        * lesson says "this answer is a console transcript, not Python". Anything
        * else is Python source, which is the common case. */
-      var isMarkdown = String(data.solution).indexOf("```") !== -1;
+      /* A solution with no fence is code; one written as sentences is prose. The
+       * tell is a line that reads like a sentence rather than a statement. */
+      var solution = String(data.solution);
+      var isMarkdown = solution.indexOf("```") !== -1 ||
+        /^[A-Z][a-z]+\s+[a-z]/.test(solution) && solution.indexOf("=") === -1;
       node.appendChild(
         detailsBlock(
           labels.solution,
@@ -1069,7 +1073,9 @@
     showSection("lesson-quiz", hasQuiz);
 
     var hasMistakes = fillList("lesson-mistakes", lesson.common_mistakes, function (text) {
-      return el("li", null, text);
+      var item = el("li");
+      item.innerHTML = renderInline(escapeHtml(String(text)));
+      return item;
     });
     showSection("lesson-mistakes", hasMistakes);
 
@@ -1106,7 +1112,9 @@
     showSection("lesson-links", hasLinks);
 
     var hasGlossary = fillList("lesson-glossary", lesson.glossary_terms, function (term) {
-      return el("li", null, term);
+      var item = el("li");
+      item.innerHTML = renderInline(escapeHtml(String(term)));
+      return item;
     });
     showSection("lesson-glossary", hasGlossary);
 
@@ -1361,6 +1369,33 @@
         }
       }
     }
+  }
+
+  /* Chrome does not render a closed <details> on paper, and an author rule
+   * cannot reveal one: the content lives in a slot the browser hides. Opening
+   * them for the duration of the print is the only reliable way to put the
+   * answer and the expected output on the page. */
+  var reopened = [];
+
+  function openForPrint() {
+    reopened = [];
+    var all = document.querySelectorAll("details:not([open])");
+    for (var index = 0; index < all.length; index += 1) {
+      all[index].open = true;
+      reopened.push(all[index]);
+    }
+  }
+
+  function restoreAfterPrint() {
+    reopened.forEach(function (node) {
+      node.open = false;
+    });
+    reopened = [];
+  }
+
+  if (window.matchMedia) {
+    window.addEventListener("beforeprint", openForPrint);
+    window.addEventListener("afterprint", restoreAfterPrint);
   }
 
   window.App = {

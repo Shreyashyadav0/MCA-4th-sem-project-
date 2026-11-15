@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "How a skip differs from a failure",
       "path": "TESTING.md",
-      "lines": "181-210"
+      "lines": "181-199"
     }
   ],
   "learn_more": [
