@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Field validators and constraints",
   "order": 606,
   "duration_min": 25,
-  "concept_md": "### Two kinds of rule\n\nA **constraint** is declared on the field: `min_length=1` on `issue`, `min_length=1` on `file`. Pydantic applies it without any code of yours.\n\nA **validator** is a function that runs after the type check, for rules a constraint cannot express:\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\n### What the line validator adds\n\nThe pattern `^\\d+(?:-\\d+)?$` could be a constraint, but the *ascending* check cannot: it needs to compare two halves of the same string. So the validator does both, and raises `ValueError` with a message a human can act on.\n\n### Validators run in declaration order\n\nA model with several validators applies them in the order the fields are declared, and a failure stops the rest. That is why the message for a bad `line` is about the line and not about a later field.\n\n### The null-byte rule lives elsewhere\n\n`ReviewRequest` in the API validates that a pasted code body carries no null bytes, because a null byte in a diff is a request the parser should never see. Same technique, different boundary: the model that receives untrusted input owns the check.\n\n### What a validator may not do\n\nIt may not reach outside the value it was given. A validator that read a file, called a service or looked at another field would make construction depend on the world, and every test would need that world to exist. These validators are pure functions of one string, which is why the models can be exercised in the browser runner.",
+  "concept_md": "### Two kinds of rule\n\nA **constraint** is declared on the field: `min_length=1` on `issue`, `min_length=1` on `file`. Pydantic applies it without any code of yours.\n\nA **validator** is a function that runs after the type check, for rules a constraint cannot express:\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\n### What the line validator adds\n\nThe pattern `^\\d+(?:-\\d+)?$` could be a constraint, but the *ascending* check cannot: it needs to compare two halves of the same string. So the validator does both, and raises `ValueError` with a message a human can act on.\n\n### Validators run in declaration order\n\nPydantic runs every field's validation and collects all the errors, so one bad input can report several problems at once — an empty `file`, a descending `line` and an empty `suggested_fix` in the same `ValidationError`. That is why `errors()` returns a list rather than a single entry.\n\n### The null-byte rule lives elsewhere\n\n`ReviewRequest` in the API validates that a pasted code body carries no null bytes, because a null byte in a diff is a request the parser should never see. Same technique, different boundary: the model that receives untrusted input owns the check.\n\n### What a validator may not do\n\nIt may not reach outside the value it was given. A validator that read a file, called a service or looked at another field would make construction depend on the world, and every test would need that world to exist. These validators are pure functions of one string, which is why the models can be exercised in the browser runner.",
   "code_examples": [
     {
       "id": "6.6-ex-0",
@@ -41,15 +41,15 @@ window.LESSONS.push({
       "why": "`min_length` looks at one value; deciding that 9-4 descends means splitting the value and comparing, which needs code."
     },
     {
-      "q": "What happens to the remaining validators when one raises?",
+      "q": "Two fields are invalid at once. What does `errors()` return?",
       "options": [
-        "They are skipped for that field only",
-        "They all run and every error is collected",
-        "They stop; the first failure is reported",
-        "They run twice"
+        "Both errors, one per field",
+        "Only the first error",
+        "A single error naming the model",
+        "Nothing until `model_validate` is called"
       ],
-      "answer": 2,
-      "why": "A validator failure ends validation for that model, which is why the error you see is about the first bad field in declaration order."
+      "answer": 0,
+      "why": "Pydantic validates every field and collects the failures, so a caller can fix several problems in one pass rather than one per run."
     },
     {
       "q": "Where is the null-byte check made, and why there?",

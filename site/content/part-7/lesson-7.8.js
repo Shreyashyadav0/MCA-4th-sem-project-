@@ -9,13 +9,13 @@ window.LESSONS.push({
   "title": "Guided read of app/parser.py",
   "order": 708,
   "duration_min": 30,
-  "concept_md": "### 614 lines, in five blocks\n\n**1. Errors and path helpers** — `DiffParseError` at **69**, `normalize_path` at **73**, `_spans` at **89**, `_parse_range` at **106**. Small, pure, and used by everything below.\n\n**2. The models** — `DiffLine` at **112**, `Hunk` at **123**, `FileDiff` at **152**, `FileSummary` at **193**, `DiffBundle` at **206**, `DiffReviewResult` at **248**. The shapes the parser produces.\n\n**3. The builder** — `_Builder` at **305**. State that accumulates across lines, with `finish()` deciding what the collected lines mean.\n\n**4. The entry points** — `parse_diff` at **343**, `parse_diff_file` at **503**, `anchor_findings` at **518**, `bundle_from_source` at **575**.\n\n**5. That is the whole file** — thirteen definitions, no renderer. The Markdown comment is built in `app/main.py` from `as_row()`, which is why the parser stays a pure text-to-model module.\n\n### The order is the design\n\nModels before builder before entry points, because each layer uses only what is above it. Reading top to bottom means never meeting a name before it is defined — the same property that makes the module importable without side effects.\n\n### The two functions worth memorising\n\n`parse_diff` at **343** is where text becomes models, and `anchor_findings` at **518** is where models meet a diff. Everything else in the file exists to serve one of those two.",
+  "concept_md": "### 614 lines, in five blocks\n\n**1. Errors and path helpers** — `DiffParseError` at **69**, `normalize_path` at **73**, `_spans` at **89**, `_parse_range` at **106**. Small, pure, and used by everything below.\n\n**2. The models** — `DiffLine` at **112**, `Hunk` at **123**, `FileDiff` at **152**, `FileSummary` at **193**, `DiffBundle` at **206**, `DiffReviewResult` at **248**. The shapes the parser produces.\n\n**3. The builder** — `_Builder` at **305**. State that accumulates across lines, with `finish()` deciding what the collected lines mean.\n\n**4. The entry points** — `parse_diff` at **343**, `parse_diff_file` at **503**, `anchor_findings` at **518**, `bundle_from_source` at **575**.\n\n**5. That is the whole file** — fifteen definitions, no renderer. The Markdown comment is built in `app/main.py` from `as_row()`, which is why the parser stays a pure text-to-model module.\n\n### The order is the design\n\nModels before builder before entry points, because each layer uses only what is above it. Reading top to bottom means never meeting a name before it is defined — the same property that makes the module importable without side effects.\n\n### The two functions worth memorising\n\n`parse_diff` at **343** is where text becomes models, and `anchor_findings` at **518** is where models meet a diff. Everything else in the file exists to serve one of those two.",
   "code_examples": [
     {
       "id": "7.8-ex-0",
       "lang": "console",
       "caption": "The file's index",
-      "code": "import subprocess\nout = subprocess.run([\"grep\", \"-n\", \"^class \\\\|^def \", \"app/parser.py\"],\n                     capture_output=True, text=True).stdout\nprint(out.strip())",
+      "code": "grep -n '^class \\|^def ' app/parser.py",
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",
@@ -71,7 +71,7 @@ window.LESSONS.push({
   },
   "common_mistakes": [
     "Reading `parse_diff` first; it assumes the models you have not met.",
-    "Looking for the Markdown renderer in `models.py`; it lives here.",
+    "Looking for the Markdown renderer here; it is built in `app/main.py` and `app/github_client.py` from `as_row()`.",
     "Assuming the file reads something at import time; it does not."
   ],
   "project_links": [
@@ -88,7 +88,7 @@ window.LESSONS.push({
     {
       "label": "The entry points",
       "path": "app/parser.py",
-      "lines": "343-600"
+      "lines": "343-614"
     }
   ],
   "learn_more": [

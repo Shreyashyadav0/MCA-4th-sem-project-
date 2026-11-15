@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "file and line, and why line is a string",
   "order": 602,
   "duration_min": 20,
-  "concept_md": "### `line` is a string, and that is deliberate\n\nA finding may concern one line or a range. The model stores both as text:\n\n```text\n\"42\"      one line\n\"42-45\"   four lines\n```\n\nAn `int` could not hold the second, and a tuple would need its own serialisation in every consumer. A string that matches `^\\d+(?:-\\d+)?$` holds both, sorts predictably once split, and survives JSON without a custom encoder.\n\n### The validator is the only gate\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\nIt rejects anything that is not a number or an ascending range. `\"4-2\"` fails because a range that descends is a caller bug, not a finding, and `\"line 42\"` fails because prose is not a line number. `\"42-42\"` passes: it ascends, and it names one line.\n\n### `file` is a path, or `<snippet>`\n\n`file` is relative to the project root so a comment can be posted against the right file. When the input was pasted code rather than a diff, the tool uses the sentinel `<snippet>`, which is not a path and must never be treated as one.\n\n### Why this matters downstream\n\nThe anchorer splits on `-` to get the start line, so the format is not decoration: it is the interface between the finding and the diff.",
+  "concept_md": "### `line` is a string, and that is deliberate\n\nA finding may concern one line or a range. The model stores both as text:\n\n```text\n\"42\"      one line\n\"42-45\"   four lines\n```\n\nAn `int` could not hold the second, and a tuple would need its own serialisation in every consumer. A string that matches `^\\d+(?:-\\d+)?$` holds both, sorts predictably once split, and survives JSON without a custom encoder.\n\n### The validator is the only gate\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\nIt rejects anything that is not a number or an ascending range. `\"4-2\"` fails because a range that descends is a caller bug, not a finding, and `\"line 42\"` fails because prose is not a line number. `\"42-42\"` passes: it ascends, and it names one line.\n\n### `file` is a path, or `<snippet>`\n\n`file` is relative to the project root so a comment can be posted against the right file. When the input was pasted code rather than a diff, the tool uses the sentinel `<snippet>`, which is not a path and must never be treated as one.\n\n### Why this matters downstream\n\nThe anchorer calls `_parse_range` on the value to get `(start, end)`, so the format is not decoration: it is the interface between the finding and the diff.",
   "code_examples": [
     {
       "id": "6.2-ex-0",
@@ -72,8 +72,8 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "The anchorer needs the first line of a range. Write the expression it uses, and say what it returns for `\"42-45\"` and for `\"42\"`.",
     "hint": "Split on the dash and take the first part.",
-    "solution": "```python\nint(finding.line.split(\"-\")[0])\n\n\"42-45\" -> 42\n\"42\"    -> 42\n```",
-    "explanation": "Splitting on a dash that may not be there is why the format is a string with a fixed shape: one expression handles both cases."
+    "solution": "```python\nfrom app.parser import _parse_range\n\n_parse_range(\"42-45\")  # (42, 45)\n_parse_range(\"42\")     # (42, 42)\n```",
+    "explanation": "One helper handles both forms, which is why the anchorer never splits the string itself."
   },
   "common_mistakes": [
     "Passing an int for `line`, which fails validation rather than being coerced.",

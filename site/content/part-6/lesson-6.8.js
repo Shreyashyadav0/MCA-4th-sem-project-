@@ -15,7 +15,7 @@ window.LESSONS.push({
       "id": "6.8-ex-0",
       "lang": "console",
       "caption": "The file's own index, from grep",
-      "code": "import subprocess\nprint(subprocess.run([\"grep\", \"-n\", \"^class \\\\|^def \\\\|^_\", \"app/models.py\"],\n                     capture_output=True, text=True).stdout.strip())",
+      "code": "grep -n '^class \\|^def \\|^_' app/models.py",
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner has Python but no shell, so this command cannot run there; it needs a checkout on disk.",

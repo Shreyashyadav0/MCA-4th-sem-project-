@@ -908,10 +908,31 @@ caught three of my own errors before they shipped: `ReviewResult` requires
 The two guided reads are terminal: they are `grep` commands, and the runner has
 no shell.
 
+**Two audit rounds, and the second one mattered.** The first found fourteen
+findings; the second found sixteen, and among them five behavioural claims the
+code contradicts — all mine:
+
+- 6.6 said a failed validator stops the rest. Pydantic collects every field's
+  error, so a bad input can report five problems at once.
+- 6.7 said `counts` and `sorted_findings` were computed fields. Only `verdict` is;
+  the other two are a method and a property, never serialised.
+- 7.3 said `FileDiff` carries `hunk_count`, and that the review-detail endpoint
+  returns summaries. Neither is true.
+- 7.4 said `added_spans` is computed in `finish()`. It is a property on `FileDiff`
+  that recomputes from `added_line_numbers` on every access.
+- 7.6 said the anchorer compares against `added_spans`. It compares against
+  `added_line_numbers`, a set of integers, via `_parse_range`.
+
+All five are corrected, and the two guided-read examples now ship shell commands
+rather than Python source under a terminal tier — the terminal panel runs a shell,
+so the Python form could never have run.
+
 **Deferred, measured, not hidden.** Twenty-four of the 48 quiz questions still
 have the correct option as the unique longest by more than 8 characters. The
 answer *indices* are even (12/12/12/12) and no two options duplicate, but the
-length tell is a real guessing channel and needs a hand pass per question.
+length tell is a real guessing channel and needs a hand pass per question. Part 7
+also restates format-level material from Part 5 in 7.1 and 7.4; both need a
+rewrite that teaches the code rather than the format.
 
 **Gate.** `validate_lessons.py` → `OK lessons=66 parts_covered=8
 manifest_entries=66`, exit 0. Manifest and all three pages carry the same sixteen

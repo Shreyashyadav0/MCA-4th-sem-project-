@@ -86,7 +86,7 @@ window.LESSONS.push({
     {
       "label": "bundle_from_source",
       "path": "app/parser.py",
-      "lines": "575-600"
+      "lines": "575-614"
     },
     {
       "label": "The endpoint that uses it",

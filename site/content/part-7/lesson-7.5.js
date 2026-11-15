@@ -91,7 +91,7 @@ window.LESSONS.push({
     {
       "label": "The confinement check that rejects an escape",
       "path": "app/main.py",
-      "lines": "427-429"
+      "lines": "425-429"
     }
   ],
   "learn_more": [

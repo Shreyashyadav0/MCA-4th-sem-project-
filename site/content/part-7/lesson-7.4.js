@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "added_spans and the _spans compaction",
   "order": 704,
   "duration_min": 30,
-  "concept_md": "### The problem with a list of numbers\n\nA file with four added lines reports `[3, 4, 7, 8]`. That is accurate and hard to read: a reviewer has to reconstruct that it means two blocks rather than four scattered lines.\n\n`_spans` turns a sorted list into ranges:\n\n```text\n[3, 4, 7, 8]   ->   ['3-4', '7-8']\n[1, 2, 3, 4, 5] ->   ['1-5']\n[9]             ->   ['9']\n```\n\n### Why the shape matters downstream\n\nThe anchorer asks \"does this finding's line fall in an added span?\". With ranges it splits on `-` and compares two integers; with a list it would scan. And the Markdown comment shows the ranges, so the reader sees two blocks at a glance.\n\n### The invariant\n\n`added_spans` covers exactly the added line numbers, no more and no fewer. `added_line_count` is the length of the underlying list, not of the span strings — which is why `['3-4','7-8']` sits beside `4`.\n\n### Where it is computed\n\nIn the builder's `finish()`, from the `DiffLine` objects it collected, so the spans and the lines cannot disagree.\n\n### Why not compute it on demand\n\nEvery consumer wants the spans: the anchorer, the summary, the Markdown table. Computing them once, where the lines are already in hand, is cheaper than four callers each walking the list — and it keeps the invariant in one place.",
+  "concept_md": "### The problem with a list of numbers\n\nA file with four added lines reports `[3, 4, 7, 8]`. That is accurate and hard to read: a reviewer has to reconstruct that it means two blocks rather than four scattered lines.\n\n`_spans` turns a sorted list into ranges:\n\n```text\n[3, 4, 7, 8]   ->   ['3-4', '7-8']\n[1, 2, 3, 4, 5] ->   ['1-5']\n[9]             ->   ['9']\n```\n\n### Why the shape matters downstream\n\nThe anchorer asks \"does this finding's line fall in an added span?\". With ranges it splits on `-` and compares two integers; with a list it would scan. And the Markdown comment shows the ranges, so the reader sees two blocks at a glance.\n\n### The invariant\n\n`added_spans` covers exactly the added line numbers, no more and no fewer. `added_line_count` is the length of the underlying list, not of the span strings — which is why `['3-4','7-8']` sits beside `4`.\n\n### Where it is computed\n\n`added_spans` is a property on `FileDiff`: every access runs `_spans(self.added_line_numbers)`, over a set built from the hunk lines. Nothing is cached, so a span cannot go stale — and the cost is paid only by a caller that asks.\n\n### Who actually uses it\n\nThe summary and the Markdown table read the spans. The anchorer does not: it compares against `added_line_numbers`, the set of integers, because a membership test on a set is cheaper than parsing range strings.",
   "code_examples": [
     {
       "id": "7.4-ex-0",
@@ -89,9 +89,9 @@ window.LESSONS.push({
       "lines": "89-105"
     },
     {
-      "label": "Where added_spans is built",
+      "label": "The added_spans property",
       "path": "app/parser.py",
-      "lines": "305-342"
+      "lines": "172-175"
     }
   ],
   "learn_more": [
