@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Setup: Python, venv, git, terminal basics",
   "order": 3,
   "duration_min": 25,
-  "concept_md": "### What you need\n\nPython **3.12** — the repository pins `3.12.13` in `.python-version`, and the lock file's wheels are built for it. A different minor version will usually work and occasionally will not; when the test count disagrees with this site, the interpreter is the first thing to check.\n\nGit, so `git status` can tell you what you changed. A terminal you are comfortable in.\n\n### Four commands\n\n```console\ncd ai-code-reviewer        # get to the project root\nls                         # what is here: app/ tests/ samples/ site/\npython -m pytest -q tests  # the whole suite\ngit status                 # only site/ should ever be modified by these waves\n```\n\n### Create the environment\n\n```console\npython -m venv .venv\nsource .venv/bin/activate     # Windows: .venv\\Scripts\\activate\npip install -r requirements.lock\n```\n\nInstall from the **lock**, not from `requirements.txt`. The lock pins all 37 distributions including the test tooling; the plain requirements file lists the runtime dependencies only, so `pytest` will not be there and the suite will not run.\n\n### The one number to remember\n\n`640 passed, 1 skipped`. The skip is a live-model smoke test guarded by an environment variable, so it runs on a machine with LM Studio and skips everywhere else. Collected is **641** — one more than the passes, because the skip is still a test.\n\n### When it goes wrong\n\nIf `python -m pytest` says \"no module named pytest\", the environment is wrong, not the code. If the counts differ from 640/1, re-read the interpreter version and reinstall from the lock before reading another lesson: you are otherwise studying a different program.",
+  "concept_md": "### What you need\n\nPython **3.12** — the repository pins `3.12.13` in `.python-version`, and the lock was frozen under it. A different minor version will usually work and occasionally will not; when the test count disagrees with this site, the interpreter is the first thing to check.\n\nGit, so `git status` can tell you what you changed. A terminal you are comfortable in.\n\n### Four commands\n\n```console\ncd ai-code-reviewer        # get to the project root\nls                         # what is here: app/ tests/ samples/ site/\npython -m pytest -q tests  # the whole suite\ngit status                 # only site/ should ever be modified by these waves\n```\n\n### Create the environment\n\n```console\npython -m venv .venv\nsource .venv/bin/activate     # Windows: .venv\\Scripts\\activate\npip install -r requirements.lock\n```\n\nInstall from the **lock**, not from `requirements.txt`. The lock pins all 37 distributions including the test tooling; the plain requirements file lists the runtime dependencies only, so `pytest` will not be there and the suite will not run.\n\n### The one number to remember\n\n`640 passed, 1 skipped`. The skip is a live-model smoke test guarded by an environment variable, so it runs on a machine with LM Studio and skips everywhere else. Collected is **641** — one more than the passes, because the skip is still a test.\n\n### When it goes wrong\n\nIf `python -m pytest` says \"no module named pytest\", the environment is wrong, not the code. If the counts differ from 640/1, re-read the interpreter version and reinstall from the lock before reading another lesson: you are otherwise studying a different program.",
   "code_examples": [
     {
       "id": "0.3-ex-0",
@@ -28,11 +28,11 @@ window.LESSONS.push({
       "q": "Which file should you install from?",
       "options": [
         "requirements.txt",
-        "requirements.lock",
         "requirements-dev.txt",
+        "requirements.lock",
         "pyproject.toml"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The lock pins all 37 distributions including the test tooling; requirements.txt lists runtime dependencies only, so pytest would be missing."
     },
     {
@@ -40,11 +40,11 @@ window.LESSONS.push({
       "options": [
         "639",
         "640",
-        "641",
-        "642"
+        "642",
+        "641"
       ],
-      "answer": 2,
-      "why": "A skipped test is still collected: 640 passes plus the one skip is 641 collected, which is what --collect-only prints."
+      "answer": 3,
+      "why": "Discovery runs first and the marker is evaluated second: a skipped test was still found, so it is collected — 640 executed passes plus the one skip is 641."
     },
     {
       "q": "`python -m pytest` says there is no module named pytest. What is the likely cause?",
@@ -60,15 +60,15 @@ window.LESSONS.push({
   ],
   "try_it": {
     "prompt": "Run `python --version`, then `python -m pytest -q tests --collect-only | tail -1`, and compare the collected count with what a real run reports.",
-    "starter": "",
-    "solution": "`3.12.13` and `641 tests collected`, against `640 passed, 1 skipped` from a real run. The difference is the skipped test, which is collected but not executed.",
+    "starter": "import sys\nprint(sys.version.split()[0])\n",
+    "solution": "```text\n`3.12.13` and `641 tests collected`, against `640 passed, 1 skipped` from a real run. The difference is the skipped test, which is collected but not executed.\n```",
     "explanation": "Two numbers, one test: knowing which is which is the difference between trusting the suite and misreading it."
   },
   "exercise": {
-    "prompt": "Run all three commands — `python --version`, `git status`, and the collect-only command — and report what each one tells you. Then say what the collected count should be and why.",
-    "hint": "`git status` on a clean checkout prints nothing after the branch line; any entry is a change you made.",
-    "solution": "`python --version` prints 3.12.13, matching `.python-version`. `git status` should show a clean tree, or only files under `site/` if you have been editing lessons. The collect-only command prints **641 tests collected**; the run reports 640 passed and 1 skipped, because the skipped live-model test is still a collected test.\n\n> If pytest is not installed at all, the environment came from `requirements.txt` rather than `requirements.lock` — reinstall from the lock.",
-    "explanation": "The three commands answer three different questions: which interpreter, what have I changed, and is the suite intact. Run them before trusting any other number."
+    "prompt": "Break the environment on purpose and diagnose it from the error. Deactivate the venv (`deactivate`), then run `python -m pytest -q tests` with the system interpreter and read what it says. Reactivate and run it again.",
+    "hint": "The first failure names the missing module, not the code. Check `which python` after each step.",
+    "solution": "```text\nOutside the venv the system interpreter has none of the pinned packages, so the run fails with `No module named pytest` (or, if pytest happens to be installed globally, with an import error for pydantic).\n\n```console\n$ deactivate\n$ python -m pytest -q tests\n/usr/bin/python: No module named pytest\n$ source .venv/bin/activate\n$ python -m pytest -q tests\n640 passed, 1 skipped\n```\n\nThe same command, two interpreters, two answers. `which python` is the fastest way to tell which one you are about to use.\n```",
+    "explanation": "A missing module is an environment fact, not a code fact. Reading the error before reinstalling saves the twenty minutes spent reinstalling the wrong thing."
   },
   "common_mistakes": [
     "Installing from `requirements.txt` and then wondering why pytest is missing: the test tooling lives in the lock and in `requirements-dev.txt`.",
@@ -79,10 +79,10 @@ window.LESSONS.push({
     {
       "label": "The pinned dependency set — install from this",
       "path": "requirements.lock",
-      "lines": "1-37"
+      "lines": "1-40"
     },
     {
-      "label": "Test and lint tooling",
+      "label": "Test tooling: pytest, and the runtime dependencies it builds on",
       "path": "requirements-dev.txt",
       "lines": "1-2"
     },

@@ -7,12 +7,13 @@
 # only interpreter guaranteed to have requirements.lock installed.
 PYTHON ?= $(if $(wildcard .venv-verify/bin/python),.venv-verify/bin/python,python3)
 
-.PHONY: help verify test lint run clean
+.PHONY: help verify test lint site run clean
 
 help:
 	@echo "make verify  - one-command verifier (venv + lock + pytest + zero-network proof)"
 	@echo "make test    - run the test suite: $(PYTHON) -m pytest -q tests"
 	@echo "make lint    - syntax/lint check (bash -n on scripts, py_compile on app)"
+	@echo "make site    - validate the learning site: python site/tools/validate_lessons.py"
 	@echo "make run     - start the webhook server: uvicorn app.main:app --reload --port 8000"
 	@echo "make clean   - remove __pycache__, .pytest_cache and .venv-verify"
 
@@ -21,6 +22,9 @@ verify:
 
 test:
 	$(PYTHON) -m pytest -q tests
+
+site:
+	$(PYTHON) site/tools/validate_lessons.py
 
 lint:
 	bash -n scripts/verify.sh

@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Functions, args, kwargs, type hints",
   "order": 103,
   "duration_min": 20,
-  "concept_md": "### Four ways to pass arguments\n\n```python\ndef rule(line, severity=\"MEDIUM\"): ...      # positional + default\ndef total(*numbers): ...                    # any number of positionals\ndef make_finding(**fields): ...             # any number of keywords\ndef review(bundle, *, provider=\"auto\"): ...  # keyword-only after the star\n```\n\nThe star is the important one. Everything after `*` must be passed by name, which is how a function with six options stays readable: `review(bundle, provider=\"local\")` says what it means, `review(bundle, \"local\", False)` does not.\n\n### Defaults are evaluated once\n\nA default is built when the `def` runs, not per call. `def add(f, acc=[])` shares one list across every call. Use `None` and build inside.\n\n### Type hints are documentation the tools can check\n\n```python\ndef make_finding(**kw) -> dict[str, str]:\n```\n\nThe return annotation is not decoration: `-> dict[str, str]` tells a reader the values are strings, and `mypy` can prove it. `*args: int` and `**kw: str` annotate the element type, not the tuple or dict.\n\n### On a real signature\n\n`app/engine.py` defines the review entry point with two positional parameters and four keyword-only ones — `provider`, `force_offline`, `min_severity`, `categories` — all defaulted. That is the pattern this lesson teaches, used where it matters: a call site cannot silently pass the wrong option positionally.\n\n### Keyword arguments make boundaries explicit\n\n`make_finding(**kw)` accepts whatever the caller passes, which is convenient and dangerous: an unknown field would sail through. The example below closes that hole by checking the keys against an allow-list — the same discipline `Finding` enforces with `extra=\"forbid\"`, one layer earlier.",
+  "concept_md": "### Four ways to pass arguments\n\n```python\ndef rule(line, severity=\"MEDIUM\"): ...      # positional + default\ndef total(*numbers): ...                    # any number of positionals\ndef make_finding(**fields): ...             # any number of keywords\ndef review(bundle, *, provider=\"auto\"): ...  # keyword-only after the star\n```\n\nThe star is the important one. Everything after `*` must be passed by name, which is how a function with six options stays readable: `review(bundle, settings, provider=\"local\")` says what it means; passing the same values positionally does not.\n\n### Defaults are evaluated once\n\nA default is built when the `def` runs, not per call. `def add(f, acc=[])` shares one list across every call. Use `None` and build inside.\n\n### Type hints are documentation the tools can check\n\n```python\ndef make_finding(**kw) -> dict[str, str]:\n```\n\nThe return annotation is not decoration: `-> dict[str, str]` tells a reader the values are strings, and a type checker can prove it. `*args: int` and `**kw: str` annotate the element type, not the tuple or dict.\n\n### On a real signature\n\n`app/engine.py` defines the review entry point with two positional parameters and four keyword-only ones — `provider`, `force_offline`, `min_severity`, `categories` — all defaulted. That is the pattern this lesson teaches, used where it matters: a call site cannot silently pass the wrong option positionally.\n\n### Keyword arguments make boundaries explicit\n\n`make_finding(**kw)` accepts whatever the caller passes, which is convenient and dangerous: an unknown field would sail through. The example below closes that hole by checking the keys against an allow-list — the same discipline `Finding` enforces with `extra=\"forbid\"`, one layer earlier.",
   "code_examples": [
     {
       "id": "1.3-ex-0",
@@ -26,35 +26,35 @@ window.LESSONS.push({
     {
       "q": "What does the `*` in `def review(bundle, *, provider=\"auto\")` change?",
       "options": [
-        "Nothing, it is decoration",
         "Every parameter after it must be passed by keyword",
+        "Nothing, it is decoration",
         "It unpacks a tuple",
         "It makes the parameter optional"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "A bare star ends the positional parameters, so provider can only be given by name — which is what keeps a six-option call readable."
     },
     {
       "q": "Why is `def add(f, acc=[])` a bug waiting to happen?",
       "options": [
         "Lists cannot be default values",
-        "The list is created once, at def time, and shared by every call",
         "It fails on the first call",
+        "The list is created once, at def time, and shared by every call",
         "It copies the list on each call"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "Defaults are evaluated when the def runs, so every call appends to the same list and findings leak between reviews."
     },
     {
-      "q": "`def make_finding(**kw) -> dict[str, str]` — what does the annotation say?",
+      "q": "`def make_finding(**kw) -> dict[str, str]` — what does the `->` part promise?",
       "options": [
-        "kw is a dict of str keys and str values",
-        "The function returns a dict whose keys and values are strings",
-        "The function accepts exactly two arguments",
-        "Nothing useful"
+        "Nothing; return annotations are ignored by every tool",
+        "That every argument passed in kw is a string",
+        "That the function returns a string",
+        "That the function returns a dict whose keys and values are both strings"
       ],
-      "answer": 1,
-      "why": "The return annotation types the result: str keys, str values. It is what lets a checker catch a caller that expects ints."
+      "answer": 3,
+      "why": "The arrow types the result. `**kw` is annotated separately (`**kw: str` types the values), which is why the two halves of a signature say different things."
     }
   ],
   "try_it": {

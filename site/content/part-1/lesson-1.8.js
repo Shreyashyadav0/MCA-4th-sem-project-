@@ -27,22 +27,22 @@ window.LESSONS.push({
       "q": "`@logged` above a function is shorthand for what?",
       "options": [
         "A comment",
-        "`severity_rank = logged(severity_rank)`",
         "A subclass",
+        "`severity_rank = logged(severity_rank)`",
         "A type annotation"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The decorator is called with the function and its return value takes the name, which is why the wrapper becomes the function callers see."
     },
     {
       "q": "What does `@functools.wraps(function)` change?",
       "options": [
         "It speeds up the call",
-        "It copies __name__, __doc__ and annotations onto the wrapper",
+        "It makes the function async",
         "It removes the wrapper",
-        "It makes the function async"
+        "It copies __name__, __doc__ and annotations onto the wrapper"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Without it every decorated function is named `wrapper`, so tracebacks and help() mislead — the one line that keeps a decorator honest."
     },
     {
@@ -60,13 +60,13 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Write a `@timed` decorator that prints how many milliseconds the function took, and stack it with `@logged` on the same function. Read the order the lines come out in.",
     "starter": "import functools\nimport time\n\n\ndef timed(function):\n    @functools.wraps(function)\n    def wrapper(*args, **kwargs):\n        start = time.perf_counter()\n        result = function(*args, **kwargs)\n        print(function.__name__, \"took\", round((time.perf_counter() - start) * 1000, 3), \"ms\")\n        return result\n    return wrapper\n",
-    "solution": "import functools\nimport time\n\n\ndef timed(function):\n    @functools.wraps(function)\n    def wrapper(*args, **kwargs):\n        start = time.perf_counter()\n        result = function(*args, **kwargs)\n        print(function.__name__, \"took\", round((time.perf_counter() - start) * 1000, 3), \"ms\")\n        return result\n    return wrapper\n\n\ndef logged(function):\n    @functools.wraps(function)\n    def wrapper(*args, **kwargs):\n        print(\"before\", function.__name__)\n        result = function(*args, **kwargs)\n        print(\"after\", function.__name__)\n        return result\n    return wrapper\n\n\n@logged\n@timed\ndef work() -> None:\n    sum(range(1000))\n\n\nwork()\n",
+    "solution": "```text\nimport functools\nimport time\n\n\ndef timed(function):\n    @functools.wraps(function)\n    def wrapper(*args, **kwargs):\n        start = time.perf_counter()\n        result = function(*args, **kwargs)\n        print(function.__name__, \"took\", round((time.perf_counter() - start) * 1000, 3), \"ms\")\n        return result\n    return wrapper\n\n\ndef logged(function):\n    @functools.wraps(function)\n    def wrapper(*args, **kwargs):\n        print(\"before\", function.__name__)\n        result = function(*args, **kwargs)\n        print(\"after\", function.__name__)\n        return result\n    return wrapper\n\n\n@logged\n@timed\ndef work() -> None:\n    sum(range(1000))\n\n\nwork()\n```",
     "explanation": "`@logged` is applied last, so it is the outermost wrapper: `before work`, then the timing line, then `after work`. The number varies by machine; the order does not."
   },
   "exercise": {
     "prompt": "Read the `/rules` handler in `app/main.py` and name three things: the decorator, the function it wraps, and what the decorator returns.",
     "hint": "The decorator takes arguments, so it is called before it decorates anything.",
-    "solution": "The decorator is `@app.get(\"/rules\", tags=[\"rules\"], summary=\"...\", response_model=list[RuleInfo])` — called with a path first, returning a decorator. The function it wraps is `list_rules`. What it returns is that same function, registered against the path in FastAPI's route table; the framework calls it later and serialises the `list[RuleInfo]` it produces.",
+    "solution": "```text\nThe decorator is `@app.get(\"/rules\", tags=[\"rules\"], summary=\"...\", response_model=list[RuleInfo])` — called with a path first, returning a decorator. The function it wraps is `list_rules`. What it returns is that same function, registered against the path in FastAPI's route table; the framework calls it later and serialises the `list[RuleInfo]` it produces.\n```",
     "explanation": "Three layers: `app.get(path)` builds a decorator, the decorator registers the function, and the framework calls it per request. The handler body never sees HTTP."
   },
   "common_mistakes": [

@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Classes, dataclasses and @property",
   "order": 104,
   "duration_min": 25,
-  "concept_md": "### Three ways to hold data, and when each is right\n\nA plain **class** when the object has behaviour and invariants. A **dataclass** when it is mostly data: `@dataclass` writes `__init__`, `__repr__` and `__eq__` for you, and `frozen=True` makes instances immutable and hashable. A **Pydantic `BaseModel`** when the data crosses a boundary and must be validated — a stray key from a model should fail loudly, not leak into a pull-request comment.\n\nThis repository uses all three, and the choice is deliberate:\n\n- `Finding` is a `BaseModel` with `extra=\"forbid\"` — it validates what a rule or a model hands it.\n- `MatchResult` in `benchmarks/matching.py` is a `@dataclass(frozen=True)` — internal, trusted, and cheap.\n- `Point` below is the smallest useful example of the second kind.\n\n### `@property` is a method that reads like an attribute\n\n```python\n@property\ndef magnitude(self) -> float:\n    return (self.x ** 2 + self.y ** 2) ** 0.5\n```\n\n`point.magnitude` computes every time it is read; it is not stored. That is the right tool for a derived value — `MatchResult.tp` is `len(self.matched)`, and computing it beats keeping a second field in sync.\n\n### Frozen means frozen\n\n`frozen=True` blocks assignment: `point.x = 5.0` raises `FrozenInstanceError`. That is not a limitation to work around; it is what makes the instance safe to share and to hash.\n\n### When you want a setter, do not use @property\n\nA `@property` with no setter used where assignment was intended fails at runtime, not at review time. If the value must change, make it a field.",
+  "concept_md": "### Three ways to hold data, and when each is right\n\n```python\n@dataclass(frozen=True)\nclass Point:\n    x: float\n    y: float\n\n    @property\n    def magnitude(self) -> float:\n        return (self.x ** 2 + self.y ** 2) ** 0.5\n```\n\nSix lines, and you get `__init__`, `__repr__` and `__eq__` for free, an immutable instance, and a derived value that cannot drift. The rest of this lesson is why each of those three choices was made.\n\nA plain **class** when the object has behaviour and invariants. A **dataclass** when it is mostly data: `@dataclass` writes `__init__`, `__repr__` and `__eq__` for you, and `frozen=True` makes instances immutable and hashable. A **Pydantic `BaseModel`** when the data crosses a boundary and must be validated — a stray key from a model should fail loudly, not leak into a pull-request comment.\n\nThis repository uses all three, and the choice is deliberate:\n\n- `Finding` is a `BaseModel` with `extra=\"forbid\"` — it validates what a rule or a model hands it.\n- `MatchResult` in `benchmarks/matching.py` is a `@dataclass(frozen=True)` — internal, trusted, and cheap.\n- `Point` below is the smallest useful example of the second kind.\n\n### `@property` is a method that reads like an attribute\n\n```python\n@property\ndef magnitude(self) -> float:\n    return (self.x ** 2 + self.y ** 2) ** 0.5\n```\n\n`point.magnitude` computes every time it is read; it is not stored. That is the right tool for a derived value — `MatchResult.tp` is `len(self.matched)`, and computing it beats keeping a second field in sync.\n\n### Frozen means frozen\n\n`frozen=True` blocks assignment: `point.x = 5.0` raises `FrozenInstanceError`. That is not a limitation to work around; it is what makes the instance safe to share and to hash.\n\n### When you want a setter, do not use @property\n\nA `@property` with no setter used where assignment was intended fails at runtime, not at review time. If the value must change, make it a field.",
   "code_examples": [
     {
       "id": "1.4-ex-0",
@@ -27,23 +27,23 @@ window.LESSONS.push({
       "q": "Why is `Finding` a Pydantic model rather than a dataclass?",
       "options": [
         "Pydantic is faster",
-        "Because it crosses a boundary and must reject a stray key",
         "Because dataclasses cannot hold strings",
+        "Because it crosses a boundary and must reject a stray key",
         "Because it needs a @property"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "`extra=\"forbid\"` fails an unknown field at the boundary, which is the whole point of validating what a model returns."
     },
     {
       "q": "What does `@dataclass(frozen=True)` give you besides immutability?",
       "options": [
         "A setter for every field",
-        "Hashability, because the instance cannot change",
+        "Validation against a schema",
         "Automatic JSON output",
-        "Validation against a schema"
+        "Hashability, because the instance cannot change"
       ],
-      "answer": 1,
-      "why": "An object whose fields cannot change has a stable hash, so it can be a set member or a dict key — which is why MatchResult is frozen."
+      "answer": 3,
+      "why": "An object whose fields cannot change has a stable hash, so it can be a set member or a dict key — which is why the benchmark's match results are frozen rather than plain classes."
     },
     {
       "q": "`point.magnitude` — when is the value computed?",
@@ -64,10 +64,10 @@ window.LESSONS.push({
     "explanation": "Mutable, the second print is `Point(x=5.0, y=4.0) 6.4031242374328485` — the property recomputed, which is why a derived value needs no second field. Frozen, the assignment raises FrozenInstanceError instead."
   },
   "exercise": {
-    "prompt": "In two or three sentences, explain when this repository uses a dataclass and when it uses a BaseModel, using `MatchResult` and `Finding` as the examples.",
-    "hint": "One of them crosses a boundary where untrusted input arrives; the other never leaves the process.",
-    "solution": "`Finding` is a `BaseModel` because it is built from untrusted input — a rule's dict or a model's JSON — and `extra=\"forbid\"` must reject an unknown field at that boundary. `MatchResult` is a frozen dataclass because it is internal: computed from trusted values, never parsed, and immutable so it can be hashed and compared cheaply.",
-    "explanation": "The dividing line is trust, not taste: validate where data enters, and keep the internal shapes cheap."
+    "prompt": "Add a `scale(factor: float) -> \"Point\"` method to the frozen `Point` that returns a NEW point, then print `point`, `point.scale(2)` and `Point(3.0, 4.0) == Point(3.0, 4.0)`.",
+    "hint": "A frozen instance cannot change, so the method must build and return another one.",
+    "solution": "from dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Point:\n    x: float\n    y: float\n\n    def scale(self, factor: float) -> \"Point\":\n        return Point(self.x * factor, self.y * factor)\n\n\npoint = Point(3.0, 4.0)\nprint(point)\nprint(point.scale(2))\nprint(Point(3.0, 4.0) == Point(3.0, 4.0))\n",
+    "explanation": "It prints `Point(x=3.0, y=4.0)`, `Point(x=6.0, y=8.0)`, `True`. The original is unchanged because `scale` returns a new instance; equality works because `@dataclass` generates `__eq__` from the fields — neither of which a plain class gives you for free."
   },
   "common_mistakes": [
     "Forgetting `frozen=True` on a type that is meant to be immutable, then mutating it somewhere and wondering why a cached count is wrong.",
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "MatchResult — a frozen dataclass with derived properties",
       "path": "benchmarks/matching.py",
-      "lines": "320-345"
+      "lines": "320-355"
     },
     {
       "label": "Finding — the validated BaseModel, for contrast",

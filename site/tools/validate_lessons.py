@@ -651,6 +651,28 @@ def check_project_links(lesson: dict, where: str, report: Report) -> None:
             )
 
 
+def check_manifest_order(
+    paths: list[str], lessons: list[dict], lesson_where: dict[int, str], report: Report
+) -> None:
+    """The four lists agreeing is not enough: they must agree on ascending order.
+
+    The sidebar sorts by `order`, the pager walks the manifest order and search
+    sorts by `order`, so a consistently mis-ordered site would page in one order
+    and list in another — with nothing to catch it.
+    """
+    ranks = {}
+    for lesson in lessons:
+        if isinstance(lesson.get("order"), int):
+            ranks[lesson_where.get(id(lesson), "")] = lesson["order"]
+    known = [ranks.get(path) for path in paths if ranks.get(path) is not None]
+    if known != sorted(known):
+        report.fail(
+            "assets/manifest.js",
+            "lesson paths are not in ascending lesson order — the manifest, the three "
+            "pages and the sidebar would disagree",
+        )
+
+
 def check_pages(paths: list[str], report: Report) -> None:
     expected = paths
     for page in PAGES:
@@ -707,6 +729,7 @@ def check_pages(paths: list[str], report: Report) -> None:
         wanted = PAGE_SCRIPTS.get(page, [])
         if order != wanted:
             report.fail(page, f"script order is {order}, expected {wanted}")
+
 
 
 def main() -> int:
@@ -814,6 +837,7 @@ def main() -> int:
             report.fail("assets/manifest.js", f"content file is not listed: {found}")
 
     check_pages(paths, report)
+    check_manifest_order(paths, lessons, lesson_where, report)
 
     if report.failures:
         for line in report.failures:

@@ -26,47 +26,47 @@ window.LESSONS.push({
     {
       "q": "What closes the file in `with open(...) as handle:`?",
       "options": [
-        "The garbage collector, eventually",
         "The context manager's `__exit__`, on the way out of the block",
+        "The garbage collector, eventually",
         "A call to `handle.close()` you must write",
         "Nothing; the OS does it"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "`__exit__` runs when the block ends, including on an exception, which is exactly what a bare open cannot promise."
     },
     {
       "q": "In a `@contextmanager` function, what is the value bound by `as`?",
       "options": [
         "The function itself",
-        "Whatever is yielded",
         "The exception, if any",
+        "Whatever is yielded",
         "None, always"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The `yield` splits the function into enter and exit, and its value is what `as` receives — here the upper-cased label."
     },
     {
       "q": "Why does the example wrap the `yield` in `try/finally`?",
       "options": [
         "Style",
-        "So the cleanup runs even when the block raises",
+        "To return a value",
         "Because yield is illegal otherwise",
-        "To return a value"
+        "So the cleanup runs even when the block raises"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Without it, an exception inside the `with` block skips the code after the yield and the cleanup never happens."
     }
   ],
   "try_it": {
-    "prompt": "Make `timed` print the elapsed time in milliseconds between enter and exit. Use `time.perf_counter()`.",
-    "starter": "from contextlib import contextmanager\nimport time\n\n\n@contextmanager\ndef timed(label: str):\n    start = time.perf_counter()\n    yield label\n    print(label, \"took\", round((time.perf_counter() - start) * 1000, 2), \"ms\")\n",
-    "solution": "from contextlib import contextmanager\nimport time\n\n\n@contextmanager\ndef timed(label: str):\n    start = time.perf_counter()\n    try:\n        yield label\n    finally:\n        elapsed = (time.perf_counter() - start) * 1000\n        print(label, \"took\", round(elapsed, 2), \"ms\")\n\n\nwith timed(\"sum\"):\n    sum(range(100000))\n",
-    "explanation": "The number varies by machine — never quote it as a fact. The `finally` is what makes the timing survive an exception, which is the part worth keeping."
+    "prompt": "Use `contextlib.suppress` to ignore a `ZeroDivisionError`, then write the same thing by hand as a context manager whose `__exit__` returns True. Print after each block.",
+    "starter": "from contextlib import suppress\n\nwith suppress(ZeroDivisionError):\n    1 / 0\nprint(\"suppressed, still running\")\n",
+    "solution": "from contextlib import suppress\n\nwith suppress(ZeroDivisionError):\n    1 / 0\nprint(\"suppressed, still running\")\n\n\nclass Quiet:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc, tb):\n        return exc_type is ZeroDivisionError\n\n\nwith Quiet():\n    1 / 0\nprint(\"quiet, still running\")\n",
+    "explanation": "Both print the same two lines. `__exit__` returning True is what swallows the exception — that is the whole difference between `suppress` and a manager that lets the error through."
   },
   "exercise": {
     "prompt": "Explain what breaks when a `@contextmanager` function returns instead of yielding exactly once. Try it and read the error.",
     "hint": "A generator that never yields is not a context manager; contextlib checks.",
-    "solution": "Returning before any `yield` raises `RuntimeError: generator didn't yield` when the `with` block is entered — `__enter__` calls `next()` and finds nothing. Yielding twice raises `RuntimeError: generator didn't stop` on exit, because the manager must produce exactly one value.",
+    "solution": "```text\nReturning before any `yield` raises `RuntimeError: generator didn't yield` when the `with` block is entered — `__enter__` calls `next()` and finds nothing. Yielding twice raises `RuntimeError: generator didn't stop` on exit, because the manager must produce exactly one value.\n```",
     "explanation": "The protocol is exactly one yield: the first `next()` is the enter, the second is the exit, and a third has nowhere to go."
   },
   "common_mistakes": [
@@ -95,7 +95,7 @@ window.LESSONS.push({
   "glossary_terms": [
     "__enter__ / __exit__ — the two methods the `with` statement calls",
     "@contextmanager — turns a one-yield generator into a context manager",
-    "yield — the point where enter ends and exit begins",
+    "yield — hands a value back to the caller and pauses the function until the next value is asked for",
     "pathlib — the module this repository reads files with; read_text closes for you"
   ]
 });

@@ -63,3 +63,8 @@ jobs:
         env:
           PIP_USER: "0"
         run: python scripts/verify_offline.py
+
+      - name: Validate the learning site
+        # The gate every site wave must pass: lesson schema, ids, quizzes, the
+        # manifest/page list agreement and a fresh embedded-source bundle.
+        run: python site/tools/validate_lessons.py

@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Typing: Optional, Union, Literal, TypedDict, Protocol",
   "order": 112,
   "duration_min": 25,
-  "concept_md": "### Four tools, four jobs\n\n- **`X | None`** (the modern `Optional[X]`) — the value may be absent. `min_severity: Severity | None = None` in `app/engine.py` means \"no threshold\".\n- **`Union[A, B]` / `A | B`** — one of a fixed set of *types*. Useful when the shapes differ.\n- **`Literal[\"a\", \"b\"]`** — one of a fixed set of *values*. `ChangeKind = Literal[\"added\", \"modified\", \"deleted\", \"renamed\"]` in `app/parser.py` says a string, but only these four.\n- **`Protocol`** — structural typing: \"anything with this method\". No inheritance required.\n\n### Why Literal beats str\n\n`provider: str` accepts `\"sarvam\"`, `\"SARVAM\"`, `\"openai\"` and a typo. `provider: Literal[\"mock\", \"local\", \"sarvam\"]` accepts three, and a checker rejects the fourth before it runs. A closed set written as a type is documentation the tools enforce.\n\n### Why Protocol is the interesting one\n\n```python\nclass Provider(Protocol):\n    name: str\n    def review(self, diff: str) -> list[str]: ...\n```\n\nAny class with `name` and `review` satisfies it. The caller does not import the implementation, and the implementation does not inherit from anything. That is exactly why this repository can swap Sarvam for LM Studio without a class hierarchy: both enter through one adapter with the same shape.\n\n### TypedDict, briefly\n\n`TypedDict` describes a dict with fixed keys and value types — the JSON payload case. It is a dict at runtime, so it costs nothing, and a checker catches `payload[\"sevrity\"]`.\n\n### Two rules of thumb\n\nPick one spelling for \"may be absent\" and keep it: `X | None` everywhere, not a mix with `Optional`. And reach for `Protocol` when two things share behaviour but not ancestry — that is the decoupling, not the type itself.",
+  "concept_md": "### Four tools, four jobs\n\n- **`X | None`** (the modern `Optional[X]`) — the value may be absent. `min_severity: Severity | None = None` in `app/engine.py` means \"no threshold\".\n- **`Union[A, B]` / `A | B`** — one of a fixed set of *types*. Useful when the shapes differ.\n- **`Literal[\"a\", \"b\"]`** — one of a fixed set of *values*. `ChangeKind = Literal[\"added\", \"modified\", \"deleted\", \"renamed\"]` in `app/parser.py` says a string, but only these four.\n- **`Protocol`** — structural typing: \"anything with this method\". No inheritance required.\n\n### Why Literal beats str\n\n`provider: str` accepts `\"sarvam\"`, `\"SARVAM\"`, `\"openai\"` and a typo. `provider: Literal[\"mock\", \"local\", \"sarvam\"]` accepts three, and a checker rejects the fourth before it runs. A closed set written as a type is documentation the tools enforce.\n\n### Why Protocol is the interesting one\n\n```python\nclass Provider(Protocol):\n    name: str\n    def review(self, diff: str) -> list[str]: ...\n```\n\nAny class with `name` and `review` satisfies it. The caller does not import the implementation, and the implementation does not inherit from anything. This repository does not declare a `Protocol` itself — Sarvam and LM Studio enter through one OpenAI-compatible adapter by convention rather than by a declared interface — but the property it relies on is the same one: two providers, one shape, no shared base class.\n\n### TypedDict, briefly (a general technique, not used here)\n\n`TypedDict` describes a dict with fixed keys and value types — the JSON payload case. It is a dict at runtime, so it costs nothing, and a checker catches `payload[\"sevrity\"]`.\n\n### Two rules of thumb\n\nPick one spelling for \"may be absent\" and keep it: `X | None` everywhere, not a mix with `Optional`. And reach for `Protocol` when two things share behaviour but not ancestry — that is the decoupling, not the type itself.",
   "code_examples": [
     {
       "id": "1.12-ex-0",
@@ -27,22 +27,22 @@ window.LESSONS.push({
       "q": "What does `Protocol` give you that inheritance does not?",
       "options": [
         "Faster dispatch",
-        "Structural typing: any class with the right methods fits, without importing or subclassing",
         "Runtime validation",
+        "Structural typing: any class with the right methods fits, without importing or subclassing",
         "Multiple inheritance"
       ],
-      "answer": 1,
+      "answer": 2,
       "why": "The caller depends on a shape, not a name, which is why a provider can be swapped without either side importing the other."
     },
     {
       "q": "Why is `Literal[\"mock\", \"local\", \"sarvam\"]` better than `str` here?",
       "options": [
         "It is shorter",
-        "It makes the closed set a type, so a checker rejects a fourth value before it runs",
+        "It allows more values",
         "It runs faster",
-        "It allows more values"
+        "It makes the closed set a type, so a checker rejects a fourth value before it runs"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "`str` accepts every string including typos; the Literal turns the documentation into something the tools enforce."
     },
     {
@@ -54,13 +54,13 @@ window.LESSONS.push({
         "It is a typo for Optional"
       ],
       "answer": 1,
-      "why": "It is the modern spelling of Optional: the parameter may be absent, and None is the value that means 'do not filter'."
+      "why": "Without it every caller has to re-check for None and decide what a missing threshold means; the annotation moves that decision to one place and lets a checker flag the call that forgets."
     }
   ],
   "try_it": {
     "prompt": "Add a third provider class that satisfies the Protocol without inheriting from it, and pass it to `run`.",
     "starter": "class CachedProvider:\n    name = \"cached\"\n\n    def review(self, diff: str) -> list[str]:\n        return [\"cached finding\"]\n",
-    "solution": "class CachedProvider:\n    name = \"cached\"\n\n    def review(self, diff: str) -> list[str]:\n        return [\"cached finding\"]\n\n\nprint(run(CachedProvider(), \"diff\"))\n",
+    "solution": "from typing import Protocol\n\n\nclass Provider(Protocol):\n    name: str\n\n    def review(self, diff: str) -> list[str]: ...\n\n\ndef run(provider: Provider, diff: str) -> list[str]:\n    print(\"running\", provider.name)\n    return provider.review(diff)\n\n\nclass CachedProvider:\n    name = \"cached\"\n\n    def review(self, diff: str) -> list[str]:\n        return [\"cached finding\"]\n\n\nprint(run(CachedProvider(), \"diff\"))\n",
     "explanation": "It prints `running cached` then `['cached finding']`. Nothing had to inherit from `Provider` — that is structural typing: the shape is the contract."
   },
   "exercise": {

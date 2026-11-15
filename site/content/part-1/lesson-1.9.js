@@ -10,7 +10,7 @@ window.LESSONS.push({
   "title": "Iterators and generators, enough to read the parser",
   "order": 109,
   "duration_min": 20,
-  "concept_md": "### Iterable, iterator, generator\n\nAn **iterable** is something you can loop over. An **iterator** is the object that walks it, with `__next__`. A **generator** is the easy way to write an iterator: any function containing `yield` returns one.\n\n```python\ndef added_lines(diff):\n    for line in diff.splitlines():\n        if line.startswith(\"+\"):\n            yield line[1:]\n```\n\nNothing runs when you call it. The body runs one step at a time, each time the consumer asks for the next value, and stops when the function returns.\n\n### Lazy is the point\n\nA diff can be thousands of lines. `added_lines` holds one line at a time, not a list of all of them. The parser in `app/parser.py` walks hunks the same way: it reads a line, decides what kind it is, appends it to the current hunk, and moves on — memory proportional to the diff, not to the file count.\n\n### A generator is consumed once\n\n```python\nlines = added_lines(DIFF)\nlist(lines)   # ['added one', 'added two']\nlist(lines)   # []\n```\n\nThe second call is empty, because the generator is exhausted. When you need to loop twice, materialise it once: `lines = list(added_lines(DIFF))`.\n\n### Generator expressions\n\n`sum(len(line) for line in lines)` is a generator expression: same laziness, no function. It is the right tool when the loop exists only to feed a single call.\n\n### Reading the parser with this in mind\n\n`parse_diff` returns a `DiffBundle` of `FileDiff` objects, each with `hunks`, each with `lines`. Derived values are computed on demand rather than stored: `added_line_count` is a `@property`, and `added_lines()` is a method that walks the hunks and returns the numbers.",
+  "concept_md": "### Iterable, iterator, generator\n\nAn **iterable** is something you can loop over. An **iterator** is the object that walks it, with `__next__`. A **generator** is the easy way to write an iterator: any function containing `yield` returns one.\n\n```python\ndef added_lines(diff):\n    for line in diff.splitlines():\n        if line.startswith(\"+\"):\n            yield line[1:]\n```\n\nNothing runs when you call it. The body runs one step at a time, each time the consumer asks for the next value, and stops when the function returns.\n\n### Lazy is the point\n\nA diff can be thousands of lines, and `added_lines` never holds more than one of them. The parser in `app/parser.py` is the eager counterpart: `parse_diff` splits the raw text once, builds a `FileDiff` per file, and returns the whole bundle. Eager is the right choice there because anchoring needs the complete structure; generators are the right choice when a consumer only needs one item at a time.\n\n### A generator is consumed once\n\n```python\nlines = added_lines(DIFF)\nlist(lines)   # ['added one', 'added two']\nlist(lines)   # []\n```\n\nThe second call is empty, because the generator is exhausted. When you need to loop twice, materialise it once: `lines = list(added_lines(DIFF))`.\n\n### Generator expressions\n\nThis is the lazy cousin of the comprehension in lesson 1.2: same shape, one item at a time.\n\n`sum(len(line) for line in lines)` is a generator expression: same laziness, no function. It is the right tool when the loop exists only to feed a single call.\n\n### Reading the parser with this in mind\n\n`parse_diff` returns a `DiffBundle` of `FileDiff` objects, each with `hunks`, each with `lines`. Derived values are computed on demand rather than stored: `added_line_count` and `added_line_numbers` are `@property` on `FileDiff`, and `Hunk.added_lines` is a property listing one hunk's new line numbers. None of them caches, so none of them can go stale.",
   "code_examples": [
     {
       "id": "1.9-ex-0",
@@ -27,11 +27,11 @@ window.LESSONS.push({
       "q": "When does the body of a generator function run?",
       "options": [
         "When the function is called",
-        "One step at a time, each time the consumer asks for the next value",
+        "All at once, then cached",
         "When the module is imported",
-        "All at once, then cached"
+        "One step at a time, each time the consumer asks for the next value"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "Calling it only builds the generator; the body advances on each `next()`, which is what keeps memory proportional to one item."
     },
     {
@@ -46,15 +46,15 @@ window.LESSONS.push({
       "why": "It is an iterator, not a collection: once exhausted it stays exhausted, so a second pass needs `list(...)` first."
     },
     {
-      "q": "Why does a parser walk hunks lazily?",
+      "q": "`parse_diff` returns the whole `DiffBundle` at once rather than yielding files. Why is that the right choice here?",
       "options": [
-        "Because yield is faster to type",
-        "Because a diff can be large and one line at a time is enough",
-        "Because Python forbids lists of lines",
-        "Because hunks are immutable"
+        "Because anchoring needs the complete structure: every file, every hunk, before a finding can be placed",
+        "Because Python cannot yield from a recursive parser",
+        "Because generators are slower",
+        "Because the diff is always small"
       ],
-      "answer": 1,
-      "why": "The parser needs each line once, in order; holding the whole file in memory would cost more and buy nothing."
+      "answer": 0,
+      "why": "A finding is anchored by looking up a line across the finished bundle, so the bundle has to exist before anchoring starts — laziness would buy nothing and cost a second pass."
     }
   ],
   "try_it": {
@@ -64,10 +64,10 @@ window.LESSONS.push({
     "explanation": "It prints `generator` then `['added one', 'added two']`: the blank added line is skipped. Note the `+` of the diff marker is stripped before the blank check, which is the order that matters."
   },
   "exercise": {
-    "prompt": "Predict the output of two nested generators before you run it: an outer generator that yields inner generators, each yielding two numbers.",
-    "hint": "The outer loop gives you generators, not numbers, unless you iterate them.",
-    "solution": "def pairs():\n    for start in (1, 3):\n        yield (start, start + 1)\n\n\nfor inner in pairs():\n    print(inner)\n",
-    "explanation": "It prints `(1, 2)` then `(3, 4)` — the outer generator yields tuples here, so each loop body receives one. If it yielded generators instead, printing would show `<generator object ...>` and you would need an inner loop to see the numbers."
+    "prompt": "Predict the output before you run it: an outer generator that yields an INNER generator for each starting number, each inner one yielding two values.",
+    "hint": "The outer loop hands you generators, so you need an inner loop before you see numbers.",
+    "solution": "def pairs():\n    for start in (1, 3):\n        yield (start, start + 1)\n\n\ndef streams():\n    for start in (1, 3):\n        yield (value for value in (start, start + 1))\n\n\nfor inner in pairs():\n    print(inner)\n\nfor inner in streams():\n    print([value for value in inner])\n",
+    "explanation": "The first loop prints `(1, 2)` and `(3, 4)` — tuples, so no inner loop is needed. The second yields generator objects, which print as `<generator object ...>` unless you iterate them; the list comprehension is what makes the numbers visible. Two generators nested is a shape you have to unwrap deliberately."
   },
   "common_mistakes": [
     "Looping over an exhausted generator and concluding it is empty rather than spent.",
@@ -76,9 +76,9 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "Hunk and FileDiff: derived counts computed on demand",
+      "label": "Hunk and FileDiff: derived values as properties that recompute",
       "path": "app/parser.py",
-      "lines": "160-190"
+      "lines": "123-190"
     },
     {
       "label": "parse_diff — the entry point that walks the diff once",

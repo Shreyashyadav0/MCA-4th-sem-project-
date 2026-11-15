@@ -433,7 +433,7 @@
 
       button.disabled = true;
       button.textContent = first ? "Loading Python…" : "Running…";
-      setStatus(figure, first ? "Loading Python (about 10 MB, once)…" : "Running…");
+      setStatus(figure, first ? "Loading Python (about 14 MB, once)…" : "Running…");
 
       if (tier === "browser-pkg") {
         setStatus(figure, "Loading the package, then running…");

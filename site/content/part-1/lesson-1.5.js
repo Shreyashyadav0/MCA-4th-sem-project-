@@ -27,11 +27,11 @@ window.LESSONS.push({
       "q": "Why does `GitHubAuthError` subclass `GitHubError`?",
       "options": [
         "To reuse code",
-        "So one `except GitHubError` covers every posting failure while the subclass stays available",
+        "To make it faster to raise",
         "Because Python requires it",
-        "To make it faster to raise"
+        "So one `except GitHubError` covers every posting failure while the subclass stays available"
       ],
-      "answer": 1,
+      "answer": 3,
       "why": "The hierarchy exists for the granularity of `except`: catch the base for a single handler, catch the subclass when the caller needs to distinguish."
     },
     {
@@ -48,26 +48,26 @@ window.LESSONS.push({
     {
       "q": "What does `raise NewError(...) from exc` add?",
       "options": [
-        "Nothing visible",
         "The original exception as __cause__, so the traceback shows both",
+        "Nothing visible",
         "A retry",
         "A warning"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "`from` chains the cause, which is the difference between a readable traceback and a mystery when a decode error becomes a ReviewInputError."
     }
   ],
   "try_it": {
     "prompt": "Add a `RateLimitError(AuthError)` with a `retry_after` attribute, raise it, and catch it twice: once as `AuthError`, once as `RateLimitError`.",
     "starter": "class ReviewError(Exception):\n    pass\n\n\nclass AuthError(ReviewError):\n    pass\n\n\nclass RateLimitError(AuthError):\n    def __init__(self, message: str, retry_after: float) -> None:\n        super().__init__(message)\n        self.retry_after = retry_after\n",
-    "solution": "class ReviewError(Exception):\n    pass\n\n\nclass AuthError(ReviewError):\n    pass\n\n\nclass RateLimitError(AuthError):\n    def __init__(self, message: str, retry_after: float) -> None:\n        super().__init__(message)\n        self.retry_after = retry_after\n\n\nfor handler in (AuthError, RateLimitError):\n    try:\n        raise RateLimitError(\"slow down\", 30.0)\n    except handler as error:\n        print(handler.__name__, \"caught\", type(error).__name__, getattr(error, \"retry_after\", None))\n",
+    "solution": "```text\nclass ReviewError(Exception):\n    pass\n\n\nclass AuthError(ReviewError):\n    pass\n\n\nclass RateLimitError(AuthError):\n    def __init__(self, message: str, retry_after: float) -> None:\n        super().__init__(message)\n        self.retry_after = retry_after\n\n\nfor handler in (AuthError, RateLimitError):\n    try:\n        raise RateLimitError(\"slow down\", 30.0)\n    except handler as error:\n        print(handler.__name__, \"caught\", type(error).__name__, getattr(error, \"retry_after\", None))\n```",
     "explanation": "Both handlers catch it, and the second can read `retry_after`. That is the same shape as `GitHubRateLimitError` in `app/github_client.py`, which carries the header value."
   },
   "exercise": {
-    "prompt": "Explain why `GitHubAuthError` subclasses `GitHubError` rather than `Exception`, and what catching the parent buys the caller. Cite the class you read it in.",
-    "hint": "Think about the one handler a caller who only wants to know 'posting failed' would write.",
-    "solution": "`GitHubAuthError(GitHubError)` in `app/github_client.py` means a caller can write one `except GitHubError` and cover every posting failure — auth, not found, rate limit, 5xx — without naming each. A caller that needs to retry only on a rate limit still catches `GitHubRateLimitError` and reads `retry_after`. Subclassing `Exception` directly would force every caller to enumerate the four cases or catch too much.",
-    "explanation": "The base class is a contract about what can go wrong, and the subclasses are the resolution at which a caller can act."
+    "prompt": "Build the two-level hierarchy from the example, then show the difference: catch a `RateLimitError` with `except AuthError`, and try to catch it with a sibling `except NotFoundError`. Print what each handler sees.",
+    "hint": "A subclass is caught by a handler for its parent, never by a handler for a sibling.",
+    "solution": "class ReviewError(Exception):\n    pass\n\n\nclass AuthError(ReviewError):\n    pass\n\n\nclass RateLimitError(AuthError):\n    pass\n\n\nclass NotFoundError(ReviewError):\n    pass\n\n\ntry:\n    raise RateLimitError(\"slow down\")\nexcept AuthError as error:\n    print(\"parent caught:\", type(error).__name__)\n\ntry:\n    raise RateLimitError(\"slow down\")\nexcept NotFoundError:\n    print(\"sibling caught it\")\nexcept ReviewError as error:\n    print(\"grandparent caught:\", type(error).__name__)\n",
+    "explanation": "It prints `parent caught: RateLimitError` then `grandparent caught: RateLimitError`. The sibling handler never fires — that is the shape `app/github_client.py` relies on: one `except GitHubError` covers everything, and a narrower handler only catches its own branch."
   },
   "common_mistakes": [
     "A bare `except:` or `except Exception: pass`. It swallows the typo in your own code and turns a failure into a silent wrong answer.",

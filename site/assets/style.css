@@ -833,6 +833,17 @@ details.solution[open] summary {
   background: var(--surface);
   /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
   padding: var(--space-3) var(--space-2) var(--space-6);
+  /* The head stays put and the tree scrolls under it: at 16 lessons the list is
+   * taller than the viewport, and a title that scrolls away is a lost anchor. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
 }
 
 .sidebar-toggle {

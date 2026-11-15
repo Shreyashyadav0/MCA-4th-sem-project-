@@ -29,10 +29,10 @@ window.LESSONS.push({
       "options": [
         "app/parser.py",
         "app/rules.py",
-        "app/engine.py",
-        "app/main.py"
+        "app/main.py",
+        "app/engine.py"
       ],
-      "answer": 2,
+      "answer": 3,
       "why": "app/engine.py holds PROVIDERS and select_provider; every surface calls it, so the decision cannot drift between CLI and HTTP."
     },
     {
@@ -49,25 +49,25 @@ window.LESSONS.push({
     {
       "q": "A live review fails mid-flight. How many warnings should you see?",
       "options": [
-        "None",
         "Exactly one",
+        "None",
         "One per rule",
         "One per retry"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "The degraded path is designed to emit a single WARNING; two would mean the adapter and the fallback both logged, which ADR 0004 exists to prevent."
     }
   ],
   "try_it": {
     "prompt": "Open `ARCHITECTURE.md` and find the box that owns line anchoring. Then find which module draws the inline-comment boundary.",
-    "starter": "",
-    "solution": "Anchoring is `app/parser.py` (`anchor_findings`); the inline-versus-summary decision is `app/github_client.py` (`build_payload`). Both are named in the architecture diagram's result shapes.",
+    "starter": "# The precedence order, and the module that owns it.\nPROVIDERS = (\"sarvam\", \"local\", \"mock\")\nprint(\"first choice:\", PROVIDERS[0])\n",
+    "solution": "```text\nAnchoring is `app/parser.py` (`anchor_findings`); the inline-versus-summary decision is `app/github_client.py` (`build_payload`). Both are named in the architecture diagram's result shapes.\n```",
     "explanation": "Anchoring is review metadata — can GitHub attach this comment? — so it wraps a finding rather than extending it."
   },
   "exercise": {
     "prompt": "Map each of these five files to its box in the diagram, in one line each: `app/parser.py`, `app/rules.py`, `app/engine.py`, `app/openai_compat_provider.py`, `app/main.py`.",
     "hint": "One of the five is a surface, not a stage in the pipeline.",
-    "solution": "- `app/parser.py` — parser, plus the anchoring step after the findings exist.\n- `app/rules.py` — the rule engine: 63 deterministic rules over added lines.\n- `app/engine.py` — the selector: provider precedence and the single entry point.\n- `app/openai_compat_provider.py` — the one transport both hosted and local models use.\n- `app/main.py` — a surface (FastAPI), which calls the engine and stores the result.",
+    "solution": "```text\n- `app/parser.py` — parser, plus the anchoring step after the findings exist.\n- `app/rules.py` — the rule engine: 63 deterministic rules over added lines.\n- `app/engine.py` — the selector: provider precedence and the single entry point.\n- `app/openai_compat_provider.py` — the one transport both hosted and local models use.\n- `app/main.py` — a surface (FastAPI), which calls the engine and stores the result.\n```",
     "explanation": "Four stages and one surface. Persistence is a side branch: nothing in parser, rules, engine or the providers imports the database, which is why the pipeline runs with no database at all."
   },
   "common_mistakes": [

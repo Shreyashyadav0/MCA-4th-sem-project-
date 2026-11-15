@@ -1,7 +1,7 @@
 # The learning site
 
 A static, offline-first W3Schools-style site for the Autonomous AI Code Reviewer.
-Thirteen parts, 104 lessons planned; two are written (0.1 and 1.1).
+Thirteen parts, 108 lessons planned; sixteen are written (0.1–0.4 and 1.1–1.12).
 
 **This site is a learning aid; `docs/learning/` is the source of truth.**
 
@@ -167,7 +167,8 @@ materialise is actually embedded. It exits non-zero with one line per problem.
    crossed, stays literal text.
 
 2. Append its path to `assets/manifest.js`, in lesson order.
-3. Add the same `<script src>` to `index.html` and `lesson.html`, in the same place.
+3. Add the same `<script src>` to `index.html`, `lesson.html` and `tryit.html`, in the
+   same place — the gate fails a page whose list disagrees with the manifest.
 4. Run the validator. It fails if the three lists disagree, which is the point.
 5. Append a row to `STATE.md`. Never rewrite an earlier row.
 
