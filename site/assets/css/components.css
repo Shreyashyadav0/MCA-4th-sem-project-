@@ -119,10 +119,15 @@ input::placeholder {
 
 .part {
   border: 1px solid var(--border);
+  border-left: 4px solid var(--accent); /* the green edge, on every part */
   border-radius: var(--radius);
   padding: var(--space-4);
   margin-bottom: var(--space-3);
   background: var(--bg);
+}
+
+.part-pending {
+  border-left-color: var(--border-strong);
 }
 
 .part-pending {
@@ -144,7 +149,7 @@ input::placeholder {
 }
 
 .part-number {
-  color: var(--muted);
+  color: var(--accent-strong);
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -154,8 +159,9 @@ input::placeholder {
 
 .part-badge {
   font-size: 0.8125rem;
-  color: var(--muted);
-  border: 1px solid var(--border);
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
   border-radius: 999px;
   padding: 0 var(--space-3);
   white-space: nowrap;
