@@ -180,7 +180,7 @@ materialise is actually embedded. It exits non-zero with one line per problem.
   a benchmark number exists, because in this repository neither has happened. See
   `HANDOFF.md`.
 - Test counts, rule counts and module counts are quoted from the repository at
-  commit `ca96890`, and only there.
+  commit `c5a8c8b`, and only there.
 
 ## Licence
 
