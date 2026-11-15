@@ -21,7 +21,6 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading);
-  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -81,21 +80,28 @@ a:hover {
   margin: 0 0 var(--space-5);
 }
 
+/* W3Schools headings: Segoe UI at weight 400, 36/30/24 on their scale. Ours sit
+ * one step down because our prose column is narrower than their full width. */
 h1 {
-  font-size: 1.75rem;
-  line-height: 1.25;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
   margin: 0 0 var(--space-3);
   max-width: var(--measure);
+  color: var(--text);
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-weight: 400;
+  font-size: var(--text-lg);
   line-height: 1.3;
   margin: var(--space-6) 0 var(--space-3);
 }
 
 h3 {
-  font-size: 1.0625rem;
+  font-weight: 600;
+  font-size: var(--text-md);
   margin: var(--space-5) 0 var(--space-2);
 }
 
@@ -250,8 +256,8 @@ figure {
   padding-inline: var(--space-2);
 }
 
-.sidebar-toggle {
-  display: none;
+.site-header .sidebar-toggle {
+  display: none; /* .btn sets display:inline-flex in a later sheet; this must win */
 }
 
 .sidebar-scrim {
@@ -428,7 +434,7 @@ figure {
     display: block;
   }
 
-  .sidebar-toggle {
+  .site-header .sidebar-toggle {
     display: inline-block;
   }
 

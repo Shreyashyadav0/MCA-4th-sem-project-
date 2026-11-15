@@ -360,7 +360,6 @@ details.solution[open] summary {
   padding: var(--space-4) var(--space-5);
   margin: 0 0 var(--space-4);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-soft);
 }
 
 .quiz-legend {
