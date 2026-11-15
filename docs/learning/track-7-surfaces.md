@@ -59,10 +59,11 @@ an exit code or an HTTP status the caller would misread.
 - `app/cli.py:403` — `_report_posting()` returns `_EXIT_OK` when the post succeeded
   *or* was skipped as a duplicate, `_EXIT_INPUT_ERROR` otherwise. A duplicate is
   not a failure.
-- `app/main.py:936` — `@app.post("/webhook")`. The handler order is:
-  signature (`app/main.py:975`), JSON decode (`:981`), event filter (`:987`),
-  action filter (`:995`), diff source, then `_publish_review` (`:597`).
-- `app/main.py:651` — `except Exception  # noqa: BLE001 - deliberate: GitHub must
+- `app/main.py:1135` — `@app.post(`, with the path `"/webhook"` on line 1136. The
+  handler order is: signature (`app/main.py:1176`), body read (`:1171`), event filter
+  (`:1186`), action filter (`:1194`), diff source, then `_publish_review`
+  (`app/main.py:772`, called at `:1222` and `:1259`).
+- `app/main.py:835` — `except Exception  # noqa: BLE001 - deliberate: GitHub must
   never see a 5xx`: the webhook boundary converts any posting exception into
   `posting.ok = False` and keeps the status at 200.
 - `app/github_client.py:1115` — the duplicate check: the payload's summary

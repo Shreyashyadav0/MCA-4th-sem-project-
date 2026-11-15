@@ -1,12 +1,12 @@
 # TESTING.md — what the suite covers, how to run part of it, and what it does not prove
 
-The suite is 598 collected cases across twelve files (525 app cases + 73 benchmark cases), all offline. The command that matters:
+The suite is 641 collected cases across sixteen files (568 app cases + 73 benchmark cases), all offline. The command that matters:
 
 ```bash
 python -m pytest -q tests
 ```
 
-**Real output, captured 2026-11-14:**
+**Real output, captured 2026-11-15:**
 
 ```text
 ........................................................................ [ 28%]
@@ -16,10 +16,10 @@ python -m pytest -q tests
 ........................................................................ [ 84%]
 ........................................................................ [ 98%]
 ......                                                                   [100%]
-597 passed, 1 skipped in 11.26s
+640 passed, 1 skipped in 11.26s
 ```
 
-The elapsed time moves between runs (8.5 s to 12 s on this machine); the counts
+The elapsed time moves between runs (under a second to a minute, depending on the machine); the counts
 do not. `s` is the single skip, explained in §3.
 
 ---
@@ -41,10 +41,16 @@ checked-in tree.
 | GitHub posting — hardening | `app/github_client.py` | `tests/test_posting_hardening.py` | 32 |
 | GitHub posting — webhook flow | `app/main.py` + `app/github_client.py` | `tests/test_webhook_posting.py` | 27 |
 | CLI | `app/cli.py` | `tests/test_cli.py` | 14 |
-| Benchmarks | `benchmarks/` | **none** | 0 |
-| **Total** | | | **596** |
+| Storage | `app/db.py` | `tests/test_db.py` | 27 |
+| Auth | `app/auth.py` | `tests/test_auth.py` | 13 |
+| Audit gaps | several modules | `tests/test_audit_gaps.py` | 15 |
+| Diagrams | `docs/diagrams/make_diagrams.py` | `tests/test_diagram_generator.py` | 3 |
+| Benchmarks — matching | `benchmarks/matching.py` | `tests/test_matching.py` | 35 |
+| Benchmarks — metrics | `benchmarks/metrics.py` | `tests/test_metrics.py` | 20 |
+| Benchmarks — runner | `benchmarks/runner.py` | `tests/test_runner_mock.py` | 18 |
+| **Total** | | | **641** |
 
-598 collected = 597 passed + 1 skipped.
+641 collected = 640 passed + 1 skipped.
 
 Two things in that table are worth stating rather than letting someone discover
 them:
@@ -55,8 +61,10 @@ them:
   the precedence tests: `sarvam > local > mock`, forced-provider degradation
   naming the missing variable, and `--offline` beating a fully configured
   provider.
-- **The benchmarks layer has zero tests.** It is exercised by hand (§6). Its
-  numbers are a smoke check, not a quality claim.
+- **The benchmarks layer has 73 tests, not zero.** `tests/test_matching.py`,
+  `tests/test_metrics.py` and `tests/test_runner_mock.py` cover the harness's
+  logic offline. What is not covered is the quality of its output: precision and
+  recall over the golden set are a smoke check, not a quality claim (§6).
 
 ### Counted tests versus `def test_`
 
@@ -76,7 +84,7 @@ One file:
 python -m pytest -q tests/test_rules.py
 ```
 
-**Real output, captured 2026-11-14:**
+**Real output, captured 2026-11-15:**
 
 ```text
 ........................................................................ [ 77%]
@@ -124,7 +132,7 @@ Slowest first — the right first command when the suite starts creeping:
 python -m pytest -q tests --durations=5
 ```
 
-**Real output (tail), captured 2026-11-14:**
+**Real output (tail), captured 2026-11-15:**
 
 ```text
 ============================= slowest 5 durations ==============================
@@ -133,7 +141,7 @@ python -m pytest -q tests --durations=5
 0.06s call     tests/test_rules.py::test_regex_flood_does_not_blow_up
 0.05s call     tests/test_webhook_posting.py::test_duplicate_delivery_is_skipped_without_any_post
 0.05s call     tests/test_webhook_posting.py::test_test_review_endpoints_never_post
-597 passed, 1 skipped in 8.47s
+640 passed, 1 skipped in 8.47s
 ```
 
 Nothing is slow. The top entry is 90 ms, which is itself the finding: no test
@@ -154,7 +162,7 @@ python -m pytest -q "tests/test_openai_compat_provider.py::test_auto_with_both_c
 
 ---
 
-## 3. What "597 passed, 1 skipped" means
+## 3. What "640 passed, 1 skipped" means
 
 One test did not run, and it is correct that it did not run. `-rs` names it:
 
@@ -166,7 +174,7 @@ python -m pytest -q tests -rs
 
 ```text
 SKIPPED [1] tests/test_openai_compat_provider.py:1062: needs a live LM Studio server
-597 passed, 1 skipped in 11.02s
+640 passed, 1 skipped in 11.02s
 ```
 
 The test is `tests/test_openai_compat_provider.py::test_live_smoke_review_against_a_real_endpoint`,
@@ -198,11 +206,11 @@ LIVE_BASE_URL = os.getenv("LMSTUDIO_BASE_URL")          # module level, line 66
 LMSTUDIO_BASE_URL=http://localhost:1234/v1 python -m pytest -q tests/test_openai_compat_provider.py
 ```
 
-That turns `597 passed, 1 skipped` into `583 passed` on a machine with LM Studio
+That turns `640 passed, 1 skipped` into `641 passed` on a machine with LM Studio
 running. **This has not been done in this repository** — no LM Studio server has
 ever been available here, so the un-skipped path is unverified. See `DEMO.md` §3.
 
-So the honest reading is: 582 tests prove the offline behaviour of every layer;
+So the honest reading is: 640 tests prove the offline behaviour of every layer;
 1 test is a live-model wiring check that CI must not run.
 
 ---
@@ -216,7 +224,7 @@ So the honest reading is: 582 tests prove the offline behaviour of every layer;
 python scripts/verify_offline.py
 ```
 
-**Real output, captured 2026-11-14:**
+**Real output, captured 2026-11-15:**
 
 ```text
 Network blocked: outbound connections are disabled for this run (socket.create_connection and non-loopback getaddrinfo raise; new AF_INET/AF_INET6 sockets are refused; AF_UNIX/loopback stay available for asyncio's self-pipe).
@@ -228,7 +236,7 @@ Network blocked: outbound connections are disabled for this run (socket.create_c
 ........................................................................ [ 84%]
 ........................................................................ [ 98%]
 ......                                                                   [100%]
-597 passed, 1 skipped in 11.79s
+640 passed, 1 skipped in 11.79s
 ```
 
 Same counts as the unblocked run. That is the proof: nothing changes when the
@@ -296,9 +304,9 @@ misleading.
   `/docs` are exercised through the ASGI transport in-process. Nothing renders a
   page or drives a browser, so a JS-level breakage in `/docs` would not fail the
   suite.
-- **No benchmarks coverage.** `benchmarks/` has zero tests. Its precision, recall
-  and F1 numbers come from two golden samples and are labelled a smoke check by
-  the tool itself.
+- **No benchmark quality claim.** The harness's logic has 73 tests, but its
+  precision, recall and F1 numbers come from two golden samples and are labelled
+  a smoke check by the tool itself.
 - **No test asserts latency or memory.** `--durations=5` reports what happened;
   nothing fails when it gets worse.
 - **The skipped live test is the only thing that would touch a real endpoint**,
@@ -314,7 +322,7 @@ There is no test file; the tool is the interface.
 python -m benchmarks.eval
 ```
 
-**Real output, captured 2026-11-14:**
+**Real output, captured 2026-11-15:**
 
 ```text
 benchmark: dataset=benchmarks/golden modes=rules,local,merged samples=2

@@ -158,8 +158,10 @@ step 5 is a gate, not a formality.
   environment in which the recorded test counts hold.
 - **`make verify` green.** That recipe builds its own verifier venv, installs the lock, runs
   `pytest` and then proves zero network access. On the tree this curriculum was written against it
-  reports `597 passed, 1 skipped`. If you cannot reproduce that number before Track 1, stop and fix
-  the environment: a curriculum measured against a moving baseline teaches you the wrong lesson.
+  reports `597 passed, 1 skipped`. That 597 is the figure for the frozen baseline this curriculum
+  was written against; current `main` reports `640 passed, 1 skipped` (641 collected). If you cannot
+  reproduce 640 before Track 1, stop and fix the environment: a curriculum measured against a moving
+  baseline teaches you the wrong lesson.
 - **A place to write.** `rebuild/` exists and is yours. Nothing you write there is imported by
   `app/`.
 

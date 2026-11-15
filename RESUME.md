@@ -55,7 +55,7 @@ Two further cautions, both cheap to obey:
 
 - **Do not hand-edit `requirements.lock`.** It is generated; `docs/REPRODUCIBILITY.md`
   §2 gives the exact regeneration procedure. Editing versions in place makes the
-  lock a lie and the "597 passed" claim unreproducible.
+  lock a lie and the "640 passed" claim unreproducible.
 - **There is no `.gitignore` in this tree.** `README.md` suggests `cp .env.example .env`.
   If you put a real key in `.env`, nothing in this repository stops you from
   committing it. Prefer environment variables in the shell for a live run, or add
@@ -95,7 +95,7 @@ Expected: `scripts/verify.sh` builds or reuses `.venv-verify`, installs
 PASS: tests and zero-network proof succeeded
 ```
 
-with `597 passed, 1 skipped` in the pytest output above it. The one skip is the
+with `640 passed, 1 skipped` in the pytest output above it. The one skip is the
 live LM Studio test, which cannot run without a local model — it is expected.
 
 This is the entire health check. There is no separate lint gate to remember and
@@ -211,7 +211,7 @@ one, and the descriptions there are authoritative for what each track contains.
 | Days 1–4 | Track 1 | Establishes the baseline the later tracks assume. Do not skip ahead; the rest of the curriculum presumes it. |
 | Days 5–9 | Track 3 | The design core — the part that explains why the code looks like this. |
 | Days 10–13 | Track 6 | The evaluation and reporting layer, which is where the unfinished work lives. |
-| Day 14 | `make verify` | The only acceptance test. If it prints `597 passed, 1 skipped`, you are back. |
+| Day 14 | `make verify` | The only acceptance test. If it prints `640 passed, 1 skipped`, you are back. |
 
 If day 14 fails, you have learned the codebase but not the environment. Go to
 `docs/REPRODUCIBILITY.md` §5, not to the source.

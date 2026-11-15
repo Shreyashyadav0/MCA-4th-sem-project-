@@ -613,10 +613,10 @@ a consistently mis-ordered site, and the gate is now run by CI and by
 **Round two — the blockers.**
 
 1. Lesson 0.2 called `docs/learning/` "the source of truth", but `HANDOFF.md`
-   says it is the ledger that wins, and `docs/learning/README.md:161` still
-   quotes a stale pass count from the frozen baseline. The lesson and the site
-   README now name
-   `HANDOFF.md` as the ledger and describe `docs/learning/` as the curriculum.
+   says it is the ledger that wins, and `docs/learning/README.md:161` quoted a stale pass
+   count as its reproduction target. The lesson, the site README and that file now name
+   `HANDOFF.md` as the ledger, describe `docs/learning/` as the curriculum, and give the
+   current figure alongside the frozen one.
 2. Lesson 1.7 used `@contextlib.contextmanager` and `yield` four lessons before
    either is taught, with no pointer forward. It now says so explicitly.
 3. Lesson 1.3's exercise solution imported `app.models` while its example

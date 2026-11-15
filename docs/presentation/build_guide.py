@@ -51,7 +51,8 @@ OUT = os.path.join(HERE, "naive_to_pro_guide.pdf")
 # --------------------------------------------------------------------------
 # Facts. Each of these is verifiable in the tree; see section 8 of the guide.
 # --------------------------------------------------------------------------
-TESTS_PASSED = 597
+TESTS_PASSED = 640
+TESTS_COLLECTED = 641
 TESTS_SKIPPED = 1
 RULE_COUNT = 63
 RULE_CATEGORIES = 10
@@ -853,15 +854,15 @@ def section_7():
         "by file, expected line start, then actual line start. That is deterministic, "
         "and it is documented as a limitation rather than a design."))
 
-    s.append(body("Numbers that disagree inside the tree", S_H2))
+    s.append(body("Numbers that once disagreed inside the tree", S_H2))
     s.append(body(
-        "Some prose still says %d passed. The tree runs %d passed, %d skipped, and "
-        "the learning curriculum's own prerequisite check states %d. Treat %d as the "
-        "baseline: a curriculum measured against a moving baseline teaches the wrong "
-        "lesson, so if you cannot reproduce %d before Track 1, fix the environment "
-        "first."
-        % (509, TESTS_PASSED, TESTS_SKIPPED, TESTS_PASSED, TESTS_PASSED,
-           TESTS_PASSED)))
+        "Earlier drafts of these documents quoted %d passed and %d collected. The "
+        "tree runs %d passed, %d skipped and %d collected, and every document now "
+        "names those figures. Treat %d as the baseline: a curriculum measured "
+        "against a moving baseline teaches the wrong lesson, so if you cannot "
+        "reproduce %d before Track 1, fix the environment first."
+        % (509, 598, TESTS_PASSED, TESTS_SKIPPED, TESTS_COLLECTED,
+           TESTS_PASSED, TESTS_PASSED)))
     s.append(body(
         "Two smaller items, both documented in ADR 0004: a module "
         "docstring that still describes the abandoned delegation, and an unused "

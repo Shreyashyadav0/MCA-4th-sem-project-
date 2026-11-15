@@ -11,8 +11,8 @@ Usage:
 Every number that appears in the deck is either structural (phase numbers, slide
 numbers) or verifiable in this tree:
 
-    597 passed + 1 skipped   python -m pytest -q tests          (598 collected)
-    598 collected            python -m pytest --collect-only -q tests
+    640 passed + 1 skipped   python -m pytest -q tests          (641 collected)
+    641 collected            python -m pytest --collect-only -q tests
     63 rules, 10 categories  app/rules.py RULE_COUNT, RuleCategory
     5 finding fields         app/models.py Finding
     3 provider modes         app/engine.py PROVIDERS
@@ -167,8 +167,9 @@ SLIDES: list[dict] = [
                 ["4", "Model review layer with a guaranteed local fallback", "87"],
                 ["5", "Pull-request posting: inline, summary, idempotent", "113"],
                 ["6", "One OpenAI-compatible adapter, two providers, one selector", "51"],
+                ["--", "Persistence, auth, audit gaps and diagrams", "58"],
                 ["--", "Benchmark harness: matching, metrics, runner", "73"],
-                ["Total", "598 collected = 597 passed + 1 skipped", "583"],
+                ["Total", "641 collected = 640 passed + 1 skipped", "641"],
             ],
         },
         "note_after_table": (
@@ -179,8 +180,8 @@ SLIDES: list[dict] = [
         "notes": (
             "Ninety seconds. Do not read the table row by row. Say the project was built in "
             "six phases, each with a fixed interface and its own tests, and that the counts "
-            "are collected tests in that phase's test files. The suite total is 583 "
-            "collected, which runs as 597 passed and 1 skipped, and the skip is the "
+            "are collected tests in that phase's test files. The suite total is 641 "
+            "collected, which runs as 640 passed and 1 skipped, and the skip is the "
             "live-model smoke test that needs a real server."
         ),
     },
@@ -277,7 +278,7 @@ SLIDES: list[dict] = [
             "widths": [4.55, 7.5],
             "rows": [
                 ["63-rule engine, CLI, API, diff parsing, anchoring",
-                 "Implemented; covered by the offline suite (597 passed, 1 skipped)."],
+                 "Implemented; covered by the offline suite (640 passed, 1 skipped)."],
                 ["Zero-network, zero-credential operation",
                  "Verified: verify_offline.py blocks sockets, then runs the suite."],
                 ["Benchmark harness end to end",
