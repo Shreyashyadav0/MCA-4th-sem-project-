@@ -56,7 +56,7 @@ window.LESSONS.push({
       "options": [
         "A traceback line",
         "Only a message string",
-        "The model's JSON schema",
+        "The model's JSON schema, which lists every field name",
         "`loc`, `msg`, `type` and `input`"
       ],
       "answer": 3,

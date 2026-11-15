@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What does the red step of red-green-refactor require?",
       "options": [
         "A test that passes",
-        "A test with no assertions",
+        "A test with no assertions that still counts as a pass",
         "A test that is skipped",
         "A test that fails, for the reason you expect"
       ],
@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "One tests a function's contract, the other tests the pieces together",
         "One is faster",
-        "One uses pytest and the other does not use a test runner at all",
+        "One uses pytest and the other does not use a test runner at all, just a script",
         "There is none"
       ],
       "answer": 0,

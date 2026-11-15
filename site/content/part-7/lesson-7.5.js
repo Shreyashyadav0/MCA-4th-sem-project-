@@ -34,7 +34,7 @@ window.LESSONS.push({
     {
       "q": "What does `normalize_path('a/')` return?",
       "options": [
-        "It raises a ValueError",
+        "It raises a ValueError naming the offending component",
         "An empty string",
         "`/`",
         "`a/`, because the guard stops the strip"
@@ -47,7 +47,7 @@ window.LESSONS.push({
       "options": [
         "Yes, it strips the parent segments",
         "No — that is the confinement check in the API",
-        "Yes, it rejects any path with a dot",
+        "Yes, it rejects any path with a dot in the final component",
         "No, and nothing else does either"
       ],
       "answer": 1,

@@ -35,7 +35,7 @@ window.LESSONS.push({
         "So Pydantic accepts it as a field type",
         "So it can be compared with integers",
         "So it serialises as its own text rather than an enum wrapper",
-        "So the values can be sorted alphabetically"
+        "So the values can be sorted alphabetically in a report column"
       ],
       "answer": 2,
       "why": "A `str` mixin makes the JSON and the display text the same string, which is why no consumer needs an enum encoder."

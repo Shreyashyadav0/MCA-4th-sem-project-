@@ -29,7 +29,7 @@ window.LESSONS.push({
         "`skip`",
         "`skipif`, with the reason stated",
         "`xfail`",
-        "None — delete the test"
+        "None — delete the test, since the marker has done its job"
       ],
       "answer": 1,
       "why": "`skipif` records the condition and the reason, so the report explains itself on every machine."
@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What does an `xpass` mean?",
       "options": [
         "A test marked `xfail` that passed",
-        "A test that failed twice",
+        "A test that failed twice and is now reported as an error",
         "A skipped test",
         "A test that errored"
       ],

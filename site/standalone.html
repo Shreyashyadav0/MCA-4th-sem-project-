@@ -4940,7 +4940,7 @@ window.LESSONS.push({
     {
       "q": "How many findings does the rule engine produce for samples/sample.diff?",
       "options": [
-        "3",
+        "python -m pytest -q tests, verbosely",
         "4",
         "5",
         "63"
@@ -5044,7 +5044,7 @@ window.LESSONS.push({
         "The example is marked terminal: it needs something a browser does not have",
         "The page failed to render and should be reloaded once",
         "Your browser is too old to run WebAssembly in a page",
-        "The example was written before the runner existed at all"
+        "The example was written before the runner existed at all, so it cannot run"
       ],
       "answer": 0,
       "why": "The tier is declared in the lesson data; a terminal example shows its command and expected output instead of a Run button."
@@ -5065,7 +5065,7 @@ window.LESSONS.push({
       "options": [
         "In the repository",
         "On a server",
-        "In the lesson file",
+        "In the lesson file, beside the example it belongs to",
         "In this browser's localStorage"
       ],
       "answer": 3,
@@ -5170,7 +5170,7 @@ window.LESSONS.push({
       "options": [
         "The repository is corrupt and needs to be cloned again",
         "The environment is not active, or came from the wrong requirements file",
-        "The test files were deleted by the last run of the suite",
+        "The test files were deleted by the last run of the suite, so nothing is found",
         "The installed Python is too old to run this test suite"
       ],
       "answer": 1,
@@ -5261,7 +5261,7 @@ window.LESSONS.push({
     {
       "q": "Which module decides whether the review uses sarvam, local or mock?",
       "options": [
-        "app/parser.py",
+        "app/parser.py, which does the parsing",
         "app/rules.py",
         "app/main.py",
         "app/engine.py"
@@ -5408,7 +5408,7 @@ window.LESSONS.push({
         "block",
         "approve",
         "approve with comments",
-        "It raises"
+        "It raises before the value is ever stored on the model"
       ],
       "answer": 2,
       "why": "Only CRITICAL or HIGH blocks; MEDIUM and LOW still produce a comment, which is the difference between approve and approve with comments."
@@ -5514,7 +5514,7 @@ window.LESSONS.push({
       "q": "Why does `severity_counts` in app/models.py return a dict?",
       "options": [
         "So the verdict reads counts instead of rescanning the findings list",
-        "Because a dict is faster to build than a list of findings",
+        "Because a dict is faster to build than a list of findings at every call site",
         "Because JSON cannot encode a list of counts without keys",
         "Because the findings were already stored in a dict shape"
       ],
@@ -5525,7 +5525,7 @@ window.LESSONS.push({
       "q": "What does `setdefault(key, []).append(x)` do?",
       "options": [
         "Replaces the key's value with x",
-        "Raises KeyError if the key is missing",
+        "Raises KeyError if the key is missing from the mapping",
         "Creates an empty list on first use, then appends to it",
         "Sorts the list before appending"
       ],
@@ -5622,7 +5622,7 @@ window.LESSONS.push({
         "Every parameter after it must be passed by keyword",
         "Nothing, it is decoration",
         "It unpacks a tuple",
-        "It makes the parameter optional"
+        "It makes the parameter optional at every call site"
       ],
       "answer": 0,
       "why": "A bare star ends the positional parameters, so provider can only be given by name — which is what keeps a six-option call readable."
@@ -5641,7 +5641,7 @@ window.LESSONS.push({
     {
       "q": "`def make_finding(**kw) -> dict[str, str]` — what does the `->` part promise?",
       "options": [
-        "Nothing; return annotations are ignored by every tool",
+        "Nothing; return annotations are ignored by every tool that reads them today",
         "That every argument passed in kw is a string",
         "That the function returns a string",
         "That the function returns a dict whose keys and values are both strings"
@@ -5720,7 +5720,7 @@ window.LESSONS.push({
       "q": "Why is `Finding` a Pydantic model rather than a dataclass?",
       "options": [
         "Pydantic is faster",
-        "Because dataclasses cannot hold strings",
+        "Because dataclasses cannot hold strings as field values without a type hint",
         "Because it crosses a boundary and must reject a stray key",
         "Because it needs a @property"
       ],
@@ -5731,7 +5731,7 @@ window.LESSONS.push({
       "q": "What does `@dataclass(frozen=True)` give you besides immutability?",
       "options": [
         "A setter for every field",
-        "Validation against a schema",
+        "Validation against a schema that is declared separately",
         "Automatic JSON output",
         "Hashability, because the instance cannot change"
       ],
@@ -5940,7 +5940,7 @@ window.LESSONS.push({
         "\"__main__\"",
         "The module's dotted name",
         "None",
-        "The file path"
+        "The file path, which pytest prints beside the test name"
       ],
       "answer": 1,
       "why": "Only the file Python was told to run gets `\"__main__\"`; an imported module carries its own name, which is why the guard is silent."
@@ -5951,7 +5951,7 @@ window.LESSONS.push({
         "Because the imports are absolute and start at the `app` package",
         "Because git refuses to run anywhere else in the tree",
         "Because pytest is installed into that directory only",
-        "Because the tests import each other by absolute path"
+        "Because the tests import each other by an absolute path from the repo root"
       ],
       "answer": 0,
       "why": "`from app.models import Finding` resolves only if the directory containing `app/` is on sys.path, which the root is and a subdirectory is not."
@@ -5959,7 +5959,7 @@ window.LESSONS.push({
     {
       "q": "You run `python tests/test_rules.py` and see no test output. Why?",
       "options": [
-        "The tests are broken and the environment needs reinstalling from the lock",
+        "The tests are broken and the environment needs reinstalling from the lock file again",
         "pytest is missing from the environment you are running in",
         "Running the file executes it as __main__: the test functions are defined, not called",
         "The file was never saved after the last edit was made"
@@ -6044,7 +6044,7 @@ window.LESSONS.push({
       "options": [
         "The context manager's `__exit__`, on the way out of the block",
         "The garbage collector, eventually",
-        "A call to `handle.close()` you must write",
+        "A call to `handle.close()` that you must remember to write in a finally block",
         "Nothing; the OS does it"
       ],
       "answer": 0,
@@ -6066,7 +6066,7 @@ window.LESSONS.push({
       "options": [
         "Style",
         "To return a value",
-        "Because yield is illegal otherwise",
+        "Because `yield` is illegal outside a generator function",
         "So the cleanup runs even when the block raises"
       ],
       "answer": 3,
@@ -6172,7 +6172,7 @@ window.LESSONS.push({
         "A new function that calls the handler on each request",
         "Usually the same function, after registering it against the path",
         "A JSON string built from the handler's annotations",
-        "A route object the handler must return to be registered"
+        "A route object the handler must return for it to be registered with the app"
       ],
       "answer": 1,
       "why": "FastAPI records the function at import time and calls it later; that is why the body looks like ordinary Python with no HTTP in it."
@@ -6375,7 +6375,7 @@ window.LESSONS.push({
       "q": "Why does `read_source` check the path before reading it?",
       "options": [
         "Because checking first is faster than reading and failing",
-        "Because pathlib refuses to read a file it has not stat'ed first",
+        "Because pathlib refuses to read a file it has not stat'ed first, as a safety rule",
         "So a missing path or a directory becomes one typed error, not a raw OSError",
         "To count how many files the CLI was given on the command line"
       ],
@@ -6564,7 +6564,7 @@ window.LESSONS.push({
       "q": "What does `Protocol` give you that inheritance does not?",
       "options": [
         "Multiple inheritance, which a plain class cannot otherwise use",
-        "Faster method dispatch, because no lookup table has to be built",
+        "Faster method dispatch, because no lookup table has to be built at call time at all",
         "Structural typing: any class with the right methods fits, without importing it",
         "Runtime validation of every argument that a method receives"
       ],
@@ -6691,7 +6691,7 @@ window.LESSONS.push({
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
         "So the error arrives before the value is stored",
-        "Because Pydantic is faster when it validates early in the call",
+        "Because Pydantic is faster when it validates early in the call path, before storage",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"
       ],
@@ -6914,7 +6914,7 @@ window.LESSONS.push({
       "options": [
         "When the rule only constrains the field's type",
         "When the rule needs more than one field or more than one line of logic",
-        "Always — a validator is clearer than a constraint, so prefer it",
+        "Always — a validator is clearer than a constraint, so prefer it everywhere",
         "When the field happens to be a string type"
       ],
       "answer": 1,
@@ -6924,7 +6924,7 @@ window.LESSONS.push({
       "q": "What does `error.errors()[0][\"loc\"]` give you?",
       "options": [
         "The path to the failing field, as a tuple",
-        "The line of source that failed",
+        "The line of source that failed, quoted from the file",
         "The exception class",
         "The model name"
       ],
@@ -7009,7 +7009,7 @@ window.LESSONS.push({
       "options": [
         "A missing field",
         "An unknown key arriving in the payload",
-        "A value of the wrong type",
+        "A value of the wrong type, which the validator rejects",
         "A slow validator"
       ],
       "answer": 1,
@@ -7029,7 +7029,7 @@ window.LESSONS.push({
     {
       "q": "What does `str_strip_whitespace=True` change?",
       "options": [
-        "It removes all spaces inside strings",
+        "It removes all spaces inside strings, not only the ends",
         "It converts strings to lowercase",
         "It trims leading and trailing spaces before validation",
         "It makes strings optional"
@@ -7135,7 +7135,7 @@ window.LESSONS.push({
         "`TypeError`, which Pydantic re-raises unchanged",
         "`SystemExit`, which stops the run at once",
         "`ValueError`, which Pydantic wraps into a ValidationError entry",
-        "`AssertionError`, which pytest reports as a failure"
+        "`AssertionError`, which pytest reports as a test failure rather than an error"
       ],
       "answer": 2,
       "why": "`ValueError` is the documented signal; the entry's message then begins \"Value error, \" followed by your text."
@@ -7145,7 +7145,7 @@ window.LESSONS.push({
       "options": [
         "Because it is faster",
         "Because `after` does not exist for models",
-        "Because computed fields are not validated when the model is built",
+        "Because computed fields are not validated when the model is built from JSON",
         "Because it must reshape the raw input before any field is validated"
       ],
       "answer": 3,
@@ -7242,9 +7242,9 @@ window.LESSONS.push({
     {
       "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
-        "Because a bare default is rejected for a mutable list field",
-        "Because a bare `= []` default is shared by every instance that is built",
-        "Because a bare default is rejected for a mutable list field",
+        "Because a bare `= []` is shared by every instance that is built",
+        "Because a mutable default is rejected at class definition time",
+        "Because `Field` is the only way to give a list field a default at all",
         "Because it is the documented spelling for a fresh list"
       ],
       "answer": 3,
@@ -7253,7 +7253,7 @@ window.LESSONS.push({
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",
       "options": [
-        "The first finding has a bad line",
+        "The first finding has a bad line and the second is fine",
         "The second finding's line field failed validation",
         "There are two findings",
         "The model has one error"
@@ -7352,7 +7352,7 @@ window.LESSONS.push({
     {
       "q": "When is a `Literal` better than an `Enum`?",
       "options": [
-        "When the set needs behaviour or ordering",
+        "When the set needs behaviour or a guaranteed order, rather than membership",
         "When the set is a few strings and nothing else is attached",
         "When the values are integers",
         "Never"
@@ -7589,7 +7589,7 @@ window.LESSONS.push({
       "options": [
         "A traceback line",
         "Only a message string",
-        "The model's JSON schema",
+        "The model's JSON schema, which lists every field name",
         "`loc`, `msg`, `type` and `input`"
       ],
       "answer": 3,
@@ -7691,7 +7691,7 @@ window.LESSONS.push({
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
         "That a frozen dataclass ignores its annotations",
-        "That frozen dataclasses cannot be compared for equality",
+        "That frozen dataclasses cannot be compared for equality at all, ever",
         "That a dataclass is always faster than a BaseModel",
         "That annotations are not enforced at runtime without a validator"
       ],
@@ -7793,7 +7793,7 @@ window.LESSONS.push({
       "q": "What does the red step of red-green-refactor require?",
       "options": [
         "A test that passes",
-        "A test with no assertions",
+        "A test with no assertions that still counts as a pass",
         "A test that is skipped",
         "A test that fails, for the reason you expect"
       ],
@@ -7816,7 +7816,7 @@ window.LESSONS.push({
       "options": [
         "One tests a function's contract, the other tests the pieces together",
         "One is faster",
-        "One uses pytest and the other does not use a test runner at all",
+        "One uses pytest and the other does not use a test runner at all, just a script",
         "There is none"
       ],
       "answer": 0,
@@ -8012,7 +8012,7 @@ window.LESSONS.push({
       "q": "When should a fixture `yield` instead of `return`?",
       "options": [
         "When it is expensive",
-        "When it returns a Path",
+        "When it returns a Path rather than raising on failure",
         "When it has cleanup to do after the test",
         "Always"
       ],
@@ -8116,7 +8116,7 @@ window.LESSONS.push({
     {
       "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
       "options": [
-        "pytest splits the tuple and runs it twice",
+        "pytest splits the tuple and runs the test once per element in the tuple",
         "pytest splits the tuple",
         "It passes",
         "Collection fails: the tuple length does not match the names"
@@ -8127,7 +8127,7 @@ window.LESSONS.push({
     {
       "q": "Where do the ids in `test_...[LOW]` come from?",
       "options": [
-        "pytest numbers them in run order",
+        "pytest numbers them in the order they run",
         "The parameter values, by default",
         "The test function's docstring",
         "You must always supply `ids=`"
@@ -8209,7 +8209,7 @@ window.LESSONS.push({
     {
       "q": "What does `monkeypatch.setenv` guarantee?",
       "options": [
-        "The variable stays set for the session",
+        "The variable stays set for the session, so later tests see it",
         "It fails if the variable exists",
         "It writes a .env file",
         "It is set for this test and restored afterwards"
@@ -8220,7 +8220,7 @@ window.LESSONS.push({
     {
       "q": "Why `delenv(\"X\", raising=False)`?",
       "options": [
-        "Because the fixture is autouse, so every test pays for it",
+        "Because the fixture is autouse, so every test in the file pays for it",
         "Because deleting an unset variable raises unless you say otherwise",
         "Because it makes the test measurably faster to run",
         "Because it sets the variable to an empty string"
@@ -8316,7 +8316,7 @@ window.LESSONS.push({
         "`skip`",
         "`skipif`, with the reason stated",
         "`xfail`",
-        "None — delete the test"
+        "None — delete the test, since the marker has done its job"
       ],
       "answer": 1,
       "why": "`skipif` records the condition and the reason, so the report explains itself on every machine."
@@ -8325,7 +8325,7 @@ window.LESSONS.push({
       "q": "What does an `xpass` mean?",
       "options": [
         "A test marked `xfail` that passed",
-        "A test that failed twice",
+        "A test that failed twice and is now reported as an error",
         "A skipped test",
         "A test that errored"
       ],
@@ -8524,7 +8524,7 @@ window.LESSONS.push({
         "Only `requests.get`",
         "The DNS resolver only",
         "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
-        "Nothing; it runs with the network off and never tries to reach out"
+        "Nothing; it runs with the network off and never tries to reach out at all"
       ],
       "answer": 2,
       "why": "Three seams, because a library can dial out by any of them — patching one leaves the others open."
@@ -8532,7 +8532,7 @@ window.LESSONS.push({
     {
       "q": "Why are loopback and AF_UNIX allowed through?",
       "options": [
-        "Because tests need localhost to bind a port for the client",
+        "Because tests need localhost to bind a port for the client to call",
         "They are not allowed",
         "Because they are faster",
         "Because asyncio's event loop builds a self-pipe with a socket"
@@ -8546,7 +8546,7 @@ window.LESSONS.push({
         "That pytest imported the patches before collection",
         "That no test would use the network on a machine without the patches",
         "That the patches were applied before pytest started",
-        "That the suite passed while the patches were in place"
+        "That the suite passed while the patches were in place during the run"
       ],
       "answer": 1,
       "why": "It is evidence about this run under these patches — which is exactly what the README claims, no more."
@@ -8966,7 +8966,7 @@ window.LESSONS.push({
     {
       "q": "What does `response_model=` do to the handler's return value?",
       "options": [
-        "Nothing — it only documents the route",
+        "Nothing — it only documents the route for readers",
         "It validates and filters what goes out",
         "It converts the return value to a string",
         "It sets the status code of the response"
@@ -8977,7 +8977,7 @@ window.LESSONS.push({
     {
       "q": "Why can the schema not drift from the code?",
       "options": [
-        "A scheduled test regenerates it nightly",
+        "A scheduled job regenerates it nightly from the code",
         "It is written by hand and then reviewed",
         "It is computed from the code at import",
         "It is copied out of the README by hand"
@@ -9088,7 +9088,7 @@ window.LESSONS.push({
       "options": [
         "The happy path stays straight and the error leaves where it happened",
         "Raising is measurably faster than returning",
-        "FastAPI cannot serialise a returned error object",
+        "FastAPI cannot serialise a returned error object on its own, so it needs a handler",
         "Raising sets the status and returning cannot"
       ],
       "answer": 0,
@@ -9432,7 +9432,7 @@ window.LESSONS.push({
       "q": "Why does `/review` need a line range rather than a line number?",
       "options": [
         "Because the decorator carries a responses block",
-        "Because the file is not in alphabetical order",
+        "Because the file is not in alphabetical order at all",
         "Because decorators are never given line numbers",
         "Because the handler is defined in another file"
       ],
@@ -10107,7 +10107,7 @@ window.LESSONS.push({
     {
       "q": "Why does `binary` matter to a review's honesty?",
       "options": [
-        "Because it changes the file's change kind",
+        "Because it changes the file's change kind to modified",
         "Because it makes the JSON payload smaller",
         "Because binary files are usually unsafe",
         "Because clean and unexamined must differ"
@@ -10118,7 +10118,7 @@ window.LESSONS.push({
     {
       "q": "`FileSummary` copies `binary=file.binary`. Why copy rather than recompute?",
       "options": [
-        "Because recomputing it would be slow",
+        "Because recomputing it on every read would be slow",
         "Because one fact must have one source",
         "Because FileDiff has no binary field",
         "Because the summary is built elsewhere"
@@ -10486,7 +10486,7 @@ window.LESSONS.push({
     {
       "q": "Which field makes a finding anchorable to a diff?",
       "options": [
-        "`suggested_fix`, which is the replacement code the rule proposes",
+        "`suggested_fix`, which is the replacement code the rule proposes to the reader",
         "`issue`, which names the problem",
         "`line`, which is what the anchorer compares against changed spans",
         "`severity`, which orders the output"
@@ -10580,7 +10580,7 @@ window.LESSONS.push({
       "options": [
         "Because JSON cannot store integers",
         "A string holds both a number and an ascending range",
-        "Because Pydantic cannot validate integers",
+        "Because Pydantic cannot validate integers from JSON at all",
         "Because the file names are strings too"
       ],
       "answer": 1,
@@ -10695,7 +10695,7 @@ window.LESSONS.push({
         "So Pydantic accepts it as a field type",
         "So it can be compared with integers",
         "So it serialises as its own text rather than an enum wrapper",
-        "So the values can be sorted alphabetically"
+        "So the values can be sorted alphabetically in a report column"
       ],
       "answer": 2,
       "why": "A `str` mixin makes the JSON and the display text the same string, which is why no consumer needs an enum encoder."
@@ -10817,7 +10817,7 @@ window.LESSONS.push({
     {
       "q": "Why does the model forbid an empty `issue`?",
       "options": [
-        "Because Pydantic requires a minimum of two",
+        "Because Pydantic requires a minimum of two fields per model",
         "Because JSON cannot store empty strings",
         "Because the column would render as null",
         "A finding with no diagnosis cannot be acted on or triaged"
@@ -10942,7 +10942,7 @@ window.LESSONS.push({
     {
       "q": "Why is `strict=True` not used on this model?",
       "options": [
-        "Because frozen and strict cannot be combined on the same model",
+        "Because frozen and strict cannot be combined on the same model class",
         "Because strict mode disables validators",
         "Because inputs arrive as JSON and from a model, where coercion helps",
         "Because strict mode is slower"
@@ -11160,7 +11160,7 @@ window.LESSONS.push({
       "q": "What does `_drop_computed` prevent?",
       "options": [
         "A stored verdict that disagrees with the findings",
-        "A JSON payload that is too large",
+        "A JSON payload that is too large to parse in one pass",
         "The findings from being sorted",
         "The mode from being validated"
       ],
@@ -11280,7 +11280,7 @@ window.LESSONS.push({
       "options": [
         "Because the models are frozen",
         "Because nothing in models.py knows about either",
-        "Because the file is under 200 lines",
+        "Because the file is under 200 lines and needs no guide",
         "Because Pydantic mocks the network"
       ],
       "answer": 1,
@@ -11377,7 +11377,7 @@ window.LESSONS.push({
     {
       "q": "What does `parse_diff` take as its first argument?",
       "options": [
-        "A bundle to fill in",
+        "A bundle to fill in as you go",
         "A path to a diff file",
         "An open file handle",
         "The diff text itself"
@@ -11496,7 +11496,7 @@ window.LESSONS.push({
         "Because the paths are not known yet",
         "A later header line may say new file mode or rename",
         "Because the kind depends on the body",
-        "Because `diff --git` carries no paths"
+        "Because `diff --git` carries no paths, only the two blob hashes"
       ],
       "answer": 1,
       "why": "The `diff --git` line gives two paths; `new file mode`, `deleted file mode` and the rename lines arrive after it and override the guess."
@@ -11505,7 +11505,7 @@ window.LESSONS.push({
       "q": "What does `close_hunk()` reset?",
       "options": [
         "Only the binary flag",
-        "The whole builder, including both the old path and the new one",
+        "The whole builder, including both the old path and the new one, in order",
         "The collected lines and the counters for the hunk just finished",
         "The list of finished files"
       ],
@@ -11516,7 +11516,7 @@ window.LESSONS.push({
       "q": "What is the second pass in \"collect, then conclude\"?",
       "options": [
         "`finish()`, which turns the builder state into a FileDiff",
-        "`parse_diff`, which splits the text into lines",
+        "`parse_diff`, which splits the text into lines before walking them",
         "`close_hunk`, which empties the buffer",
         "`normalize_path`, which strips the prefix"
       ],
@@ -11623,7 +11623,7 @@ window.LESSONS.push({
         "So the two cannot disagree about the same file",
         "Because storage is expensive",
         "Because `FileSummary` is frozen",
-        "Because the bundle is immutable"
+        "Because the bundle is immutable once it has been built"
       ],
       "answer": 0,
       "why": "`summaries()` computes from the diffs, so a change to the diff cannot leave a stale summary behind."
@@ -11632,7 +11632,7 @@ window.LESSONS.push({
       "q": "A test needs only the added span of one file. Which shape?",
       "options": [
         "Neither; spans are computed separately",
-        "The diff, because spans live in the hunks",
+        "The diff, because spans live in the hunks and not the summary",
         "The bundle, because it holds everything",
         "The summary, which carries `added_spans` without the lines"
       ],
@@ -11754,7 +11754,7 @@ window.LESSONS.push({
       "options": [
         "Because ranges use less JSON",
         "A range is two comparisons rather than a scan",
-        "Because a list cannot be serialised",
+        "Because a list cannot be serialised into the response body",
         "Because ranges preserve order"
       ],
       "answer": 1,
@@ -11846,7 +11846,7 @@ window.LESSONS.push({
     {
       "q": "What does `normalize_path('a/')` return?",
       "options": [
-        "It raises a ValueError",
+        "It raises a ValueError naming the offending component",
         "An empty string",
         "`/`",
         "`a/`, because the guard stops the strip"
@@ -11859,7 +11859,7 @@ window.LESSONS.push({
       "options": [
         "Yes, it strips the parent segments",
         "No — that is the confinement check in the API",
-        "Yes, it rejects any path with a dot",
+        "Yes, it rejects any path with a dot in the final component",
         "No, and nothing else does either"
       ],
       "answer": 1,
@@ -12187,7 +12187,7 @@ window.LESSONS.push({
       "q": "Which block would you read to learn how a hunk's lines are collected?",
       "options": [
         "The builder, from line 305",
-        "The models, from line 112",
+        "The models, from line 112 onwards",
         "The entry points, from 343",
         "The path helpers, from 69"
       ],
@@ -12328,7 +12328,7 @@ window.LESSONS.push({
     {
       "q": "What makes a single rule testable without a diff?",
       "options": [
-        "The rule is registered at import time",
+        "The rule is registered at import time by a decorator",
         "The registry is a module-level list",
         "`LineContext` is a frozen dataclass",
         "`check` takes one context and returns"
@@ -12886,7 +12886,7 @@ window.LESSONS.push({
     {
       "q": "Where is a rule's severity decided?",
       "options": [
-        "By the file the line sits inside",
+        "By the file the line sits inside, not the rule",
         "By the run's own finding count",
         "At registration, never per hit",
         "By the category's default value"
@@ -13349,7 +13349,7 @@ window.LESSONS.push({
     {
       "q": "Which part of the file must come first?",
       "options": [
-        "The entry points, which are public",
+        "The entry points, which are the public surface",
         "The checks, which are the content",
         "The types, which everything uses",
         "The registry, which is a plain list"
@@ -13469,7 +13469,7 @@ window.LESSONS.push({
       "q": "What does `extra=\"ignore\"` do to an unknown key?",
       "options": [
         "Skips it without raising",
-        "Raises on start, naming it",
+        "Raises on start, naming it in the error",
         "Stores it in a catch-all",
         "Warns once, then ignores"
       ],
@@ -13566,7 +13566,7 @@ window.LESSONS.push({
       "q": "What happens when `LMSTUDIO_BASE_URL` is empty?",
       "options": [
         "Local is simply not selected",
-        "The application will not start",
+        "The application will not start at all",
         "The Sarvam key is used instead",
         "The timeout falls back to zero"
       ],
@@ -13588,7 +13588,7 @@ window.LESSONS.push({
       "q": "What is missing if the URL is set but the model is not?",
       "options": [
         "The model name to load",
-        "The port to listen on",
+        "The port to listen on for requests",
         "The key the server wants",
         "The timeout for the call"
       ],
@@ -13691,7 +13691,7 @@ window.LESSONS.push({
       "q": "Which secret is outside this code's protection?",
       "options": [
         "One pasted in a shell",
-        "One in an env variable",
+        "One in an env variable, never in a file",
         "One loaded from a .env",
         "One held in Settings"
       ],
@@ -13793,7 +13793,7 @@ window.LESSONS.push({
       "q": "What does `request_timeout_s` refuse?",
       "options": [
         "Zero and negative values",
-        "Values above sixty seconds",
+        "Values above sixty seconds, which are refused",
         "Non-integer values only",
         "Nothing; it is unbounded"
       ],
@@ -13998,7 +13998,7 @@ window.LESSONS.push({
       "q": "What does the lock file record?",
       "options": [
         "Exactly what was tested",
-        "What would be compatible",
+        "What would be compatible with the range",
         "The project's direct needs",
         "The Python version only"
       ],
@@ -14106,7 +14106,7 @@ window.LESSONS.push({
       "q": "What does the runtime stage copy?",
       "options": [
         "The built environment only",
-        "The whole build context",
+        "The whole build context, including the source",
         "The compiler toolchain too",
         "The source, not the env"
       ],

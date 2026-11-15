@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "When should a fixture `yield` instead of `return`?",
       "options": [
         "When it is expensive",
-        "When it returns a Path",
+        "When it returns a Path rather than raising on failure",
         "When it has cleanup to do after the test",
         "Always"
       ],

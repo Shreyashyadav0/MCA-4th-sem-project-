@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Because the models are frozen",
         "Because nothing in models.py knows about either",
-        "Because the file is under 200 lines",
+        "Because the file is under 200 lines and needs no guide",
         "Because Pydantic mocks the network"
       ],
       "answer": 1,

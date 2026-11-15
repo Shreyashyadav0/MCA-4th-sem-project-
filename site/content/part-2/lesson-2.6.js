@@ -43,9 +43,9 @@ window.LESSONS.push({
     {
       "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
-        "Because a bare default is rejected for a mutable list field",
-        "Because a bare `= []` default is shared by every instance that is built",
-        "Because a bare default is rejected for a mutable list field",
+        "Because a bare `= []` is shared by every instance that is built",
+        "Because a mutable default is rejected at class definition time",
+        "Because `Field` is the only way to give a list field a default at all",
         "Because it is the documented spelling for a fresh list"
       ],
       "answer": 3,
@@ -54,7 +54,7 @@ window.LESSONS.push({
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",
       "options": [
-        "The first finding has a bad line",
+        "The first finding has a bad line and the second is fine",
         "The second finding's line field failed validation",
         "There are two findings",
         "The model has one error"

@@ -58,7 +58,7 @@ window.LESSONS.push({
     {
       "q": "How many findings does the rule engine produce for samples/sample.diff?",
       "options": [
-        "3",
+        "python -m pytest -q tests, verbosely",
         "4",
         "5",
         "63"

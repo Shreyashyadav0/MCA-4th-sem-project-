@@ -44,7 +44,7 @@ window.LESSONS.push({
       "q": "What does `_drop_computed` prevent?",
       "options": [
         "A stored verdict that disagrees with the findings",
-        "A JSON payload that is too large",
+        "A JSON payload that is too large to parse in one pass",
         "The findings from being sorted",
         "The mode from being validated"
       ],

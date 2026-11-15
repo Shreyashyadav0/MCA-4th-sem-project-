@@ -55,7 +55,7 @@ window.LESSONS.push({
     {
       "q": "What makes a single rule testable without a diff?",
       "options": [
-        "The rule is registered at import time",
+        "The rule is registered at import time by a decorator",
         "The registry is a module-level list",
         "`LineContext` is a frozen dataclass",
         "`check` takes one context and returns"

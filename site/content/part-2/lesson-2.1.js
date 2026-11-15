@@ -45,7 +45,7 @@ window.LESSONS.push({
       "q": "Why does this repository validate at construction rather than at use?",
       "options": [
         "So the error arrives before the value is stored",
-        "Because Pydantic is faster when it validates early in the call",
+        "Because Pydantic is faster when it validates early in the call path, before storage",
         "So the failure names the field while the code that built it is still on the stack",
         "Because Python requires it for every model field"
       ],

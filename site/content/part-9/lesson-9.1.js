@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What does `extra=\"ignore\"` do to an unknown key?",
       "options": [
         "Skips it without raising",
-        "Raises on start, naming it",
+        "Raises on start, naming it in the error",
         "Stores it in a catch-all",
         "Warns once, then ignores"
       ],

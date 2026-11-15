@@ -51,7 +51,7 @@ window.LESSONS.push({
       "options": [
         "The repository is corrupt and needs to be cloned again",
         "The environment is not active, or came from the wrong requirements file",
-        "The test files were deleted by the last run of the suite",
+        "The test files were deleted by the last run of the suite, so nothing is found",
         "The installed Python is too old to run this test suite"
       ],
       "answer": 1,

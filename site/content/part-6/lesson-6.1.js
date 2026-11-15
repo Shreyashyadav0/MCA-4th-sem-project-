@@ -54,7 +54,7 @@ window.LESSONS.push({
     {
       "q": "Which field makes a finding anchorable to a diff?",
       "options": [
-        "`suggested_fix`, which is the replacement code the rule proposes",
+        "`suggested_fix`, which is the replacement code the rule proposes to the reader",
         "`issue`, which names the problem",
         "`line`, which is what the anchorer compares against changed spans",
         "`severity`, which orders the output"

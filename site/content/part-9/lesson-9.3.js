@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "Which secret is outside this code's protection?",
       "options": [
         "One pasted in a shell",
-        "One in an env variable",
+        "One in an env variable, never in a file",
         "One loaded from a .env",
         "One held in Settings"
       ],

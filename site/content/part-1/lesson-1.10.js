@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "Why does `read_source` check the path before reading it?",
       "options": [
         "Because checking first is faster than reading and failing",
-        "Because pathlib refuses to read a file it has not stat'ed first",
+        "Because pathlib refuses to read a file it has not stat'ed first, as a safety rule",
         "So a missing path or a directory becomes one typed error, not a raw OSError",
         "To count how many files the CLI was given on the command line"
       ],

@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What does `request_timeout_s` refuse?",
       "options": [
         "Zero and negative values",
-        "Values above sixty seconds",
+        "Values above sixty seconds, which are refused",
         "Non-integer values only",
         "Nothing; it is unbounded"
       ],

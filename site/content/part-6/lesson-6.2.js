@@ -34,7 +34,7 @@ window.LESSONS.push({
       "options": [
         "Because JSON cannot store integers",
         "A string holds both a number and an ascending range",
-        "Because Pydantic cannot validate integers",
+        "Because Pydantic cannot validate integers from JSON at all",
         "Because the file names are strings too"
       ],
       "answer": 1,

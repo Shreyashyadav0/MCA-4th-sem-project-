@@ -64,7 +64,7 @@ window.LESSONS.push({
         "block",
         "approve",
         "approve with comments",
-        "It raises"
+        "It raises before the value is ever stored on the model"
       ],
       "answer": 2,
       "why": "Only CRITICAL or HIGH blocks; MEDIUM and LOW still produce a comment, which is the difference between approve and approve with comments."

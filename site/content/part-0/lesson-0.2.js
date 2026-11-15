@@ -30,7 +30,7 @@ window.LESSONS.push({
         "The example is marked terminal: it needs something a browser does not have",
         "The page failed to render and should be reloaded once",
         "Your browser is too old to run WebAssembly in a page",
-        "The example was written before the runner existed at all"
+        "The example was written before the runner existed at all, so it cannot run"
       ],
       "answer": 0,
       "why": "The tier is declared in the lesson data; a terminal example shows its command and expected output instead of a Run button."
@@ -51,7 +51,7 @@ window.LESSONS.push({
       "options": [
         "In the repository",
         "On a server",
-        "In the lesson file",
+        "In the lesson file, beside the example it belongs to",
         "In this browser's localStorage"
       ],
       "answer": 3,

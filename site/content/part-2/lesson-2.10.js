@@ -44,7 +44,7 @@ window.LESSONS.push({
       "q": "A frozen dataclass accepts `Point(1, \"2\")` for `y: int`. What does that show?",
       "options": [
         "That a frozen dataclass ignores its annotations",
-        "That frozen dataclasses cannot be compared for equality",
+        "That frozen dataclasses cannot be compared for equality at all, ever",
         "That a dataclass is always faster than a BaseModel",
         "That annotations are not enforced at runtime without a validator"
       ],

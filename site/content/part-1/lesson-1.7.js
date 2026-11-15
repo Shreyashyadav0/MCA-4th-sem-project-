@@ -28,7 +28,7 @@ window.LESSONS.push({
       "options": [
         "The context manager's `__exit__`, on the way out of the block",
         "The garbage collector, eventually",
-        "A call to `handle.close()` you must write",
+        "A call to `handle.close()` that you must remember to write in a finally block",
         "Nothing; the OS does it"
       ],
       "answer": 0,
@@ -50,7 +50,7 @@ window.LESSONS.push({
       "options": [
         "Style",
         "To return a value",
-        "Because yield is illegal otherwise",
+        "Because `yield` is illegal outside a generator function",
         "So the cleanup runs even when the block raises"
       ],
       "answer": 3,

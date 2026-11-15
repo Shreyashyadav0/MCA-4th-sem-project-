@@ -37,7 +37,7 @@ window.LESSONS.push({
         "Because the paths are not known yet",
         "A later header line may say new file mode or rename",
         "Because the kind depends on the body",
-        "Because `diff --git` carries no paths"
+        "Because `diff --git` carries no paths, only the two blob hashes"
       ],
       "answer": 1,
       "why": "The `diff --git` line gives two paths; `new file mode`, `deleted file mode` and the rename lines arrive after it and override the guess."
@@ -46,7 +46,7 @@ window.LESSONS.push({
       "q": "What does `close_hunk()` reset?",
       "options": [
         "Only the binary flag",
-        "The whole builder, including both the old path and the new one",
+        "The whole builder, including both the old path and the new one, in order",
         "The collected lines and the counters for the hunk just finished",
         "The list of finished files"
       ],
@@ -57,7 +57,7 @@ window.LESSONS.push({
       "q": "What is the second pass in \"collect, then conclude\"?",
       "options": [
         "`finish()`, which turns the builder state into a FileDiff",
-        "`parse_diff`, which splits the text into lines",
+        "`parse_diff`, which splits the text into lines before walking them",
         "`close_hunk`, which empties the buffer",
         "`normalize_path`, which strips the prefix"
       ],

@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What does the lock file record?",
       "options": [
         "Exactly what was tested",
-        "What would be compatible",
+        "What would be compatible with the range",
         "The project's direct needs",
         "The Python version only"
       ],

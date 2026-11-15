@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "Why is `Finding` a Pydantic model rather than a dataclass?",
       "options": [
         "Pydantic is faster",
-        "Because dataclasses cannot hold strings",
+        "Because dataclasses cannot hold strings as field values without a type hint",
         "Because it crosses a boundary and must reject a stray key",
         "Because it needs a @property"
       ],
@@ -38,7 +38,7 @@ window.LESSONS.push({
       "q": "What does `@dataclass(frozen=True)` give you besides immutability?",
       "options": [
         "A setter for every field",
-        "Validation against a schema",
+        "Validation against a schema that is declared separately",
         "Automatic JSON output",
         "Hashability, because the instance cannot change"
       ],

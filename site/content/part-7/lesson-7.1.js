@@ -34,7 +34,7 @@ window.LESSONS.push({
     {
       "q": "What does `parse_diff` take as its first argument?",
       "options": [
-        "A bundle to fill in",
+        "A bundle to fill in as you go",
         "A path to a diff file",
         "An open file handle",
         "The diff text itself"

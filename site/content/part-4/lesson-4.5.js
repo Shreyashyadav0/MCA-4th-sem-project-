@@ -39,7 +39,7 @@ window.LESSONS.push({
       "options": [
         "The happy path stays straight and the error leaves where it happened",
         "Raising is measurably faster than returning",
-        "FastAPI cannot serialise a returned error object",
+        "FastAPI cannot serialise a returned error object on its own, so it needs a handler",
         "Raising sets the status and returning cannot"
       ],
       "answer": 0,

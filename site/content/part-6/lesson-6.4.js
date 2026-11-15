@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "Why does the model forbid an empty `issue`?",
       "options": [
-        "Because Pydantic requires a minimum of two",
+        "Because Pydantic requires a minimum of two fields per model",
         "Because JSON cannot store empty strings",
         "Because the column would render as null",
         "A finding with no diagnosis cannot be acted on or triaged"

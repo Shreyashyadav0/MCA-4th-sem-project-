@@ -48,7 +48,7 @@ window.LESSONS.push({
         "So the two cannot disagree about the same file",
         "Because storage is expensive",
         "Because `FileSummary` is frozen",
-        "Because the bundle is immutable"
+        "Because the bundle is immutable once it has been built"
       ],
       "answer": 0,
       "why": "`summaries()` computes from the diffs, so a change to the diff cannot leave a stale summary behind."
@@ -57,7 +57,7 @@ window.LESSONS.push({
       "q": "A test needs only the added span of one file. Which shape?",
       "options": [
         "Neither; spans are computed separately",
-        "The diff, because spans live in the hunks",
+        "The diff, because spans live in the hunks and not the summary",
         "The bundle, because it holds everything",
         "The summary, which carries `added_spans` without the lines"
       ],

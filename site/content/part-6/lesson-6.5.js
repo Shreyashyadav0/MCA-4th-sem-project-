@@ -54,7 +54,7 @@ window.LESSONS.push({
     {
       "q": "Why is `strict=True` not used on this model?",
       "options": [
-        "Because frozen and strict cannot be combined on the same model",
+        "Because frozen and strict cannot be combined on the same model class",
         "Because strict mode disables validators",
         "Because inputs arrive as JSON and from a model, where coercion helps",
         "Because strict mode is slower"

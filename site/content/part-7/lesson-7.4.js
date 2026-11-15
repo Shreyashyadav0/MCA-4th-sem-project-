@@ -58,7 +58,7 @@ window.LESSONS.push({
       "options": [
         "Because ranges use less JSON",
         "A range is two comparisons rather than a scan",
-        "Because a list cannot be serialised",
+        "Because a list cannot be serialised into the response body",
         "Because ranges preserve order"
       ],
       "answer": 1,

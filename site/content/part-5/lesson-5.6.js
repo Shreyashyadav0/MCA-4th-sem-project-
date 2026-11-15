@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why does `binary` matter to a review's honesty?",
       "options": [
-        "Because it changes the file's change kind",
+        "Because it changes the file's change kind to modified",
         "Because it makes the JSON payload smaller",
         "Because binary files are usually unsafe",
         "Because clean and unexamined must differ"
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "`FileSummary` copies `binary=file.binary`. Why copy rather than recompute?",
       "options": [
-        "Because recomputing it would be slow",
+        "Because recomputing it on every read would be slow",
         "Because one fact must have one source",
         "Because FileDiff has no binary field",
         "Because the summary is built elsewhere"

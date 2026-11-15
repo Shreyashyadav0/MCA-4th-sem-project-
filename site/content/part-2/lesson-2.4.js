@@ -35,7 +35,7 @@ window.LESSONS.push({
       "options": [
         "A missing field",
         "An unknown key arriving in the payload",
-        "A value of the wrong type",
+        "A value of the wrong type, which the validator rejects",
         "A slow validator"
       ],
       "answer": 1,
@@ -55,7 +55,7 @@ window.LESSONS.push({
     {
       "q": "What does `str_strip_whitespace=True` change?",
       "options": [
-        "It removes all spaces inside strings",
+        "It removes all spaces inside strings, not only the ends",
         "It converts strings to lowercase",
         "It trims leading and trailing spaces before validation",
         "It makes strings optional"

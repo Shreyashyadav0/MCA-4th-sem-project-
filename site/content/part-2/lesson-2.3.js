@@ -46,7 +46,7 @@ window.LESSONS.push({
       "options": [
         "When the rule only constrains the field's type",
         "When the rule needs more than one field or more than one line of logic",
-        "Always — a validator is clearer than a constraint, so prefer it",
+        "Always — a validator is clearer than a constraint, so prefer it everywhere",
         "When the field happens to be a string type"
       ],
       "answer": 1,
@@ -56,7 +56,7 @@ window.LESSONS.push({
       "q": "What does `error.errors()[0][\"loc\"]` give you?",
       "options": [
         "The path to the failing field, as a tuple",
-        "The line of source that failed",
+        "The line of source that failed, quoted from the file",
         "The exception class",
         "The model name"
       ],

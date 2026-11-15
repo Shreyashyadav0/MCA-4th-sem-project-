@@ -36,7 +36,7 @@ window.LESSONS.push({
         "Every parameter after it must be passed by keyword",
         "Nothing, it is decoration",
         "It unpacks a tuple",
-        "It makes the parameter optional"
+        "It makes the parameter optional at every call site"
       ],
       "answer": 0,
       "why": "A bare star ends the positional parameters, so provider can only be given by name — which is what keeps a six-option call readable."
@@ -55,7 +55,7 @@ window.LESSONS.push({
     {
       "q": "`def make_finding(**kw) -> dict[str, str]` — what does the `->` part promise?",
       "options": [
-        "Nothing; return annotations are ignored by every tool",
+        "Nothing; return annotations are ignored by every tool that reads them today",
         "That every argument passed in kw is a string",
         "That the function returns a string",
         "That the function returns a dict whose keys and values are both strings"

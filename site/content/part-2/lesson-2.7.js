@@ -43,7 +43,7 @@ window.LESSONS.push({
     {
       "q": "When is a `Literal` better than an `Enum`?",
       "options": [
-        "When the set needs behaviour or ordering",
+        "When the set needs behaviour or a guaranteed order, rather than membership",
         "When the set is a few strings and nothing else is attached",
         "When the values are integers",
         "Never"

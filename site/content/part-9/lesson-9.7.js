@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What does the runtime stage copy?",
       "options": [
         "The built environment only",
-        "The whole build context",
+        "The whole build context, including the source",
         "The compiler toolchain too",
         "The source, not the env"
       ],

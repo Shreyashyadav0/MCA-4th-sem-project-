@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What happens when `LMSTUDIO_BASE_URL` is empty?",
       "options": [
         "Local is simply not selected",
-        "The application will not start",
+        "The application will not start at all",
         "The Sarvam key is used instead",
         "The timeout falls back to zero"
       ],
@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "What is missing if the URL is set but the model is not?",
       "options": [
         "The model name to load",
-        "The port to listen on",
+        "The port to listen on for requests",
         "The key the server wants",
         "The timeout for the call"
       ],

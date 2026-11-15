@@ -36,7 +36,7 @@ window.LESSONS.push({
     {
       "q": "Which part of the file must come first?",
       "options": [
-        "The entry points, which are public",
+        "The entry points, which are the public surface",
         "The checks, which are the content",
         "The types, which everything uses",
         "The registry, which is a plain list"

@@ -46,7 +46,7 @@ window.LESSONS.push({
         "`TypeError`, which Pydantic re-raises unchanged",
         "`SystemExit`, which stops the run at once",
         "`ValueError`, which Pydantic wraps into a ValidationError entry",
-        "`AssertionError`, which pytest reports as a failure"
+        "`AssertionError`, which pytest reports as a test failure rather than an error"
       ],
       "answer": 2,
       "why": "`ValueError` is the documented signal; the entry's message then begins \"Value error, \" followed by your text."
@@ -56,7 +56,7 @@ window.LESSONS.push({
       "options": [
         "Because it is faster",
         "Because `after` does not exist for models",
-        "Because computed fields are not validated when the model is built",
+        "Because computed fields are not validated when the model is built from JSON",
         "Because it must reshape the raw input before any field is validated"
       ],
       "answer": 3,

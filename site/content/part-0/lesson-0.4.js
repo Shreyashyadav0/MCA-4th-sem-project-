@@ -27,7 +27,7 @@ window.LESSONS.push({
     {
       "q": "Which module decides whether the review uses sarvam, local or mock?",
       "options": [
-        "app/parser.py",
+        "app/parser.py, which does the parsing",
         "app/rules.py",
         "app/main.py",
         "app/engine.py"

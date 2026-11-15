@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "Which block would you read to learn how a hunk's lines are collected?",
       "options": [
         "The builder, from line 305",
-        "The models, from line 112",
+        "The models, from line 112 onwards",
         "The entry points, from 343",
         "The path helpers, from 69"
       ],

@@ -45,7 +45,7 @@ window.LESSONS.push({
       "q": "Why does `severity_counts` in app/models.py return a dict?",
       "options": [
         "So the verdict reads counts instead of rescanning the findings list",
-        "Because a dict is faster to build than a list of findings",
+        "Because a dict is faster to build than a list of findings at every call site",
         "Because JSON cannot encode a list of counts without keys",
         "Because the findings were already stored in a dict shape"
       ],
@@ -56,7 +56,7 @@ window.LESSONS.push({
       "q": "What does `setdefault(key, []).append(x)` do?",
       "options": [
         "Replaces the key's value with x",
-        "Raises KeyError if the key is missing",
+        "Raises KeyError if the key is missing from the mapping",
         "Creates an empty list on first use, then appends to it",
         "Sorts the list before appending"
       ],

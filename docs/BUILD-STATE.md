@@ -4,7 +4,7 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-`f38109f` — quiz length tell 121 → 56 of 252.
+Stage 1 complete — quiz length tell 0 of 252, all four within 3 chars 0.
 
 ## Validator
 
@@ -20,13 +20,19 @@ parts complete (0–9 minus the last), 26 lessons to go to 110.
 - Wave 6b: part 9 (8) — **unaudited**
 - Quiz tell: 134 → 121 → 56, script in `site/tools/check_quiz.py`, now in CI
 
+## Stages done (mission)
+
+- **Stage 1 — quiz length tell: DONE.** 121 → 0 of 252, and the clustered rule 20 → 0.
+  `check_quiz.py` exits 0 and runs in CI beside the other two checkers.
+
 ## Next stage
 
-**Stage 1 of the mission: drive the quiz length tell to 0 of 252**, then **Stage 2:
-run Wave 6b's nine-auditor round** (the wave is written and gated but not audited).
+**Stage 2 — Wave 6b's nine-auditor round.** The wave is written, gated and committed
+as unaudited; it needs its auditors before Stage 3.
 
-First concrete action: `python site/tools/check_quiz.py` and work the list it prints
-top-down — 8 at gap ≤ 8, 48 above.
+First concrete action: package the tree and run five auditors (anchors, claims,
+schema, quiz, prose) over `site/content/part-9/`, then four more, then fix every
+CRITICAL and HIGH and re-audit the fixes with three.
 
 ## Blocked
 

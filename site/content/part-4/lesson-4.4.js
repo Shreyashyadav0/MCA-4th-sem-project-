@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "What does `response_model=` do to the handler's return value?",
       "options": [
-        "Nothing — it only documents the route",
+        "Nothing — it only documents the route for readers",
         "It validates and filters what goes out",
         "It converts the return value to a string",
         "It sets the status code of the response"
@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why can the schema not drift from the code?",
       "options": [
-        "A scheduled test regenerates it nightly",
+        "A scheduled job regenerates it nightly from the code",
         "It is written by hand and then reviewed",
         "It is computed from the code at import",
         "It is copied out of the README by hand"

@@ -51,7 +51,7 @@ window.LESSONS.push({
         "A new function that calls the handler on each request",
         "Usually the same function, after registering it against the path",
         "A JSON string built from the handler's annotations",
-        "A route object the handler must return to be registered"
+        "A route object the handler must return for it to be registered with the app"
       ],
       "answer": 1,
       "why": "FastAPI records the function at import time and calls it later; that is why the body looks like ordinary Python with no HTTP in it."

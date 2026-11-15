@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "Why does `/review` need a line range rather than a line number?",
       "options": [
         "Because the decorator carries a responses block",
-        "Because the file is not in alphabetical order",
+        "Because the file is not in alphabetical order at all",
         "Because decorators are never given line numbers",
         "Because the handler is defined in another file"
       ],

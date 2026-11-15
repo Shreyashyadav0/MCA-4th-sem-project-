@@ -33,7 +33,7 @@ window.LESSONS.push({
     {
       "q": "Where is a rule's severity decided?",
       "options": [
-        "By the file the line sits inside",
+        "By the file the line sits inside, not the rule",
         "By the run's own finding count",
         "At registration, never per hit",
         "By the category's default value"

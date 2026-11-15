@@ -27,7 +27,7 @@ window.LESSONS.push({
       "q": "What does `Protocol` give you that inheritance does not?",
       "options": [
         "Multiple inheritance, which a plain class cannot otherwise use",
-        "Faster method dispatch, because no lookup table has to be built",
+        "Faster method dispatch, because no lookup table has to be built at call time at all",
         "Structural typing: any class with the right methods fits, without importing it",
         "Runtime validation of every argument that a method receives"
       ],

@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
       "options": [
-        "pytest splits the tuple and runs it twice",
+        "pytest splits the tuple and runs the test once per element in the tuple",
         "pytest splits the tuple",
         "It passes",
         "Collection fails: the tuple length does not match the names"
@@ -48,7 +48,7 @@ window.LESSONS.push({
     {
       "q": "Where do the ids in `test_...[LOW]` come from?",
       "options": [
-        "pytest numbers them in run order",
+        "pytest numbers them in the order they run",
         "The parameter values, by default",
         "The test function's docstring",
         "You must always supply `ids=`"

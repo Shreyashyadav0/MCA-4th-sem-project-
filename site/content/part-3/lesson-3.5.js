@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "What does `monkeypatch.setenv` guarantee?",
       "options": [
-        "The variable stays set for the session",
+        "The variable stays set for the session, so later tests see it",
         "It fails if the variable exists",
         "It writes a .env file",
         "It is set for this test and restored afterwards"
@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why `delenv(\"X\", raising=False)`?",
       "options": [
-        "Because the fixture is autouse, so every test pays for it",
+        "Because the fixture is autouse, so every test in the file pays for it",
         "Because deleting an unset variable raises unless you say otherwise",
         "Because it makes the test measurably faster to run",
         "Because it sets the variable to an empty string"

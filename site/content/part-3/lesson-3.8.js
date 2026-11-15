@@ -28,7 +28,7 @@ window.LESSONS.push({
         "Only `requests.get`",
         "The DNS resolver only",
         "`socket.create_connection`, `socket.getaddrinfo` and `socket.socket`",
-        "Nothing; it runs with the network off and never tries to reach out"
+        "Nothing; it runs with the network off and never tries to reach out at all"
       ],
       "answer": 2,
       "why": "Three seams, because a library can dial out by any of them — patching one leaves the others open."
@@ -36,7 +36,7 @@ window.LESSONS.push({
     {
       "q": "Why are loopback and AF_UNIX allowed through?",
       "options": [
-        "Because tests need localhost to bind a port for the client",
+        "Because tests need localhost to bind a port for the client to call",
         "They are not allowed",
         "Because they are faster",
         "Because asyncio's event loop builds a self-pipe with a socket"
@@ -50,7 +50,7 @@ window.LESSONS.push({
         "That pytest imported the patches before collection",
         "That no test would use the network on a machine without the patches",
         "That the patches were applied before pytest started",
-        "That the suite passed while the patches were in place"
+        "That the suite passed while the patches were in place during the run"
       ],
       "answer": 1,
       "why": "It is evidence about this run under these patches — which is exactly what the README claims, no more."
