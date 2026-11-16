@@ -4927,7 +4927,17 @@ details.expected-output pre.code code {
     "content/part-11/lesson-11.3.js",
     "content/part-11/lesson-11.4.js",
     "content/part-11/lesson-11.5.js",
-    "content/part-11/lesson-11.6.js"
+    "content/part-11/lesson-11.6.js",
+    "content/part-12/lesson-12.1.js",
+    "content/part-12/lesson-12.2.js",
+    "content/part-12/lesson-12.3.js",
+    "content/part-12/lesson-12.4.js",
+    "content/part-12/lesson-12.5.js",
+    "content/part-12/lesson-12.6.js",
+    "content/part-12/lesson-12.7.js",
+    "content/part-12/lesson-12.8.js",
+    "content/part-12/lesson-12.9.js",
+    "content/part-12/lesson-12.10.js"
   ];
 })();
 
@@ -15920,10 +15930,10 @@ window.LESSONS.push({
       "id": "11.5-ex-0",
       "lang": "console",
       "caption": "The invariant is written in the engine; the line is emitted in the adapter",
-      "code": "python - <<'PY'\nimport pathlib\n\nfor name in (\"app/engine.py\", \"app/openai_compat_provider.py\"):\n    src = pathlib.Path(name).read_text().splitlines()\n    hits = [n for n, l in enumerate(src, 1) if \"WARNING\" in l or \"logger.warning\" in l]\n    print(name, hits)\nPY",
+      "code": "python - <<'PY'\nimport pathlib\n\nfor name in (\"app/engine.py\", \"app/openai_compat_provider.py\"):\n    src = pathlib.Path(name).read_text().splitlines()\n    mentions = sum(1 for l in src if \"WARNING\" in l)\n    calls = sum(1 for l in src if \"logger.warning\" in l)\n    print(\"%-32s WARNING mentions: %d, logger.warning calls: %d\" % (name, mentions, calls))\nPY",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "app/engine.py [25, 295, 332]\napp/openai_compat_provider.py [15, 25, 497, 582, 591, 635, 681]",
+      "expected_output": "app/engine.py                    WARNING mentions: 3, logger.warning calls: 0\napp/openai_compat_provider.py    WARNING mentions: 5, logger.warning calls: 2",
       "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
     }
   ],
@@ -16113,6 +16123,1081 @@ window.LESSONS.push({
     "guided read — a walk through a file in dependency order",
     "block — a group of definitions that belong together",
     "rebuild exercise — reimplementing a module against its tests"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.1.js */
+/* 12.1 — reviewer.py and the CLI contract
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.1",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "reviewer.py and the CLI contract",
+  "order": 1201,
+  "duration_min": 20,
+  "concept_md": "### Thirteen lines\n\n`reviewer.py` is thirteen lines: a shebang, a docstring, one import, and `raise SystemExit(main())`. All the logic is in `app/cli.py`. It exists so the command in the README is the command people type, and so the package stays importable without a CLI attached.\n\n### The flags\n\n`--diff` to read a unified diff instead of a source file, `--provider` to ask for one, `--offline` to forbid a live call, `--json` for machine output, `--verbose`, `--min-severity`, `--post-to-pr` and `--list-rules`.\n\n### Three exit codes\n\n`0` for a review that produced something, `1` for bad input, `2` for a usage error — the argparse convention. The codes matter because a CI step reads them: a review that found a CRITICAL is still exit `0`, since the tool succeeded at reviewing.\n\n### Why the codes are not findings\n\nIf a CRITICAL finding made the exit non-zero, every CI job would fail on the first real bug and the tool would be turned off. The exit code says whether the review ran; the findings say what it found.\n\n### Why the flag list is short\n\nEight flags is not a thin CLI — it is the set that changes what a review does rather than how it is printed. Anything that only reformats the output belongs in the formatter, and anything that changes the routing belongs in the engine, which is why `--provider` and `--offline` pass straight through.",
+  "code_examples": [
+    {
+      "id": "12.1-ex-0",
+      "lang": "console",
+      "caption": "The entry script, in full",
+      "code": "wc -l reviewer.py && sed -n '1,13p' reviewer.py",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "13 reviewer.py\n#!/usr/bin/env python3\n\"\"\"Phase 1 entry point: ``python reviewer.py <file> [--offline] [--json]``.\n\nAll logic lives in the ``app`` package; this file only anchors the CLI at the\nproject root so the command in the README is the one people type.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom app.cli import main\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "How many lines is reviewer.py?",
+      "options": [
+        "About fifty, with the argument parsing",
+        "Thirteen, all of them boilerplate",
+        "Several hundred, with the review loop",
+        "None; it is generated at install"
+      ],
+      "answer": 1,
+      "why": "The logic lives in app/cli.py; the script exists so the README's command works from the repo root."
+    },
+    {
+      "q": "What does exit code 1 mean?",
+      "options": [
+        "The review found a CRITICAL",
+        "The provider was offline",
+        "The input was bad",
+        "The usage string was printed"
+      ],
+      "answer": 2,
+      "why": "Findings never change the exit code, because a CI job that failed on the first real bug would be switched off."
+    },
+    {
+      "q": "Which flag forbids a live call?",
+      "options": [
+        "--provider none",
+        "--no-network",
+        "--mock-only",
+        "--offline"
+      ],
+      "answer": 3,
+      "why": "It maps onto force_offline in the engine, so no key can cause a call."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the CLI's exit-code constants.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '_EXIT_' app/cli.py | head -3\n```",
+    "explanation": "Zero, one and two — the argparse convention, named rather than scattered as literals."
+  },
+  "exercise": {
+    "prompt": "Which flag asks for machine-readable output, and what shape does it produce?",
+    "hint": "One flag, one JSON object.",
+    "solution": "```console\n$ grep -n '\"--json\"' -A 4 app/cli.py\n```\n\n`--json` prints one JSON object rather than the human summary.",
+    "explanation": "One object, not a stream, so a caller can parse the whole run at once."
+  },
+  "common_mistakes": [
+    "Making a CRITICAL finding set the exit code non-zero.",
+    "Putting the review logic in reviewer.py instead of the package.",
+    "Treating a usage error and bad input as the same code."
+  ],
+  "project_links": [
+    {
+      "label": "The whole entry script",
+      "path": "reviewer.py",
+      "lines": "1-13"
+    },
+    {
+      "label": "The exit codes",
+      "path": "app/cli.py",
+      "lines": "50-59"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "reviewer.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/reviewer.py"
+    },
+    {
+      "label": "app/cli.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/cli.py"
+    }
+  ],
+  "glossary_terms": [
+    "surface — a way in: CLI, API, webhook, GitHub",
+    "exit code — what a caller reads to know if it ran",
+    "entry point — the file a user invokes"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.2.js */
+/* 12.2 — Three outputs from one run
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.2",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "Three outputs from one run",
+  "order": 1202,
+  "duration_min": 25,
+  "concept_md": "### The same findings, three shapes\n\nThe CLI prints a human summary by default, one JSON object with `--json`, and more detail with `--verbose`. All three come from one `ProviderOutcome`, so they cannot disagree about what was found.\n\n### The human summary\n\nGrouped by severity, with the file and line, the issue and the suggested fix. It ends with the verdict and, when the run was degraded, the reason — because a reader of a terminal is the person most likely to be misled by an unlabelled fallback.\n\n### The JSON object\n\nThe outcome serialised: mode, provider, model, findings, reason, latency. A script reads `mode` first, because a mock run and a live run are different claims about the same findings.\n\n### Why verbose is not a fourth shape\n\nIt adds notes — which provider was selected and why, what the fallback did — to the same summary. The distinction is detail, not structure, which is why a reader can trust that `--verbose` shows nothing the JSON hides.\n\n### What a reader of the terminal needs first\n\nThe verdict, then the findings, then the reason if the run was degraded. That order is deliberate: a person who reads only the first line should still know whether the review blocked, and a person who reads two lines should know whether a model was involved.",
+  "code_examples": [
+    {
+      "id": "12.2-ex-0",
+      "lang": "console",
+      "caption": "One run, and the mode it reports",
+      "code": "python reviewer.py samples/sample.diff --diff --offline 2>&1 | tail -4",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "   Suggested Fix : Annotate it: `def render(value: str) -> str:` — every parameter and the return type.\n   Anchor        : anchored @ @@ -0,0 +1,5 @@\n\nverdict  : block",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What do all three outputs share?",
+      "options": [
+        "One formatter function",
+        "One JSON schema",
+        "One ProviderOutcome",
+        "One exit code path"
+      ],
+      "answer": 2,
+      "why": "Three renderings of one object cannot disagree about the findings or the mode."
+    },
+    {
+      "q": "What should a script read first?",
+      "options": [
+        "latency, and then the mode",
+        "model, then the provider name",
+        "reason, then the verdict",
+        "mode, then the findings"
+      ],
+      "answer": 3,
+      "why": "A mock run and a live run are different claims about identical findings."
+    },
+    {
+      "q": "What does --verbose add?",
+      "options": [
+        "Notes added to the same summary",
+        "A fourth output format entirely",
+        "The raw provider responses",
+        "A second findings list"
+      ],
+      "answer": 0,
+      "why": "It changes detail, not structure, so nothing is hidden from the JSON reader."
+    }
+  ],
+  "try_it": {
+    "prompt": "Run the sample diff offline and look at the last lines.",
+    "starter": "",
+    "solution": "```console\n$ python reviewer.py samples/sample.diff --diff --offline | tail -4\n```",
+    "explanation": "The summary ends with the verdict and the reason the run was degraded."
+  },
+  "exercise": {
+    "prompt": "Which key in the JSON output tells you the run was degraded, and what value does it hold?",
+    "hint": "It is a literal with two values.",
+    "solution": "```console\n$ python reviewer.py samples/sample.diff --diff --offline --json | python -c \"import json,sys; print(json.load(sys.stdin)['mode'])\"\n```\n\n`mock` — and `live` when a provider actually ran.",
+    "explanation": "The field is a literal, so a caller branches on it rather than inferring from an empty reason."
+  },
+  "common_mistakes": [
+    "Writing a separate formatter per output and letting them drift.",
+    "Reading the findings before the mode.",
+    "Treating --verbose as a different schema."
+  ],
+  "project_links": [
+    {
+      "label": "The notes a verbose run adds",
+      "path": "app/cli.py",
+      "lines": "183-200"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/cli.py — the formatters",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/cli.py"
+    },
+    {
+      "label": "DEMO.md — captured transcripts",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    }
+  ],
+  "glossary_terms": [
+    "render — turn one object into a display shape",
+    "verbose — more detail, same structure",
+    "verdict — the approve or block decision"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.3.js */
+/* 12.3 — The API: fourteen routes over twelve paths
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.3",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "The API: fourteen routes over twelve paths",
+  "order": 1203,
+  "duration_min": 25,
+  "concept_md": "### One app, several jobs\n\n`app/main.py` registers fourteen route decorators over twelve paths. Two paths carry two methods each — `/test-review` and `/users` — which is why the counts differ and why quoting either number without the other is misleading.\n\n### The groups\n\nOperational routes (`/`, `/health`), the rule listing, the review routes (`/review`, `/reviews`, `/reviews/{id}`), the webhook, statistics, and the user routes. Each group has its own tag in the OpenAPI schema.\n\n### Why /health matters more than it looks\n\nIt reports the credential state and whether the database is enabled. A demo that opens with `/health` can say which providers are configured before anyone tries a review, which is the difference between a five-second answer and a five-minute diagnosis.\n\n### What the API does not do\n\nIt does not review anything itself. Every route that produces a review calls the engine, so the routing, the labels and the single warning are the same as the CLI's.\n\n### Why the routes are grouped by tag\n\nBecause the OpenAPI page is documentation, and a reader looking for the webhook should not have to scan the user routes. The tags are operational, rules, review, webhook, stats and users — six groups over twelve paths, which is how the schema page stays readable.",
+  "code_examples": [
+    {
+      "id": "12.3-ex-0",
+      "lang": "console",
+      "caption": "Fourteen decorators over twelve paths",
+      "code": "python - <<'PY'\nimport re, pathlib\n\nsrc = pathlib.Path(\"app/main.py\").read_text()\npaths = re.findall(r'@app\\.(?:get|post|delete)\\(\\s*\"([^\"]+)\"', src)\nprint(\"decorators:\", src.count(\"@app.\"), \"| unique paths:\", len(set(paths)))\nprint(\"doubled:\", sorted(p for p in set(paths) if paths.count(p) > 1))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "decorators: 14 | unique paths: 11\ndoubled: ['/test-review', '/users']",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "How many paths does the app register?",
+      "options": [
+        "Fourteen, over twelve decorators",
+        "Ten, over ten decorators",
+        "Sixteen, over fourteen decorators",
+        "Twelve, over fourteen decorators"
+      ],
+      "answer": 3,
+      "why": "Two paths carry two methods each, which is why the two numbers differ."
+    },
+    {
+      "q": "What does /health report?",
+      "options": [
+        "Credential state and the database",
+        "The rule registry and its size",
+        "The last review and its mode",
+        "The provider latency and the model"
+      ],
+      "answer": 0,
+      "why": "It answers which providers are configured before anyone attempts a review."
+    },
+    {
+      "q": "What does every review route call?",
+      "options": [
+        "The adapter, called directly",
+        "The engine, and nothing else",
+        "The CLI's own formatter",
+        "The rule registry, first"
+      ],
+      "answer": 1,
+      "why": "So the routing, labels and single warning match the CLI's exactly."
+    }
+  ],
+  "try_it": {
+    "prompt": "List the route decorators.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '@app\\.' app/main.py\n```",
+    "explanation": "Fourteen lines, and two paths appear twice."
+  },
+  "exercise": {
+    "prompt": "Which two paths carry more than one method?",
+    "hint": "One is a test helper, one is a collection.",
+    "solution": "```console\n$ python -c \"import re,pathlib; s=pathlib.Path('app/main.py').read_text(); p=re.findall(r'@app\\\\.(?:get|post|delete)\\\\(\\\\s*\\\"([^\\\"]+)\\\"', s); print(sorted({x for x in p if p.count(x)>1}))\"\n```\n\n`/test-review` and `/users`.",
+    "explanation": "Each answers a GET and a POST, which is why the decorator count exceeds the path count."
+  },
+  "common_mistakes": [
+    "Quoting the route count without saying whether it is paths or decorators.",
+    "Adding a route that calls the adapter instead of the engine.",
+    "Treating /health as decoration rather than a diagnostic."
+  ],
+  "project_links": [
+    {
+      "label": "The app and its route groups",
+      "path": "app/main.py",
+      "lines": "879-892"
+    },
+    {
+      "label": "The review route",
+      "path": "app/main.py",
+      "lines": "945-1022"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/main.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/main.py"
+    },
+    {
+      "label": "app/engine.py — what every route calls",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    }
+  ],
+  "glossary_terms": [
+    "route — a path plus a method",
+    "tag — a group in the OpenAPI schema",
+    "health check — a route that reports readiness"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.4.js */
+/* 12.4 — Auth on the management routes, and only those
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.4",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "Auth on the management routes, and only those",
+  "order": 1204,
+  "duration_min": 20,
+  "concept_md": "### Where the key is required\n\nWhen `API_AUTH_ENABLED` is true, an `X-API-Key` header is required on the management endpoints: `GET /reviews`, `GET /reviews/{id}`, `GET /stats` and the `/users` routes. The review surfaces stay open.\n\n### Why the split\n\nBecause the two jobs are different. Reviewing a diff is the demo, and requiring a key to try it would make the first five minutes harder for no security gain — the diff is the user's own. Reading history is a different matter: those routes expose every review the tool has stored.\n\n### Why it is off by default\n\nA demo that needs a key before it answers is a demo that fails on stage. The default is open, and the README says plainly that a deployment should set it.\n\n### What the header is not\n\nIt is not per-user and it is not a token with a lifetime. It is one shared key compared against `DB_SEED_ADMIN_KEY`, which is the honest scope: enough to keep a deployed instance from being read by anyone who finds the URL, and no more.\n\n### What the split costs\n\nTwo behaviours to explain in the README, and one flag that changes the surface's contract when it is set. That is the price of a demo that answers immediately, and it is worth stating plainly rather than discovering when a deployment returns 401 to a request that worked locally.",
+  "code_examples": [
+    {
+      "id": "12.4-ex-0",
+      "lang": "console",
+      "caption": "Which routes are guarded",
+      "code": "python - <<'PY'\nimport pathlib, re\n\nsrc = pathlib.Path(\"app/main.py\").read_text()\nprint(\"X-API-Key mentions:\", src.count(\"X-API-Key\"))\nfor n, line in enumerate(src.splitlines(), 1):\n    if \"api_auth_enabled\" in line:\n        print(n, line.strip()[:60])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "X-API-Key mentions: 1",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which routes require the header?",
+      "options": [
+        "The management routes only",
+        "Every route in the app",
+        "The review routes only",
+        "The webhook and the reviews"
+      ],
+      "answer": 0,
+      "why": "History is a different exposure from a review of your own diff."
+    },
+    {
+      "q": "Why is auth off by default?",
+      "options": [
+        "The header is hard to send",
+        "A demo must answer first",
+        "The database is optional",
+        "The key has no default"
+      ],
+      "answer": 1,
+      "why": "A demo that demands a key before it answers fails in front of people."
+    },
+    {
+      "q": "What is the header, honestly?",
+      "options": [
+        "A per-user token with a lifetime",
+        "A signed request digest",
+        "One shared key, not per user",
+        "A rotating credential pair"
+      ],
+      "answer": 2,
+      "why": "It keeps a deployed instance from being read by anyone who finds the URL, and no more."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show the flag that turns the requirement on.",
+    "starter": "",
+    "solution": "```console\n$ grep -n 'api_auth_enabled' app/main.py | head -3\n```",
+    "explanation": "One setting, read in the dependency that guards the management routes."
+  },
+  "exercise": {
+    "prompt": "Which setting holds the key the header is compared against?",
+    "hint": "It is seeded, not issued.",
+    "solution": "```console\n$ grep -n 'db_seed_admin_key' app/config.py | head -2\n```\n\n`DB_SEED_ADMIN_KEY` — one seeded value, not a table of users.",
+    "explanation": "One key with no lifetime is the honest scope for a demo deployment."
+  },
+  "common_mistakes": [
+    "Requiring a key on the review route and breaking the demo.",
+    "Describing the header as per-user authentication.",
+    "Leaving auth off on a public deployment because it is off by default."
+  ],
+  "project_links": [
+    {
+      "label": "The auth setting",
+      "path": "app/config.py",
+      "lines": "91-98"
+    },
+    {
+      "label": "The review route that stays open",
+      "path": "app/main.py",
+      "lines": "945-1022"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/main.py — the routes",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/main.py"
+    },
+    {
+      "label": "app/config.py — the flag",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    }
+  ],
+  "glossary_terms": [
+    "management route — one that reads stored history",
+    "shared key — one secret for the whole instance",
+    "seed — a value created at first start"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.5.js */
+/* 12.5 — ADR 0005: a 422 demotes one finding, never the post
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.5",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "ADR 0005: a 422 demotes one finding, never the post",
+  "order": 1205,
+  "duration_min": 25,
+  "concept_md": "### The failure\n\nGitHub rejects an inline comment anchored to a line that is not part of the diff with HTTP 422. Our anchor is computed from a parsed diff and a canonicalised path, so the 422 should be rare — but a force-push, a rename or a differently spelled path can make GitHub's diff disagree with ours.\n\n### The decision\n\nA 422 demotes **that one finding** into the summary comment. The rest of the post continues, and the run does not fail. `inline_demoted` counts how many were moved.\n\n### Why not fail the post\n\nBecause one bad anchor out of ten would discard nine good comments and mark the check red. The reviewer would learn that the tool is flaky rather than that one line moved.\n\n### Why not retry\n\nA 422 is not transient. Retrying the same anchor produces the same 422, and the only thing a retry buys is a slower failure. The demotion is the retry: the finding still reaches the reader, in the summary instead of on the line.\n\n### What the reader sees\n\nA summary comment that lists the demoted findings with their file and line, so nothing is silently dropped — a demotion is visible, which is the whole difference between this and a silent skip.",
+  "code_examples": [
+    {
+      "id": "12.5-ex-0",
+      "lang": "console",
+      "caption": "The demotion counter",
+      "code": "python - <<'PY'\nimport pathlib\n\nsrc = pathlib.Path(\"app/github_client.py\").read_text()\nfor n, line in enumerate(src.splitlines(), 1):\n    if \"inline_demoted\" in line:\n        print(n, line.strip()[:64])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "216 inline_demoted: Number of inline comments moved into the summary\n225 inline_demoted: int\n1031 demoted (``inline_demoted``) and the summary is still posted, so",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a 422 demote?",
+      "options": [
+        "The whole post, into a comment",
+        "That one finding, to the summary",
+        "The whole review, into a mock run",
+        "The anchor, down to the file level"
+      ],
+      "answer": 1,
+      "why": "One bad anchor out of ten should not discard nine good comments."
+    },
+    {
+      "q": "Why not retry a 422?",
+      "options": [
+        "It costs a rate-limit slot",
+        "The token has expired",
+        "It is not transient",
+        "The diff has been closed"
+      ],
+      "answer": 2,
+      "why": "The same anchor produces the same rejection; a retry only makes the failure slower."
+    },
+    {
+      "q": "Where does a demoted finding end up?",
+      "options": [
+        "In the check-run output",
+        "In the review body only",
+        "Nowhere at all; it is dropped",
+        "In the summary comment itself"
+      ],
+      "answer": 3,
+      "why": "A demotion is visible: the finding still reaches the reader, with its file and line."
+    }
+  ],
+  "try_it": {
+    "prompt": "Find where the demotion count is recorded.",
+    "starter": "",
+    "solution": "```console\n$ grep -n 'inline_demoted' app/github_client.py app/main.py\n```",
+    "explanation": "A counter on the posting result, so the API response can report how many were moved."
+  },
+  "exercise": {
+    "prompt": "Which HTTP status does GitHub return for a bad anchor, and what does the code do with it?",
+    "hint": "One status, one demotion.",
+    "solution": "```console\n$ grep -n '422' app/github_client.py | head -3\n```\n\n422 — the finding is rebuilt into the summary rather than retried or raised.",
+    "explanation": "The status is treated as a fact about one anchor, not about the post."
+  },
+  "common_mistakes": [
+    "Failing the whole post on one 422.",
+    "Retrying the same anchor, which cannot succeed.",
+    "Dropping the demoted finding instead of summarising it."
+  ],
+  "project_links": [
+    {
+      "label": "The demotion counter",
+      "path": "app/main.py",
+      "lines": "209-224"
+    },
+    {
+      "label": "The posting result it lands on",
+      "path": "app/github_client.py",
+      "lines": "160-200"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "ADR 0005 — the demotion",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0005-422-demotes-single-finding-not-whole-post.md"
+    },
+    {
+      "label": "app/github_client.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/github_client.py"
+    }
+  ],
+  "glossary_terms": [
+    "anchor — the line a comment is attached to",
+    "demote — move a comment into the summary",
+    "422 — GitHub's rejection of an unanchorable comment"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.6.js */
+/* 12.6 — The idempotency marker and the fingerprint
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.6",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "The idempotency marker and the fingerprint",
+  "order": 1206,
+  "duration_min": 25,
+  "concept_md": "### The problem\n\nA webhook can be delivered twice. Re-running a review that has already posted must not post again — a duplicate comment on someone's pull request is worse than no comment.\n\n### The marker\n\nEvery posted body ends with one line:\n\n```html\n<!-- ai-code-reviewer:<fingerprint> -->\n```\n\nThe prefix is the constant `COMMENT_MARKER_PREFIX`, `<!-- ai-code-reviewer:`. The form is exact: an HTML comment, so it renders as nothing, and a marker a later run can find without guessing.\n\n### The fingerprint\n\nSixteen lowercase hex characters, a SHA-256 prefix over exactly four fields joined by a unit separator: `file`, `line`, `severity` and the whitespace-collapsed `issue`. The suggested fix is deliberately excluded — rewording the advice must not make the same finding look new.\n\n### Why those four\n\nThey are the finding's identity. Change the file or the line and it is a different finding; change the wording of the fix and it is the same finding with better advice. Hashing the whole object would make every edit a new comment.\n\n### How it is used\n\nA re-run computes the fingerprint, looks for the marker in the existing comments, and skips what it already posted — which is why the CLI can report `skipped_dup` and still exit 0.",
+  "code_examples": [
+    {
+      "id": "12.6-ex-0",
+      "lang": "console",
+      "caption": "The marker prefix and a real fingerprint",
+      "code": "python - <<'PY'\nfrom app.github_client import COMMENT_MARKER_PREFIX, fingerprint\nfrom app.models import Finding\n\nf = Finding(file=\"app/db.py\", line=\"12\", severity=\"CRITICAL\", issue=\"x1\", suggested_fix=\"y\")\nprint(\"prefix:\", repr(COMMENT_MARKER_PREFIX))\nprint(\"marker:\", COMMENT_MARKER_PREFIX + fingerprint(f) + \" -->\")\nprint(\"length:\", len(fingerprint(f)))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "prefix: '<!-- ai-code-reviewer:'\nmarker: <!-- ai-code-reviewer:ccd8171df4807f92 -->\nlength: 16",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What form does the marker take?",
+      "options": [
+        "A Markdown heading",
+        "A YAML front matter",
+        "An HTML comment",
+        "A bare hex string"
+      ],
+      "answer": 2,
+      "why": "It renders as nothing in the pull request, so a reader never sees it and a later run can find it."
+    },
+    {
+      "q": "Which field is excluded from the fingerprint?",
+      "options": [
+        "The line number",
+        "The severity value",
+        "The file path",
+        "The suggested fix"
+      ],
+      "answer": 3,
+      "why": "Rewording the advice must not make the same finding look like a new one."
+    },
+    {
+      "q": "How long is a fingerprint?",
+      "options": [
+        "Sixteen hex characters",
+        "Thirty-two hex characters",
+        "Eight hex characters",
+        "Sixty-four hex characters"
+      ],
+      "answer": 0,
+      "why": "A SHA-256 prefix, long enough to separate findings and short enough to read in a comment."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print a marker line for a made-up finding.",
+    "starter": "",
+    "solution": "```console\n$ python -c \"from app.github_client import COMMENT_MARKER_PREFIX, fingerprint; from app.models import Finding; f=Finding(file='a.py', line='1', severity='LOW', issue='x', suggested_fix='y'); print(COMMENT_MARKER_PREFIX + fingerprint(f) + ' -->')\"\n```",
+    "explanation": "The exact form a posted body ends with — an HTML comment wrapping a sixteen-hex fingerprint."
+  },
+  "exercise": {
+    "prompt": "Does changing the suggested fix change the fingerprint? Prove it.",
+    "hint": "Compute two fingerprints that differ only in the fix.",
+    "solution": "```console\n$ python -c \"from app.github_client import fingerprint; from app.models import Finding; a=Finding(file='a.py',line='1',severity='LOW',issue='x',suggested_fix='one'); b=Finding(file='a.py',line='1',severity='LOW',issue='x',suggested_fix='two'); print(fingerprint(a)==fingerprint(b))\"\n```\n\nTrue — the fix is not part of the identity.",
+    "explanation": "That equality is the property the marker depends on."
+  },
+  "common_mistakes": [
+    "Hashing the whole finding, so every reworded fix posts again.",
+    "Using a visible marker a reader would see.",
+    "Comparing the issue text without collapsing whitespace."
+  ],
+  "project_links": [
+    {
+      "label": "The marker prefix",
+      "path": "app/github_client.py",
+      "lines": "87"
+    },
+    {
+      "label": "The fingerprint",
+      "path": "app/github_client.py",
+      "lines": "263-283"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/github_client.py — the marker",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/github_client.py"
+    },
+    {
+      "label": "docs/decisions/ — the ADRs",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions"
+    }
+  ],
+  "glossary_terms": [
+    "idempotent — running twice leaves the same result",
+    "fingerprint — a short hash that identifies a finding",
+    "marker — a line a later run can search for"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.7.js */
+/* 12.7 — The webhook: verify the signature, or say you did not
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.7",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "The webhook: verify the signature, or say you did not",
+  "order": 1207,
+  "duration_min": 25,
+  "concept_md": "### What a webhook has to do\n\nAnswer GitHub within its timeout, verify that the request really came from GitHub, and hand the payload to the same engine every other surface uses.\n\n### The signature\n\nGitHub signs the body with the webhook secret and sends the digest in a header. The route recomputes it and compares. `GITHUB_WEBHOOK_SECRET` supplies the key; `WEBHOOK_ALLOW_UNSIGNED` is the escape hatch for a local test.\n\n### Why the escape hatch exists, and why it is loud\n\nA local demo cannot produce a valid signature without the secret GitHub generated. The flag lets a developer test the route without one — and it is a flag rather than a default precisely so that a deployment which forgets the secret fails closed rather than accepting anything.\n\n### What the route must not do\n\nTrust the payload's claim about which repository it came from. The signature covers the body, so a valid signature plus the configured token is what makes the request actionable; the body is data to be parsed, not an instruction.\n\n### The timeout\n\nGitHub gives a webhook a short window. The route answers and the review proceeds, which is why a degraded review is better than a slow one here — a 500 because a key was missing costs the whole review and shows as a failed check.",
+  "code_examples": [
+    {
+      "id": "12.7-ex-0",
+      "lang": "console",
+      "caption": "The two settings the webhook reads",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\nfor name in (\"github_webhook_secret\", \"webhook_allow_unsigned\"):\n    f = Settings.model_fields[name]\n    print(\"%-24s default=%r repr=%s\" % (name, f.default, f.repr))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "github_webhook_secret    default=None repr=False\nwebhook_allow_unsigned   default=False repr=True",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the route compare?",
+      "options": [
+        "The payload's repository",
+        "The sender's login",
+        "The event type",
+        "A recomputed digest"
+      ],
+      "answer": 3,
+      "why": "The signature covers the body, so the body is parsed rather than obeyed."
+    },
+    {
+      "q": "Why does the unsigned escape hatch exist?",
+      "options": [
+        "A local test has no secret",
+        "GitHub sometimes omits it",
+        "The route is faster unsigned",
+        "The engine requires it"
+      ],
+      "answer": 0,
+      "why": "A developer cannot produce a valid signature without the secret GitHub generated."
+    },
+    {
+      "q": "Why answer before reviewing?",
+      "options": [
+        "The engine is asynchronous",
+        "GitHub's timeout is short",
+        "The payload is large",
+        "The token expires quickly"
+      ],
+      "answer": 1,
+      "why": "A degraded review that arrives beats a slow one that misses the window."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the webhook's two settings and their defaults.",
+    "starter": "",
+    "solution": "```console\n$ python -c \"from app.config import Settings; print({n: Settings.model_fields[n].default for n in ('github_webhook_secret','webhook_allow_unsigned')})\"\n```",
+    "explanation": "No secret and unsigned refused — the fail-closed default."
+  },
+  "exercise": {
+    "prompt": "What happens to an unsigned request when the escape hatch is off?",
+    "hint": "Fail closed.",
+    "solution": "```console\n$ grep -n 'webhook_allow_unsigned' -A 3 app/main.py | head -8\n```\n\nIt is rejected, because the default refuses unsigned deliveries.",
+    "explanation": "A deployment that forgets the secret fails closed rather than accepting anything."
+  },
+  "common_mistakes": [
+    "Trusting the payload's repository field instead of the signature.",
+    "Defaulting the unsigned flag to true.",
+    "Reviewing inline and missing GitHub's timeout."
+  ],
+  "project_links": [
+    {
+      "label": "The webhook's two settings",
+      "path": "app/config.py",
+      "lines": "43-56"
+    },
+    {
+      "label": "The webhook route",
+      "path": "app/main.py",
+      "lines": "1135-1199"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/main.py — the webhook",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/main.py"
+    },
+    {
+      "label": "app/config.py — the secret",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    }
+  ],
+  "glossary_terms": [
+    "signature — a digest proving the body came from GitHub",
+    "fail closed — refuse when unsure",
+    "escape hatch — a flag that relaxes a check for local use"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.8.js */
+/* 12.8 — The GitHub client: what it posts and what it refuses
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.8",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "The GitHub client: what it posts and what it refuses",
+  "order": 1208,
+  "duration_min": 25,
+  "concept_md": "### One client, a fixed vocabulary\n\n`app/github_client.py` is 1285 lines and it does four things: build a review payload, post it, read existing comments to skip duplicates, and translate every failure into the tool's own errors.\n\n### What it refuses\n\nIt refuses to post without a token, and it refuses to post a single source file as a pull-request comment — a review needs a diff, because an inline comment needs a line that exists in the diff. `--post-to-pr` on a plain file is a usage error, not a silent downgrade.\n\n### The two anchors it can use\n\nA finding is posted inline when its line is in the diff, and demoted to the summary when GitHub rejects the anchor. Those are the only two outcomes, which is why the reader never sees a finding vanish.\n\n### Why the file is long\n\nBecause GitHub's failure modes are numerous and each needs a decision: 401 and 403 mean the token is wrong or lacks a scope; 404 means the repository or the pull request is not visible to it; 429 means back off; 422 means demote one comment; a 5xx means retry later; a transport error means the network is gone. Six decisions, each with its own honest message.",
+  "code_examples": [
+    {
+      "id": "12.8-ex-0",
+      "lang": "console",
+      "caption": "The client's public surface",
+      "code": "python - <<'PY'\nimport pathlib\n\nsrc = pathlib.Path(\"app/github_client.py\").read_text().splitlines()\nfor n, line in enumerate(src, 1):\n    if line.startswith((\"def \", \"class \")) or (line.startswith(\"COMMENT_MARKER\") or line.startswith(\"FILE_ONLY\")):\n        print(n, line[:56])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "85 FILE_ONLY: str = \"file_only\"\n87 COMMENT_MARKER_PREFIX: str = \"<!-- ai-code-reviewer:\"\n124 class GitHubError(Exception):\n132 class GitHubAuthError(GitHubError):\n136 class GitHubNotFoundError(GitHubError):\n140 class GitHubRateLimitError(GitHubError):\n154 class GitHubUnavailableError(GitHubError):\n164 class InlineComment:\n186 class ReviewPayload:\n210 class PostResult:\n236 def _md_code(value: str) -> str:\n263 def fingerprint(finding: Finding) -> str:\n287 def _marker_line(marker_fingerprint: str) -> str:\n299 def _new_line_end(finding: Finding) -> int:\n315 def render_inline_body(finding: Finding) -> str:\n337 def _status_value(status: object) -> str:\n350 def _canonical_paths(diff_files: Sequence[FileDiff]) -> \n371 def build_payload(\n456 def _summary_fingerprint(payload: ReviewPayload) -> str:\n481 def _counts(bodies: Sequence[str]) -> dict[str, int]:\n498 def _verdict(counts: dict[str, int]) -> str:\n514 def _summary_entry(comment: InlineComment) -> list[str]:\n536 def render_summary_body(payload: ReviewPayload) -> str:\n622 def _has_token(token: str | None) -> bool:\n634 def github_available(token: str | None = None) -> bool:\n647 def _build_github_client(token: str) -> httpx.Client:\n672 def _close_quietly(client: httpx.Client) -> None:\n689 def _retry_after(response: httpx.Response) -> float | No\n718 def _raise_for_status(response: httpx.Response) -> None:\n751 def _next_link(response: httpx.Response) -> str | None:\n773 def _safe_next_url(url: str) -> str | None:\n799 def _markers_in(response: httpx.Response) -> set[str]:\n824 def _get_existing_markers(\n863 def _comment_dict(comment: InlineComment) -> dict[str, o\n880 def _post_review_request(\n915 def _post_summary_request(\n948 def _warn(message: str) -> None:\n957 def _sleep_for(retry_after: float | None) -> None:\n967 def _single_review_payload(comment: InlineComment, event\n989 def _transport_error_message(exc: BaseException) -> str:\n1001 def post_review(\n1064 def _validate_target(owner: str, repo: str, pr_number: i\n1093 def _publish(",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the client refuse to do?",
+      "options": [
+        "Post a single source file",
+        "Post a demoted comment at all",
+        "Read the existing comments",
+        "Retry after a 5xx error"
+      ],
+      "answer": 0,
+      "why": "An inline comment needs a line that exists in a diff, so a plain file cannot be posted."
+    },
+    {
+      "q": "What does a 403 mean here?",
+      "options": [
+        "The pull request is closed",
+        "The token lacks a scope",
+        "The anchor is unanchorable",
+        "The rate limit was hit"
+      ],
+      "answer": 1,
+      "why": "401 is a bad token; 403 is a token without the permission the call needs."
+    },
+    {
+      "q": "How many outcomes can a finding have?",
+      "options": [
+        "Three: inline, summary, dropped",
+        "One: inline, or an error",
+        "Two: inline or summary",
+        "Four: one per severity"
+      ],
+      "answer": 2,
+      "why": "A demotion is the only fallback, which is why a finding never vanishes."
+    }
+  ],
+  "try_it": {
+    "prompt": "List the client's top-level definitions.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '^def \\|^class ' app/github_client.py\n```",
+    "explanation": "A handful of functions and classes; the length is in the error translation between them."
+  },
+  "exercise": {
+    "prompt": "Which status does the client retry, and which does it demote?",
+    "hint": "One is transient, one is about an anchor.",
+    "solution": "```console\n$ grep -n '429\\|422' app/github_client.py | head -4\n```\n\n429 backs off and 5xx retries later; 422 demotes one comment. Neither fails the post.",
+    "explanation": "Each status gets the response its meaning deserves rather than one blanket retry."
+  },
+  "common_mistakes": [
+    "Posting a plain source file as a pull-request review.",
+    "Treating 401 and 403 as the same failure.",
+    "Retrying a 422 instead of demoting the comment."
+  ],
+  "project_links": [
+    {
+      "label": "The marker constant",
+      "path": "app/github_client.py",
+      "lines": "87"
+    },
+    {
+      "label": "The fingerprint",
+      "path": "app/github_client.py",
+      "lines": "263-283"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/github_client.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/github_client.py"
+    },
+    {
+      "label": "ADR 0005 — the 422 demotion",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0005-422-demotes-single-finding-not-whole-post.md"
+    }
+  ],
+  "glossary_terms": [
+    "scope — the permission a token carries",
+    "back off — wait longer before the next attempt",
+    "payload — the JSON body a review post sends"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.9.js */
+/* 12.9 — The viva: three variants, and how honest each one is
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.9",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "The viva: three variants, and how honest each one is",
+  "order": 1209,
+  "duration_min": 30,
+  "concept_md": "### Three ways to run it, in ascending cost\n\n**A — offline mock.** The 63 rules, no network. This is the one that has been run end to end and captured; the transcripts in `DEMO.md` are real.\n\n**B — local via LM Studio.** The OpenAI-compatible adapter against a model on your machine. Unexercised in this repository: the live branch was verified with the real SDK against a stub server, not a real model. `DEMO.md` shows the output's shape, not a recorded run.\n\n**C — Sarvam.** The same adapter against `https://api.sarvam.ai/v1`. Unverified: no real key was ever used. The failure path is real and reproduced; no successful Sarvam review exists.\n\n### How to say it in a viva\n\nMatch `HANDOFF.md`'s ledger: real, simulated, deferred. A is real. B is simulated — the code path is real, the counterpart is a fake. C is deferred, and what has been captured is the rejection, not a review.\n\n### What not to claim\n\nThat any variant \"works with an LLM\". B and C are written to a protocol; the repository has no capture of either producing a review. Saying so is not modesty — it is the only claim the evidence supports, and a viva rewards the candidate who knows the difference.\n\n### The question you will be asked\n\n\"What happens if the model is unavailable?\" The answer is the whole design: the run degrades to the rule engine, labels itself mock, and logs one WARNING. That is true of all three variants, and it is the part that has been tested.",
+  "code_examples": [
+    {
+      "id": "12.9-ex-0",
+      "lang": "console",
+      "caption": "The three variants and their status",
+      "code": "grep -n '^| [ABC] —' DEMO.md | cut -c1-120",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "13:| A — offline mock | `app/rules.py` (63 rules, no network) | **Exercised.** Transcripts in §2 are real, captured 2\n14:| B — local via LM Studio | `app/openai_compat_provider.py` against a real model | **Unexercised in this repo.** Th\n15:| C — Sarvam | the same adapter against `https://api.sarvam.ai/v1` | **Unverified.** No real key was ever used. The",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which variant has been captured end to end?",
+      "options": [
+        "B, the local model run",
+        "A, the offline mock run",
+        "C, the Sarvam call",
+        "All three of them equally"
+      ],
+      "answer": 1,
+      "why": "Its transcripts are real; B shows a shape and C has only a rejection captured."
+    },
+    {
+      "q": "How should B be described?",
+      "options": [
+        "Real: it ran against a model",
+        "Deferred: it was never written at all",
+        "Simulated: real path, fake peer",
+        "Unverified: no code exists"
+      ],
+      "answer": 2,
+      "why": "The live branch was verified against a stub server, not a model."
+    },
+    {
+      "q": "What is true of all three variants?",
+      "options": [
+        "They all need a real API key",
+        "They all post a review comment",
+        "They all measure their own accuracy",
+        "A missing model degrades safely"
+      ],
+      "answer": 3,
+      "why": "The fallback is the tested part, and it is the same in every variant."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the three variants and their stated status.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '^| [ABC] —' DEMO.md\n```",
+    "explanation": "One line each, with the status column saying exercised, unexercised or unverified."
+  },
+  "exercise": {
+    "prompt": "Which of the three has a captured failure but no captured success?",
+    "hint": "The rejection is real; the review is not.",
+    "solution": "```console\n$ grep -n '§4.2\\|api.sarvam.ai' DEMO.md | head -3\n```\n\nC — Sarvam. The rejection was reproduced; no successful review exists.",
+    "explanation": "A captured failure is evidence about the failure path, not about the feature."
+  },
+  "common_mistakes": [
+    "Claiming any variant works with an LLM when no review was captured.",
+    "Describing B as exercised because its tests pass.",
+    "Framing the comparison against another tool instead of the ledger."
+  ],
+  "project_links": [
+    {
+      "label": "The three-variant table",
+      "path": "DEMO.md",
+      "lines": "11-586"
+    },
+    {
+      "label": "The ledger this frames against",
+      "path": "HANDOFF.md",
+      "lines": "5-53"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "DEMO.md — the variants",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    },
+    {
+      "label": "HANDOFF.md — real, simulated, deferred",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/HANDOFF.md"
+    }
+  ],
+  "glossary_terms": [
+    "exercised — run end to end with a capture",
+    "simulated — the path is real, the counterpart is fake",
+    "deferred — needs a human, cannot be produced here"
+  ]
+});
+
+</script>
+<script>
+/* content/part-12/lesson-12.10.js */
+/* 12.10 — Guided read: four surfaces, one engine
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "12.10",
+  "part": 12,
+  "part_title": "Surfaces: CLI, API, webhook, GitHub",
+  "title": "Guided read: four surfaces, one engine",
+  "order": 1210,
+  "duration_min": 30,
+  "concept_md": "### The shape of the last part\n\nFour ways in, one way through. The CLI parses arguments and prints; the API routes and serialises; the webhook verifies and hands over; the GitHub client posts. Every one of them calls `review()` in `app/engine.py` and renders the `ProviderOutcome` it gets back.\n\n### What to read, and in what order\n\n`reviewer.py` first, because it is thirteen lines and shows where the CLI lives. Then `app/cli.py` for the flags and the exit codes. Then `app/main.py` for the routes and the auth split. Then `app/github_client.py` for the posting rules, the marker and the demotion.\n\n### The invariant to look for\n\nNo surface decides which provider runs. Each one passes a `--provider` value or a request body through, and the engine answers. That is why a mock run is labelled the same way whether it came from a terminal, a webhook or a pull request.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_surfaces.py` asks you to reimplement the CLI's exit codes and the marker, which are the two contracts a surface owns. The engine is not your problem there; the shape of what it returns is.\n\n### What the site has covered\n\nTwelve parts, from a first script to the four surfaces in front of you. The last lesson is the one that says which of it has been run and which has not — because that distinction is the difference between a project and a demo.",
+  "code_examples": [
+    {
+      "id": "12.10-ex-0",
+      "lang": "console",
+      "caption": "The four surfaces, by size",
+      "code": "wc -l reviewer.py app/cli.py app/main.py app/github_client.py app/engine.py",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "    13 reviewer.py\n   549 app/cli.py\n  1610 app/main.py\n  1285 app/github_client.py\n   387 app/engine.py\n  3844 total",
+      "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What do all four surfaces call?",
+      "options": [
+        "The adapter, called directly",
+        "The rule registry, first",
+        "review() in the engine",
+        "Their own routing code"
+      ],
+      "answer": 2,
+      "why": "That is why a mock run is labelled identically from every surface."
+    },
+    {
+      "q": "Which file should be read first?",
+      "options": [
+        "app/main.py, the largest file",
+        "app/engine.py, at the centre",
+        "app/cli.py, with all of its flags",
+        "reviewer.py, at thirteen lines"
+      ],
+      "answer": 3,
+      "why": "It is short enough to show where the CLI lives before you read the CLI."
+    },
+    {
+      "q": "Which two contracts does a surface own?",
+      "options": [
+        "Exit codes and the marker",
+        "Routing and the labels",
+        "The prompt and the parser",
+        "The schema and the rule ids"
+      ],
+      "answer": 0,
+      "why": "The rebuild suite asks for those two, because the rest belongs to the engine."
+    }
+  ],
+  "try_it": {
+    "prompt": "Compare the four surface files by size.",
+    "starter": "",
+    "solution": "```console\n$ wc -l reviewer.py app/cli.py app/main.py app/github_client.py\n```",
+    "explanation": "Thirteen lines to 1610 — the entry script is a signpost, the client carries the error vocabulary."
+  },
+  "exercise": {
+    "prompt": "Which surface file is largest, and what makes it large?",
+    "hint": "One file holds six failure decisions.",
+    "solution": "```console\n$ wc -l app/main.py app/github_client.py\n```\n\n`app/main.py` at 1610 lines — routes, models and the auth dependency. The client is 1285, mostly error translation.",
+    "explanation": "Both are long for the same reason: many small decisions that each need their own honest message."
+  },
+  "common_mistakes": [
+    "Reading the client before the engine and assuming it routes.",
+    "Reimplementing the engine in a rebuild of a surface.",
+    "Treating the largest file as the most important one."
+  ],
+  "project_links": [
+    {
+      "label": "The rebuild suite",
+      "path": "rebuild/tests/test_rebuild_surfaces.py",
+      "lines": "1-40"
+    },
+    {
+      "label": "The engine every surface calls",
+      "path": "app/engine.py",
+      "lines": "320-387"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/cli.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/cli.py"
+    },
+    {
+      "label": "rebuild/README.md — the exercises",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/rebuild/README.md"
+    }
+  ],
+  "glossary_terms": [
+    "surface — a way into the same engine",
+    "contract — what a surface promises its caller",
+    "invariant — a rule that holds on every path"
   ]
 });
 

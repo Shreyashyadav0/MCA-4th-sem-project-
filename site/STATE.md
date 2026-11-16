@@ -22,6 +22,7 @@ is the bug.
 | 6a | 2026-11-15 | `423fd33` | 11 added, 4 changed | 10 (`8.1`–`8.10`) | `OK lessons=76 parts_covered=9 manifest_entries=76 ids=0.1,…,8.10` |
 | 6b | 2026-11-15 | `89080b0` | 9 added, 4 changed | 8 (`9.1`–`9.8`) | `OK lessons=84 parts_covered=10 manifest_entries=84 ids=0.1,…,9.8` |
 | 7b-1 | 2026-11-16 | `0104fde` | 7 added, 4 changed | 6 (`11.1`–`11.6`) | `OK lessons=100 parts_covered=12 manifest_entries=100` |
+| 7b-2 | 2026-11-16 | `f5b6acf` | 7 added, 4 changed | 10 (`12.1`–`12.10`) | `OK lessons=110 parts_covered=13 manifest_entries=110` |
 | 7a | 2026-11-16 | `d5bf954` | 11 added, 4 changed | 10 (`10.1`–`10.10`) | `OK lessons=94 parts_covered=11 manifest_entries=94 ids=0.1,…,10.10` |
 
 A file cannot record the hash of the commit that contains it, so the column above
@@ -1008,3 +1009,19 @@ invisible only because `LMSTUDIO_API_KEY` defaults to the placeholder `lm-studio
 `check_quiz.py` gained the per-part rule in this run, and it fired on Part 11's own
 first draft: 18 of 18 keys at index 0. That is the rule doing exactly what it was
 added for — the site-wide spread was healthy at the time.
+
+## Wave 7b, second half — Part 12, "Surfaces: CLI, API, webhook, GitHub"
+
+Ten lessons. **The site is complete: 110 lessons across thirteen parts**, which is
+what `contracts.js` declared before any of it was written.
+
+The three specifics the brief called out are in: 12.5 is ADR 0005's 422 demotion,
+12.6 is the idempotency marker with its exact HTML comment form and the
+sixteen-hex fingerprint, and 12.9 frames the three demo variants against
+`HANDOFF.md`'s real / simulated / deferred ledger rather than against any other
+tool — Sarvam is unexercised and the lesson says so.
+
+Two incidental banned numbers had to be removed: a line-number list in 11.5's
+output contained 582, and a fingerprint in 12.6 happened to contain it. Neither was
+a test count, but the rule is absolute, so 11.5 now prints counts rather than line
+numbers and 12.6 uses a different made-up finding.

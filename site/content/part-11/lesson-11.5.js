@@ -15,10 +15,10 @@ window.LESSONS.push({
       "id": "11.5-ex-0",
       "lang": "console",
       "caption": "The invariant is written in the engine; the line is emitted in the adapter",
-      "code": "python - <<'PY'\nimport pathlib\n\nfor name in (\"app/engine.py\", \"app/openai_compat_provider.py\"):\n    src = pathlib.Path(name).read_text().splitlines()\n    hits = [n for n, l in enumerate(src, 1) if \"WARNING\" in l or \"logger.warning\" in l]\n    print(name, hits)\nPY",
+      "code": "python - <<'PY'\nimport pathlib\n\nfor name in (\"app/engine.py\", \"app/openai_compat_provider.py\"):\n    src = pathlib.Path(name).read_text().splitlines()\n    mentions = sum(1 for l in src if \"WARNING\" in l)\n    calls = sum(1 for l in src if \"logger.warning\" in l)\n    print(\"%-32s WARNING mentions: %d, logger.warning calls: %d\" % (name, mentions, calls))\nPY",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "app/engine.py [25, 295, 332]\napp/openai_compat_provider.py [15, 25, 497, 582, 591, 635, 681]",
+      "expected_output": "app/engine.py                    WARNING mentions: 3, logger.warning calls: 0\napp/openai_compat_provider.py    WARNING mentions: 5, logger.warning calls: 2",
       "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
     }
   ],
