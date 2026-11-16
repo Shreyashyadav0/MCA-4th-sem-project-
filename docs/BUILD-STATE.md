@@ -4,8 +4,7 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Stage 1 done. Stage 2 done: Wave 6b audited by all nine lanes, every
-CRITICAL and HIGH fixed, and the range checker's tautology removed.
+Wave 7a committed as `51ccbb2` [unaudited]. Site at 94 lessons, 11 of 13 parts.
 
 ## Validator
 
@@ -39,13 +38,25 @@ themselves introduced, all now fixed:
 - the theme toggle's fixed aria-label did not contain a visible label of "Light
   mode"; the name now follows the visible label
 
+## Defect recorded, not fixed
+
+`sidebar.js`: on a Part 10 lesson every part with lessons opens, instead of only the
+current one. Measured at 1440 with `?id=10.1` after 2.5s: 11 of 13 toggles
+`aria-expanded="true"`. On `?id=9.1` the same probe gives 1. So `currentPart` stays
+null for part-10 lessons and the "no lesson selected" branch runs. Cosmetic — every
+lesson is reachable and aria-current is still visible — but it is not the intended
+behaviour. First suspect: the re-render at `app.js:1155` passing `lesson.id`, and
+whether part-10 ids reach `lessonsOf(part)`.
+
 ## Next stage
 
-**Stage 2's re-audit — three auditors over the fixes — then Stage 3, Wave 7a
-(Part 10, ten lessons, site to 94).**
+**Wave 7a's nine-auditor round, then Wave 7b (Parts 11 and 12, sixteen lessons,
+site to 110).**
 
-All nine lanes have now run: 61 findings across two batches. Every CRITICAL and
-HIGH is fixed and each motivating check re-run.
+First concrete action: package the tree, run five auditors over
+`site/content/part-10/` (schema, anchors, claims, quiz, prose), then four more
+(links, accessibility, layout, consistency and honesty), fix every CRITICAL and
+HIGH, re-run the motivating check, re-audit with three.
 
 Still owed, recorded rather than dropped:
 - the three-auditor re-audit of these fixes
