@@ -172,7 +172,22 @@ does not go in.
 
 ---
 
-## 7. Where the non-negotiables live
+## 7. What `check_ranges.py` cannot see
+
+A range that starts on a `def` or `class` line but **skips the decorator above it**
+passes the checker. `bad_start` rejects a blank line, a closing bracket and a
+continuation line; it never compares the start against the parsed construct, so
+`def foo(` at line 83 is accepted even when `@dataclass(frozen=True)` sits at 82 and the
+construct really begins there. Ten such ranges were found in the full-site audit by
+parsing every `.py` file with `ast`, taking each node's true first line as
+`min(decorator_list + lineno)`, and comparing — not by trusting the checker, which
+reported 0 problems before and after. They were fixed by hand.
+
+The same blind spot applies to the end of a range: a line ending in `)` is accepted as a
+close, so a range that runs past its construct into the next one also passes. Any future
+audit should re-run the `ast` comparison rather than read the checker's verdict.
+
+## 8. Where the non-negotiables live
 
 | Rule | Enforced by |
 |---|---|
@@ -189,7 +204,7 @@ does not go in.
 
 ---
 
-## 8. Release
+## 9. Release
 
 ```console
 $ git tag -a v1.1-site -m "Learning site complete: 110 lessons, 13 parts"
@@ -204,7 +219,7 @@ $ sha256sum ai-code-reviewer-site-*.zip | tee SHA256SUMS.txt
 
 ---
 
-## 9. When real labels exist: the one documented step for lesson 10.10
+## 10. When real labels exist: the one documented step for lesson 10.10
 
 10.10 currently says, correctly, that no precision, recall or F1 figure exists. **Do
 not change that lesson until labels exist.** When they do, this is the only sequence
@@ -238,11 +253,11 @@ that may change it:
 If a figure cannot be traced to a line of `benchmarks.eval --labels` output, it does not
 go in the lesson. That rule has already caught two fabricated captures in this project.
 
-## 10. What is not done, and is a person's work
+## 11. What is not done, and is a person's work
 
 - **The benchmark's labels.** The harness, the matcher and the labelling tool are all
   real; the hand-written labels are not, so there is still no precision, recall or F1
-  figure. `LABELLING.md` is the procedure; section 9 above is the step that turns the
+  figure. `LABELLING.md` is the procedure; section 10 above is the step that turns the
   first real labels into 10.10's figures.
 - **A real model.** Variant B has never had one behind it here, and variant C never had
   a real key. `DEMO.md` and `HANDOFF.md` are the ledger for that, and they win any

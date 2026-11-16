@@ -103,22 +103,32 @@ Copied from `HANDOFF.md`, which is the ledger and wins any disagreement.
 
 ---
 
-## 5. The honest limits
+## 5. Known limits
 
-Stated plainly, because they are the first thing an examiner should test:
+Stated plainly, because they are the first thing an examiner should test.
 
-- **No benchmark numbers exist.** There is no precision, recall or F1 figure for this
-  tool, and lesson 10.10 says so in those words. The harness, the matcher and the
-  labelling tool are real; the hand-written labels are not. `python -m benchmarks.eval
-  --labels` prints `no labels yet` and exits 3 rather than compute a figure from an
-  empty set.
-- **Sarvam is unexercised.** One real 403 was captured. No successful review exists.
-  Nothing in this tree claims otherwise.
-- **The live model path is unverified in this environment.** The transport was proven
-  against a stub server, not a model. Variant B of the demo has never had a real model
-  behind it here.
-- **GitHub posting has never happened for real.** The state machine is tested against a
-  fake client.
+**Running the examples needs two things.** 51 of the examples run Python in the
+browser, and that runner downloads Pyodide (about 10 MB) from `cdn.jsdelivr.net` the
+first time you press Run. With no internet, Run is unavailable; the other 60 lessons
+are unaffected, and reading, search, quizzes and print all work offline. Separately,
+7 of the examples are `curl` calls against `http://127.0.0.1:8000` and need a running
+`uvicorn`. With nothing listening they fail with `000` — that is the environment, not a
+fabricated capture.
+
+**No precision, recall or F1 figure exists.** The labelled dataset has not been built,
+so there is nothing to score against and lesson 10.10 says so in those words.
+`benchmarks/labelling.py` and `LABELLING.md` are the path to producing it;
+`python -m benchmarks.eval --labels` prints `no labels yet` and exits 3 rather than
+compute a figure from an empty set.
+
+**The Sarvam path is unexercised and no live model has run in this environment.** One
+real 403 from `api.sarvam.ai` was captured and degraded correctly; no successful Sarvam
+review exists. The OpenAI-compatible transport was proven against a stub server, not a
+model. GitHub posting has never happened for real — the state machine is tested against
+a fake client.
+
+**The submission tag is `v1.1.2-site`.** `v1.1-site` and `v1.1.1-site` are earlier
+points in the history and are not the submission.
 
 ---
 
