@@ -26,7 +26,7 @@ window.LESSONS.push({
     {
       "q": "Which function does the degraded path call?",
       "options": [
-        "offline_diff_findings directly",
+        "sarvam_provider.review_with_fallback",
         "offline_diff_findings",
         "select_provider",
         "review()"
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The relabel",
       "path": "app/engine.py",
-      "lines": "284-316"
+      "lines": "284-317"
     },
     {
       "label": "The direct call it relies on",

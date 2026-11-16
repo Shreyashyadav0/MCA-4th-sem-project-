@@ -37,7 +37,7 @@ window.LESSONS.push({
     {
       "q": "Why does the local key check look redundant?",
       "options": [
-        "The key defaults to a placeholder value",
+        "The SDK supplies a key of its own",
         "The key defaults to a placeholder",
         "The SDK supplies the key",
         "The base URL implies a key"
