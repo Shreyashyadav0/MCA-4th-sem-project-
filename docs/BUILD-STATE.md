@@ -4,7 +4,7 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Wave 7a committed as `51ccbb2` [unaudited]. Site at 94 lessons, 11 of 13 parts.
+Wave 7a is now AUDITED: `b6b23b9`. Site at 94 lessons, 11 of 13 parts.
 
 ## Validator
 
@@ -38,25 +38,29 @@ themselves introduced, all now fixed:
 - the theme toggle's fixed aria-label did not contain a visible label of "Light
   mode"; the name now follows the visible label
 
-## Defect recorded, not fixed
+## Defect fixed this run
 
-`sidebar.js`: on a Part 10 lesson every part with lessons opens, instead of only the
-current one. Measured at 1440 with `?id=10.1` after 2.5s: 11 of 13 toggles
-`aria-expanded="true"`. On `?id=9.1` the same probe gives 1. So `currentPart` stays
-null for part-10 lessons and the "no lesson selected" branch runs. Cosmetic — every
-lesson is reachable and aria-current is still visible — but it is not the intended
-behaviour. First suspect: the re-render at `app.js:1155` passing `lesson.id`, and
-whether part-10 ids reach `lessonsOf(part)`.
+`sidebar.js` computed `currentPart` inside the same `forEach` that read it, so every
+part before the current one saw null and expanded. A Part 10 lesson opened 11 of 13
+groups and the reader never saw Part 10. Resolved in a first pass; the active link
+is also scrolled into view. Verified: id=10.1 opens Part 10 only, id=9.1 Part 9, id=0.1
+Part 0.
 
 ## Next stage
 
-**Wave 7a's nine-auditor round, then Wave 7b (Parts 11 and 12, sixteen lessons,
-site to 110).**
+**Wave 7b — Parts 11 and 12, sixteen lessons (11.1-11.6, 12.1-12.10), site to 110.**
 
-First concrete action: package the tree, run five auditors over
-`site/content/part-10/` (schema, anchors, claims, quiz, prose), then four more
-(links, accessibility, layout, consistency and honesty), fix every CRITICAL and
-HIGH, re-run the motivating check, re-audit with three.
+Wave 7a's nine lanes have all run (five, then three re-auditors), every CRITICAL and
+HIGH is fixed, and the re-audit is committed.
+
+First concrete action: read `app/engine.py` and ADRs 0002 and 0004 for Part 11, and
+`reviewer.py`, `app/cli.py`, `app/main.py`, `app/github_client.py` for Part 12, then
+write the sixteen lessons with the generator discipline: equal-length quiz options,
+executed captures, construct-aligned ranges.
+
+Deferred from this run: four word-count paragraphs (10.3, 10.6, 10.8, 10.9) restate a
+section the lesson already had. Not false, but redundant; removing them drops those
+lessons under the 200-word floor, so it needs a rewrite rather than a deletion.
 
 Still owed, recorded rather than dropped:
 - the three-auditor re-audit of these fixes
