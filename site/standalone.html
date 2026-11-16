@@ -300,11 +300,15 @@ a:hover {
 }
 
 .site-header .brand {
-  color: var(--bar-text);
+  /* The product name is the one green word in the bar. #34d399 rather than the
+   * brand green: that is 4.74:1 on this charcoal, too low to read as text. */
+  color: var(--brand-green);
+  font-weight: 600;
 }
 
 .site-header .brand span {
-  color: var(--bar-muted);
+  color: var(--brand-suffix);
+  font-weight: 400;
 }
 
 .site-header .progress-total,
@@ -565,8 +569,8 @@ figure {
   top: 0;
   height: 100vh;
   overscroll-behavior: contain;
-  border-right: 1px solid var(--side-border);
-  background: var(--side-bg);
+  border-right: 1px solid var(--border);
+  background: var(--surface);
   /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
   padding: var(--space-3) 0 var(--space-6);
   /* The head stays put and the tree scrolls under it: at 16 lessons the list is
@@ -647,28 +651,23 @@ figure {
 }
 
 .side-toggle:hover {
-  background: var(--side-hover);
-}
-
-.side-part-label {
-  color: var(--side-label);
-  font-weight: 600;
+  background: var(--bg);
 }
 
 .side-toggle[aria-expanded="true"] .side-part-label::before {
   content: "▾ ";
-  color: var(--side-count);
+  color: var(--muted);
 }
 
 .side-toggle[aria-expanded="false"] .side-part-label::before {
   content: "▸ ";
-  color: var(--side-count);
+  color: var(--muted);
 }
 
 .side-part-count {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--side-count);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -692,19 +691,19 @@ figure {
 }
 
 .side-lesson:hover {
-  background: var(--side-hover);
+  background: var(--bg);
   text-decoration: underline;
 }
 
 .side-lesson.is-current {
   border-left-color: var(--accent);
-  background: var(--side-active);
+  background: var(--bg);
   font-weight: 600;
   color: var(--text); /* the fill carries the green; the label must stay readable */
 }
 
 .side-tick {
-  color: var(--side-count);
+  color: var(--muted);
   font-weight: 700;
 }
 
@@ -2149,6 +2148,12 @@ details.expected-output pre.code code {
 }
 
 </style>
+<style>
+  /* The single file holds two views in one grid cell: the layout grid has a
+   * sidebar column and one content column, so a second <main> as a sibling would
+   * be placed in a new row and never seen. */
+  .view-host { min-width: 0; }
+</style>
 </head>
 <body>
 <a class="skip-link" href="#parts-list">Skip to the lesson list</a>
@@ -2168,7 +2173,7 @@ details.expected-output pre.code code {
   <nav class="sidebar" id="site-sidebar" aria-label="All lessons"></nav>
   <div class="sidebar-scrim" hidden></div>
 
-  <main class="page">
+  <div class="view-host"><main class="page" id="index-view">
     <h1>Learn this reviewer by rebuilding it</h1>
     <p class="lede">
       The whole repository, in dependency order. Each lesson points at the exact file and line
@@ -2199,6 +2204,72 @@ details.expected-output pre.code code {
       </p>
     </noscript>
   </main>
+<main class="page" id="lesson-view" hidden>
+    <nav class="breadcrumb" id="lesson-nav" aria-label="Breadcrumb"></nav>
+
+    <article>
+      <p class="lesson-position" id="lesson-position"></p>
+      <h1 id="lesson-title" tabindex="-1">Lesson</h1>
+      <div class="lesson-meta-bar" id="lesson-meta"></div>
+
+      <section class="lesson-section" hidden aria-label="Concept">
+        <h2>Concept</h2>
+        <div id="lesson-concept"></div>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Code">
+        <h2>Code</h2>
+        <div id="lesson-examples"></div>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Try it">
+        <h2>Try it</h2>
+        <div id="lesson-tryit"></div>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Exercise">
+        <h2>Exercise</h2>
+        <div id="lesson-exercise"></div>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Quiz">
+        <h2>Check yourself</h2>
+        <div id="lesson-quiz"></div>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Common mistakes">
+        <h2>Common mistakes</h2>
+        <ul class="mistake-list" id="lesson-mistakes"></ul>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="In the repository">
+        <h2>In the repository</h2>
+        <ul class="link-list" id="lesson-links"></ul>
+      </section>
+
+      <section class="lesson-section" hidden aria-label="Glossary">
+        <h2>Glossary</h2>
+        <ul class="glossary-list" id="lesson-glossary"></ul>
+      </section>
+    </article>
+
+    <div class="lesson-footer">
+      <button type="button" class="btn btn-done" id="mark-done" aria-pressed="false" hidden>Mark done</button>
+      <nav class="pager" aria-label="Lesson navigation">
+        <a class="pager-btn pager-prev" id="prev-link" aria-disabled="true">❮ Previous</a>
+        <a class="pager-btn pager-next" id="next-link" aria-disabled="true">Next ❯</a>
+      </nav>
+    </div>
+
+    <noscript>
+      <p class="noscript-note">
+        This page renders a lesson with JavaScript, and JavaScript is off in this browser.
+        The lessons are plain text in the repository: start at
+        <code>docs/learning/README.md</code>.
+      </p>
+    </noscript>
+  </main>
+</div>
 </div>
 
 <footer class="site-footer">
@@ -17304,9 +17375,48 @@ window.LESSONS.push({
 </script>
 <script>
   (function () {
-    function boot() {
-      window.App.initIndex();
+    var home = document.getElementById("index-view");
+    var lessonView = document.getElementById("lesson-view");
+
+    function idFromHash() {
+      var h = String(window.location.hash || "").replace(/^#/, "");
+      return /^\d+\.\d+$/.test(h) ? h : "";
     }
+
+    function show(id) {
+      var isLesson = !!id;
+      if (home) home.hidden = isLesson;
+      if (lessonView) lessonView.hidden = !isLesson;
+      try {
+        if (isLesson) { window.App.initLesson(); } else { window.App.initIndex(); }
+      } catch (error) {
+        if (window.console && window.console.warn) {
+          window.console.warn("view failed to render:", error);
+        }
+      }
+      window.scrollTo(0, 0);
+    }
+
+    /* A lesson link becomes a hash change, so nothing is ever navigated to. */
+    document.addEventListener("click", function (event) {
+      var node = event.target;
+      while (node && node !== document) {
+        if (node.tagName === "A" && node.getAttribute("href") &&
+            node.getAttribute("href").indexOf("lesson.html") === 0) {
+          var m = /[?&]id=([^&]+)/.exec(node.getAttribute("href"));
+          if (m) {
+            event.preventDefault();
+            window.location.hash = decodeURIComponent(m[1]);
+            return;
+          }
+        }
+        node = node.parentNode;
+      }
+    });
+
+    window.addEventListener("hashchange", function () { show(idFromHash()); });
+
+    function boot() { show(idFromHash()); }
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", boot, { once: true });
     } else {
