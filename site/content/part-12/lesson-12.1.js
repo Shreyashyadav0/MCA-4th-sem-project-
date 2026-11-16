@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "reviewer.py and the CLI contract",
   "order": 1201,
   "duration_min": 20,
-  "concept_md": "### Thirteen lines\n\n`reviewer.py` is thirteen lines: a shebang, a docstring, one import, and `raise SystemExit(main())`. All the logic is in `app/cli.py`. It exists so the command in the README is the command people type, and so the package stays importable without a CLI attached.\n\n### The flags\n\n`--diff` to read a unified diff instead of a source file, `--provider` to ask for one, `--offline` to forbid a live call, `--json` for machine output, `--verbose`, `--min-severity`, `--post-to-pr` and `--list-rules`.\n\n### Three exit codes\n\n`0` for a review that produced something, `1` for bad input, `2` for a usage error — the argparse convention. The codes matter because a CI step reads them: a review that found a CRITICAL is still exit `0`, since the tool succeeded at reviewing.\n\n### Why the codes are not findings\n\nIf a CRITICAL finding made the exit non-zero, every CI job would fail on the first real bug and the tool would be turned off. The exit code says whether the review ran; the findings say what it found.\n\n### Why the flag list is short\n\nEight flags is not a thin CLI — it is the set that changes what a review does rather than how it is printed. Anything that only reformats the output belongs in the formatter, and anything that changes the routing belongs in the engine, which is why `--provider` and `--offline` pass straight through.",
+  "concept_md": "### Thirteen lines\n\n`reviewer.py` is thirteen lines: a shebang, a docstring, one import, and `raise SystemExit(main())`. All the logic is in `app/cli.py`. It exists so the command in the README is the command people type, and so the package stays importable without a CLI attached.\n\n### The flags\n\n`--diff` to read a unified diff instead of a source file, `--provider` to ask for one, `--offline` to forbid a live call, `--json` for machine output, `--verbose`, `--min-severity`, `--post-to-pr` and `--list-rules`.\n\n### Three exit codes\n\n`0` for a review that produced something, `1` for bad input or a failed post, `2` for a usage error — the argparse convention. The codes matter because a CI step reads them: a review that found a CRITICAL is still exit `0`, since the tool succeeded at reviewing.\n\n### Why the codes are not findings\n\nIf a CRITICAL finding made the exit non-zero, every CI job would fail on the first real bug and the tool would be turned off. The exit code says whether the review ran; the findings say what it found.\n\n### Why the flag list is short\n\nEight flags is not a thin CLI — it is the set that changes what a review does rather than how it is printed. Anything that only reformats the output belongs in the formatter, and anything that changes the routing belongs in the engine, which is why `--provider` and `--offline` pass straight through.",
   "code_examples": [
     {
       "id": "12.1-ex-0",
@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The exit codes",
       "path": "app/cli.py",
-      "lines": "50-59"
+      "lines": "50-55"
     }
   ],
   "learn_more": [

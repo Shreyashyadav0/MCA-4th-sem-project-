@@ -76,14 +76,14 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The demotion counter",
-      "path": "app/main.py",
-      "lines": "209-224"
-    },
-    {
       "label": "The posting result it lands on",
       "path": "app/github_client.py",
-      "lines": "160-200"
+      "lines": "209-228"
+    },
+    {
+      "label": "The demotion counter",
+      "path": "app/github_client.py",
+      "lines": "209-228"
     }
   ],
   "learn_more": [

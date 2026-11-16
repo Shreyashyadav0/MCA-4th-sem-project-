@@ -1664,7 +1664,10 @@ details.expected-output pre.code {
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.55;
-  white-space: pre;
+  /* A concept's code block is prose, not a terminal: wrapping beats a scrollbar
+   * that hides the end of a 148-character line. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   overflow: auto;
   tab-size: 2;
 }
@@ -1850,7 +1853,7 @@ details.expected-output pre.code code {
   left: var(--space-4);
   transform: translateY(-200%);
   padding: var(--space-2) var(--space-3);
-  background: var(--accent-strong);
+  background: var(--skip-bg); /* 5.48:1 in both themes; --accent-strong is the brand green in dark */
   color: var(--accent-contrast);
   border-radius: var(--radius);
   z-index: 10;
@@ -15525,9 +15528,9 @@ window.LESSONS.push({
     {
       "q": "Which module holds the live HTTP call?",
       "options": [
-        "app/sarvam_provider.py",
+        "app/rules.py",
         "app/engine.py",
-        "app/mock_provider.py",
+        "app/mock_provider.py on every run",
         "openai_compat_provider"
       ],
       "answer": 3,
@@ -15738,7 +15741,7 @@ window.LESSONS.push({
       "options": [
         "The SDK supplies a key of its own",
         "The key defaults to a placeholder",
-        "The SDK supplies the key",
+        "Settings has no key field at all",
         "The base URL implies a key"
       ],
       "answer": 1,
@@ -15748,7 +15751,7 @@ window.LESSONS.push({
       "q": "What does a missing variable become?",
       "options": [
         "A 500 from the route",
-        "The input that decides which mode runs",
+        "An error logged and then retried",
         "The input that picks the mode",
         "A warning and a retry"
       ],
@@ -16050,8 +16053,8 @@ window.LESSONS.push({
       "q": "Which block comes first in the file?",
       "options": [
         "The entry point",
-        "The constants and the module docstring",
-        "The selector function",
+        "The selection record",
+        "The selector function on every run",
         "The constants and docstring"
       ],
       "answer": 3,
@@ -16140,7 +16143,7 @@ window.LESSONS.push({
   "title": "reviewer.py and the CLI contract",
   "order": 1201,
   "duration_min": 20,
-  "concept_md": "### Thirteen lines\n\n`reviewer.py` is thirteen lines: a shebang, a docstring, one import, and `raise SystemExit(main())`. All the logic is in `app/cli.py`. It exists so the command in the README is the command people type, and so the package stays importable without a CLI attached.\n\n### The flags\n\n`--diff` to read a unified diff instead of a source file, `--provider` to ask for one, `--offline` to forbid a live call, `--json` for machine output, `--verbose`, `--min-severity`, `--post-to-pr` and `--list-rules`.\n\n### Three exit codes\n\n`0` for a review that produced something, `1` for bad input, `2` for a usage error — the argparse convention. The codes matter because a CI step reads them: a review that found a CRITICAL is still exit `0`, since the tool succeeded at reviewing.\n\n### Why the codes are not findings\n\nIf a CRITICAL finding made the exit non-zero, every CI job would fail on the first real bug and the tool would be turned off. The exit code says whether the review ran; the findings say what it found.\n\n### Why the flag list is short\n\nEight flags is not a thin CLI — it is the set that changes what a review does rather than how it is printed. Anything that only reformats the output belongs in the formatter, and anything that changes the routing belongs in the engine, which is why `--provider` and `--offline` pass straight through.",
+  "concept_md": "### Thirteen lines\n\n`reviewer.py` is thirteen lines: a shebang, a docstring, one import, and `raise SystemExit(main())`. All the logic is in `app/cli.py`. It exists so the command in the README is the command people type, and so the package stays importable without a CLI attached.\n\n### The flags\n\n`--diff` to read a unified diff instead of a source file, `--provider` to ask for one, `--offline` to forbid a live call, `--json` for machine output, `--verbose`, `--min-severity`, `--post-to-pr` and `--list-rules`.\n\n### Three exit codes\n\n`0` for a review that produced something, `1` for bad input or a failed post, `2` for a usage error — the argparse convention. The codes matter because a CI step reads them: a review that found a CRITICAL is still exit `0`, since the tool succeeded at reviewing.\n\n### Why the codes are not findings\n\nIf a CRITICAL finding made the exit non-zero, every CI job would fail on the first real bug and the tool would be turned off. The exit code says whether the review ran; the findings say what it found.\n\n### Why the flag list is short\n\nEight flags is not a thin CLI — it is the set that changes what a review does rather than how it is printed. Anything that only reformats the output belongs in the formatter, and anything that changes the routing belongs in the engine, which is why `--provider` and `--offline` pass straight through.",
   "code_examples": [
     {
       "id": "12.1-ex-0",
@@ -16214,7 +16217,7 @@ window.LESSONS.push({
     {
       "label": "The exit codes",
       "path": "app/cli.py",
-      "lines": "50-59"
+      "lines": "50-55"
     }
   ],
   "learn_more": [
@@ -16351,16 +16354,16 @@ window.LESSONS.push({
   "title": "The API: fourteen routes over twelve paths",
   "order": 1203,
   "duration_min": 25,
-  "concept_md": "### One app, several jobs\n\n`app/main.py` registers fourteen route decorators over twelve paths. Two paths carry two methods each — `/test-review` and `/users` — which is why the counts differ and why quoting either number without the other is misleading.\n\n### The groups\n\nOperational routes (`/`, `/health`), the rule listing, the review routes (`/review`, `/reviews`, `/reviews/{id}`), the webhook, statistics, and the user routes. Each group has its own tag in the OpenAPI schema.\n\n### Why /health matters more than it looks\n\nIt reports the credential state and whether the database is enabled. A demo that opens with `/health` can say which providers are configured before anyone tries a review, which is the difference between a five-second answer and a five-minute diagnosis.\n\n### What the API does not do\n\nIt does not review anything itself. Every route that produces a review calls the engine, so the routing, the labels and the single warning are the same as the CLI's.\n\n### Why the routes are grouped by tag\n\nBecause the OpenAPI page is documentation, and a reader looking for the webhook should not have to scan the user routes. The tags are operational, rules, review, webhook, stats and users — six groups over twelve paths, which is how the schema page stays readable.",
+  "concept_md": "### One app, several jobs\n\n`app/main.py` registers fourteen route decorators over twelve paths. Two paths carry two methods each — `/test-review` and `/users` — which is why the counts differ and why quoting either number without the other is misleading.\n\n### The groups\n\nOperational routes (`/`, `/health`), the rule listing, the review routes (`/review`, `/reviews`, `/reviews/{review_id}`), the webhook, statistics, and the user routes. Each group has its own tag in the OpenAPI schema.\n\n### Why /health matters more than it looks\n\nIt reports the credential state and whether the database is enabled. A demo that opens with `/health` can say which providers are configured before anyone tries a review, which is the difference between a five-second answer and a five-minute diagnosis.\n\n### What the API does not do\n\nIt does not review anything itself. Every route that produces a review calls the engine, so the routing, the labels and the single warning are the same as the CLI's.\n\n### Why the routes are grouped by tag\n\nBecause the OpenAPI page is documentation, and a reader looking for the webhook should not have to scan the user routes. The tags are ops, rules, review, webhook, history and users — six groups over twelve paths, which is how the schema page stays readable.",
   "code_examples": [
     {
       "id": "12.3-ex-0",
       "lang": "console",
       "caption": "Fourteen decorators over twelve paths",
-      "code": "python - <<'PY'\nimport re, pathlib\n\nsrc = pathlib.Path(\"app/main.py\").read_text()\npaths = re.findall(r'@app\\.(?:get|post|delete)\\(\\s*\"([^\"]+)\"', src)\nprint(\"decorators:\", src.count(\"@app.\"), \"| unique paths:\", len(set(paths)))\nprint(\"doubled:\", sorted(p for p in set(paths) if paths.count(p) > 1))\nPY",
+      "code": "python - <<'PY'\nimport re, pathlib\n\nsrc = pathlib.Path(\"app/main.py\").read_text()\npaths = re.findall(r'@app\\.(?:get|post|patch|delete)\\(\\s*\"([^\"]+)\"', src)\nprint(\"decorators:\", src.count(\"@app.\"), \"| unique paths:\", len(set(paths)))\nprint(\"doubled:\", sorted(p for p in set(paths) if paths.count(p) > 1))\nPY",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "decorators: 14 | unique paths: 11\ndoubled: ['/test-review', '/users']",
+      "expected_output": "decorators: 14 | unique paths: 12\ndoubled: ['/test-review', '/users']",
       "why_not": "the browser runner has no shell and does not embed the surface modules; this command runs from a checkout."
     }
   ],
@@ -16420,7 +16423,7 @@ window.LESSONS.push({
     {
       "label": "The app and its route groups",
       "path": "app/main.py",
-      "lines": "879-892"
+      "lines": "879-889"
     },
     {
       "label": "The review route",
@@ -16459,7 +16462,7 @@ window.LESSONS.push({
   "title": "Auth on the management routes, and only those",
   "order": 1204,
   "duration_min": 20,
-  "concept_md": "### Where the key is required\n\nWhen `API_AUTH_ENABLED` is true, an `X-API-Key` header is required on the management endpoints: `GET /reviews`, `GET /reviews/{id}`, `GET /stats` and the `/users` routes. The review surfaces stay open.\n\n### Why the split\n\nBecause the two jobs are different. Reviewing a diff is the demo, and requiring a key to try it would make the first five minutes harder for no security gain — the diff is the user's own. Reading history is a different matter: those routes expose every review the tool has stored.\n\n### Why it is off by default\n\nA demo that needs a key before it answers is a demo that fails on stage. The default is open, and the README says plainly that a deployment should set it.\n\n### What the header is not\n\nIt is not per-user and it is not a token with a lifetime. It is one shared key compared against `DB_SEED_ADMIN_KEY`, which is the honest scope: enough to keep a deployed instance from being read by anyone who finds the URL, and no more.\n\n### What the split costs\n\nTwo behaviours to explain in the README, and one flag that changes the surface's contract when it is set. That is the price of a demo that answers immediately, and it is worth stating plainly rather than discovering when a deployment returns 401 to a request that worked locally.",
+  "concept_md": "### Where the key is required\n\nWhen `API_AUTH_ENABLED` is true, an `X-API-Key` header is required on the management endpoints: `GET /reviews`, `GET /reviews/{id}`, `GET /stats` and the `/users` routes. The review surfaces stay open.\n\n### Why the split\n\nBecause the two jobs are different. Reviewing a diff is the demo, and requiring a key to try it would make the first five minutes harder for no security gain — the diff is the user's own. Reading history is a different matter: those routes expose every review the tool has stored.\n\n### Why it is off by default\n\nA demo that needs a key before it answers is a demo that fails on stage. The default is open, and the README says plainly that a deployment should set it.\n\n### What the header actually is\n\nA per-user key, stored as a SHA-256 hash in the `users` table and resolved to a role. `POST /users` issues one; `DB_SEED_ADMIN_KEY` only seeds the first admin, and its job ends there. A role shortfall is a 403 — a viewer cannot post, a reviewer cannot manage users.\n\nWhat it is not is a session: there is no lifetime and no refresh, so a key is revoked by changing the row rather than by expiring.\n\n### What the split costs\n\nTwo behaviours to explain in the README, and one flag that changes the surface's contract when it is set. That is the price of a demo that answers immediately, and it is worth stating plainly rather than discovering when a deployment returns 401 to a request that worked locally.",
   "code_examples": [
     {
       "id": "12.4-ex-0",
@@ -16498,20 +16501,20 @@ window.LESSONS.push({
     {
       "q": "What is the header, honestly?",
       "options": [
-        "A per-user token with a lifetime",
-        "A signed request digest",
-        "One shared key, not per user",
-        "A rotating credential pair"
+        "A per-user hashed key, with no lifetime",
+        "A per-user token that expires daily on every run",
+        "One shared secret for the instance",
+        "A signed request digest per call"
       ],
-      "answer": 2,
-      "why": "It keeps a deployed instance from being read by anyone who finds the URL, and no more."
+      "answer": 0,
+      "why": "Each user gets a key stored as a hash and resolved to a role; there is no lifetime, so revocation is a row change."
     }
   ],
   "try_it": {
     "prompt": "Show the flag that turns the requirement on.",
     "starter": "",
-    "solution": "```console\n$ grep -n 'api_auth_enabled' app/main.py | head -3\n```",
-    "explanation": "One setting, read in the dependency that guards the management routes."
+    "solution": "```console\n$ grep -n 'def require' -A 4 app/auth.py | head -8\n```",
+    "explanation": "The dependency that guards the management routes — it resolves the header to a role."
   },
   "exercise": {
     "prompt": "Which setting holds the key the header is compared against?",
@@ -16634,14 +16637,14 @@ window.LESSONS.push({
   ],
   "project_links": [
     {
-      "label": "The demotion counter",
-      "path": "app/main.py",
-      "lines": "209-224"
-    },
-    {
       "label": "The posting result it lands on",
       "path": "app/github_client.py",
-      "lines": "160-200"
+      "lines": "209-228"
+    },
+    {
+      "label": "The demotion counter",
+      "path": "app/github_client.py",
+      "lines": "209-228"
     }
   ],
   "learn_more": [
@@ -16783,7 +16786,7 @@ window.LESSONS.push({
   "title": "The webhook: verify the signature, or say you did not",
   "order": 1207,
   "duration_min": 25,
-  "concept_md": "### What a webhook has to do\n\nAnswer GitHub within its timeout, verify that the request really came from GitHub, and hand the payload to the same engine every other surface uses.\n\n### The signature\n\nGitHub signs the body with the webhook secret and sends the digest in a header. The route recomputes it and compares. `GITHUB_WEBHOOK_SECRET` supplies the key; `WEBHOOK_ALLOW_UNSIGNED` is the escape hatch for a local test.\n\n### Why the escape hatch exists, and why it is loud\n\nA local demo cannot produce a valid signature without the secret GitHub generated. The flag lets a developer test the route without one — and it is a flag rather than a default precisely so that a deployment which forgets the secret fails closed rather than accepting anything.\n\n### What the route must not do\n\nTrust the payload's claim about which repository it came from. The signature covers the body, so a valid signature plus the configured token is what makes the request actionable; the body is data to be parsed, not an instruction.\n\n### The timeout\n\nGitHub gives a webhook a short window. The route answers and the review proceeds, which is why a degraded review is better than a slow one here — a 500 because a key was missing costs the whole review and shows as a failed check.",
+  "concept_md": "### What a webhook has to do\n\nAnswer GitHub within its timeout, verify that the request really came from GitHub, and hand the payload to the same engine every other surface uses.\n\n### The signature\n\nGitHub signs the body with the webhook secret and sends the digest in a header. The route recomputes it and compares. `GITHUB_WEBHOOK_SECRET` supplies the key; `WEBHOOK_ALLOW_UNSIGNED` is the escape hatch for a local test.\n\n### Why the escape hatch exists, and why it is loud\n\nA local demo cannot produce a valid signature without the secret GitHub generated. The flag lets a developer test the route without one — and it is a flag rather than a default so that a deployment which forgets the secret does not post on the operator's identity.\n\nWhat it gates is posting, not reviewing. With no secret and no flag, the review still runs and the route still answers 200; what stops is the comment on the pull request. The code's own comment says it: the review still runs, only posting stops.\n\n### What the route must not do\n\nTrust the payload's claim about which repository it came from. The signature covers the body, so a valid signature plus the configured token is what makes the request actionable; the body is data to be parsed, not an instruction.\n\n### The timeout\n\nGitHub gives a webhook a short window. The route answers and the review proceeds, which is why a degraded review is better than a slow one here — a 500 because a key was missing costs the whole review and shows as a failed check.",
   "code_examples": [
     {
       "id": "12.7-ex-0",
@@ -16840,7 +16843,7 @@ window.LESSONS.push({
   "exercise": {
     "prompt": "What happens to an unsigned request when the escape hatch is off?",
     "hint": "Fail closed.",
-    "solution": "```console\n$ grep -n 'webhook_allow_unsigned' -A 3 app/main.py | head -8\n```\n\nIt is rejected, because the default refuses unsigned deliveries.",
+    "solution": "```console\n$ sed -n '800,812p' app/main.py\n```\n\nThe review still runs; only the post is refused, because an unauthenticated caller could otherwise make the bot comment on any repository.",
     "explanation": "A deployment that forgets the secret fails closed rather than accepting anything."
   },
   "common_mistakes": [
@@ -16857,7 +16860,7 @@ window.LESSONS.push({
     {
       "label": "The webhook route",
       "path": "app/main.py",
-      "lines": "1135-1199"
+      "lines": "1135-1261"
     }
   ],
   "learn_more": [
@@ -16891,7 +16894,7 @@ window.LESSONS.push({
   "title": "The GitHub client: what it posts and what it refuses",
   "order": 1208,
   "duration_min": 25,
-  "concept_md": "### One client, a fixed vocabulary\n\n`app/github_client.py` is 1285 lines and it does four things: build a review payload, post it, read existing comments to skip duplicates, and translate every failure into the tool's own errors.\n\n### What it refuses\n\nIt refuses to post without a token, and it refuses to post a single source file as a pull-request comment — a review needs a diff, because an inline comment needs a line that exists in the diff. `--post-to-pr` on a plain file is a usage error, not a silent downgrade.\n\n### The two anchors it can use\n\nA finding is posted inline when its line is in the diff, and demoted to the summary when GitHub rejects the anchor. Those are the only two outcomes, which is why the reader never sees a finding vanish.\n\n### Why the file is long\n\nBecause GitHub's failure modes are numerous and each needs a decision: 401 and 403 mean the token is wrong or lacks a scope; 404 means the repository or the pull request is not visible to it; 429 means back off; 422 means demote one comment; a 5xx means retry later; a transport error means the network is gone. Six decisions, each with its own honest message.",
+  "concept_md": "### One client, a fixed vocabulary\n\n`app/github_client.py` is 1285 lines and it does four things: build a review payload, post it, read existing comments to skip duplicates, and translate every failure into the tool's own errors.\n\n### What it refuses\n\nIt refuses to post without a token, and it refuses to post a single source file as a pull-request comment — a review needs a diff, because an inline comment needs a line that exists in the diff. `--post-to-pr` on a plain file exits 1, an input error, rather than silently downgrading.\n\n### The two anchors it can use\n\nA finding is posted inline when its line is in the diff, and demoted to the summary when GitHub rejects the anchor. Those are the only two outcomes, which is why the reader never sees a finding vanish.\n\n### Why the file is long\n\nBecause GitHub's failure modes are numerous and each needs a decision: 401 and 403 mean the token is wrong or lacks a scope; 404 means the repository or the pull request is not visible to it; 429 means back off; 422 means demote one comment; a 5xx means retry later; a transport error means the network is gone. Six decisions, each with its own honest message.",
   "code_examples": [
     {
       "id": "12.8-ex-0",
@@ -16999,7 +17002,7 @@ window.LESSONS.push({
   "title": "The viva: three variants, and how honest each one is",
   "order": 1209,
   "duration_min": 30,
-  "concept_md": "### Three ways to run it, in ascending cost\n\n**A — offline mock.** The 63 rules, no network. This is the one that has been run end to end and captured; the transcripts in `DEMO.md` are real.\n\n**B — local via LM Studio.** The OpenAI-compatible adapter against a model on your machine. Unexercised in this repository: the live branch was verified with the real SDK against a stub server, not a real model. `DEMO.md` shows the output's shape, not a recorded run.\n\n**C — Sarvam.** The same adapter against `https://api.sarvam.ai/v1`. Unverified: no real key was ever used. The failure path is real and reproduced; no successful Sarvam review exists.\n\n### How to say it in a viva\n\nMatch `HANDOFF.md`'s ledger: real, simulated, deferred. A is real. B is simulated — the code path is real, the counterpart is a fake. C is deferred, and what has been captured is the rejection, not a review.\n\n### What not to claim\n\nThat any variant \"works with an LLM\". B and C are written to a protocol; the repository has no capture of either producing a review. Saying so is not modesty — it is the only claim the evidence supports, and a viva rewards the candidate who knows the difference.\n\n### The question you will be asked\n\n\"What happens if the model is unavailable?\" The answer is the whole design: the run degrades to the rule engine, labels itself mock, and logs one WARNING. That is true of all three variants, and it is the part that has been tested.",
+  "concept_md": "### Three ways to run it, in ascending cost\n\n**A — offline mock.** The 63 rules, no network. This is the one that has been run end to end and captured; the transcripts in `DEMO.md` are real.\n\n**B — local via LM Studio.** The OpenAI-compatible adapter against a model on your machine. Unexercised in this repository: the live branch was verified with the real SDK against a stub server, not a real model. `DEMO.md` shows the output's shape, not a recorded run.\n\n**C — Sarvam.** The same adapter against `https://api.sarvam.ai/v1`. No real key was ever used. The failure path is real and reproduced; no successful Sarvam review exists. `DEMO.md` calls it unverified and `HANDOFF.md` files it under simulated — the same fact, two words, and both mean no review was ever captured.\n\n### How to say it in a viva\n\nMatch `HANDOFF.md`'s ledger: real, simulated, deferred. A is real. B is simulated — the code path is real, the counterpart is a fake. C is simulated in `HANDOFF.md`'s ledger — the code path is real, the counterpart is a fake — and what has been captured is the rejection, not a review. The deferred item is the real key, which only a human can supply.\n\n### What not to claim\n\nThat any variant \"works with an LLM\". B and C are written to a protocol; the repository has no capture of either producing a review. Saying so is not modesty — it is the only claim the evidence supports, and a viva rewards the candidate who knows the difference.\n\n### The question you will be asked\n\n\"What happens if the model is unavailable?\" The answer is the whole design: the run degrades to the rule engine, labels itself mock, and logs one WARNING. That is true of all three variants, and it is the part that has been tested.",
   "code_examples": [
     {
       "id": "12.9-ex-0",
@@ -17068,12 +17071,12 @@ window.LESSONS.push({
     {
       "label": "The three-variant table",
       "path": "DEMO.md",
-      "lines": "11-586"
+      "lines": "11-15"
     },
     {
       "label": "The ledger this frames against",
       "path": "HANDOFF.md",
-      "lines": "5-53"
+      "lines": "5-17"
     }
   ],
   "learn_more": [
@@ -17107,7 +17110,7 @@ window.LESSONS.push({
   "title": "Guided read: four surfaces, one engine",
   "order": 1210,
   "duration_min": 30,
-  "concept_md": "### The shape of the last part\n\nFour ways in, one way through. The CLI parses arguments and prints; the API routes and serialises; the webhook verifies and hands over; the GitHub client posts. Every one of them calls `review()` in `app/engine.py` and renders the `ProviderOutcome` it gets back.\n\n### What to read, and in what order\n\n`reviewer.py` first, because it is thirteen lines and shows where the CLI lives. Then `app/cli.py` for the flags and the exit codes. Then `app/main.py` for the routes and the auth split. Then `app/github_client.py` for the posting rules, the marker and the demotion.\n\n### The invariant to look for\n\nNo surface decides which provider runs. Each one passes a `--provider` value or a request body through, and the engine answers. That is why a mock run is labelled the same way whether it came from a terminal, a webhook or a pull request.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_surfaces.py` asks you to reimplement the CLI's exit codes and the marker, which are the two contracts a surface owns. The engine is not your problem there; the shape of what it returns is.\n\n### What the site has covered\n\nTwelve parts, from a first script to the four surfaces in front of you. The last lesson is the one that says which of it has been run and which has not — because that distinction is the difference between a project and a demo.",
+  "concept_md": "### The shape of the last part\n\nFour ways in, one way through. The CLI parses arguments and prints; the API routes and serialises; the webhook verifies and hands over; the GitHub client posts. Every one of them calls `review()` in `app/engine.py` and renders the `ProviderOutcome` it gets back.\n\n### What to read, and in what order\n\n`reviewer.py` first, because it is thirteen lines and shows where the CLI lives. Then `app/cli.py` for the flags and the exit codes. Then `app/main.py` for the routes and the auth split. Then `app/github_client.py` for the posting rules, the marker and the demotion.\n\n### The invariant to look for\n\nNo surface decides which provider runs. Each one passes a `--provider` value or a request body through, and the engine answers. That is why a mock run is labelled the same way whether it came from a terminal, a webhook or a pull request.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_surfaces.py` asks you to reimplement the CLI's exit codes and the marker, which are the two contracts a surface owns. The engine is not your problem there; the shape of what it returns is.\n\n### What the site has covered\n\nThirteen parts, from a first script to the four surfaces in front of you. The last lesson is the one that says which of it has been run and which has not — because that distinction is the difference between a project and a demo.",
   "code_examples": [
     {
       "id": "12.10-ex-0",
@@ -17176,7 +17179,7 @@ window.LESSONS.push({
     {
       "label": "The rebuild suite",
       "path": "rebuild/tests/test_rebuild_surfaces.py",
-      "lines": "1-40"
+      "lines": "1-81"
     },
     {
       "label": "The engine every surface calls",

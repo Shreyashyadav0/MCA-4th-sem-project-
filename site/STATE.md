@@ -1022,6 +1022,6 @@ sixteen-hex fingerprint, and 12.9 frames the three demo variants against
 tool — Sarvam is unexercised and the lesson says so.
 
 Two incidental banned numbers had to be removed: a line-number list in 11.5's
-output contained 582, and a fingerprint in 12.6 happened to contain it. Neither was
+output contained a banned test-count number, and a fingerprint in 12.6 happened to contain it. Neither was
 a test count, but the rule is absolute, so 11.5 now prints counts rather than line
 numbers and 12.6 uses a different made-up finding.

@@ -39,7 +39,7 @@ window.LESSONS.push({
       "options": [
         "The SDK supplies a key of its own",
         "The key defaults to a placeholder",
-        "The SDK supplies the key",
+        "Settings has no key field at all",
         "The base URL implies a key"
       ],
       "answer": 1,
@@ -49,7 +49,7 @@ window.LESSONS.push({
       "q": "What does a missing variable become?",
       "options": [
         "A 500 from the route",
-        "The input that decides which mode runs",
+        "An error logged and then retried",
         "The input that picks the mode",
         "A warning and a retry"
       ],

@@ -27,8 +27,8 @@ window.LESSONS.push({
       "q": "Which block comes first in the file?",
       "options": [
         "The entry point",
-        "The constants and the module docstring",
-        "The selector function",
+        "The selection record",
+        "The selector function on every run",
         "The constants and docstring"
       ],
       "answer": 3,

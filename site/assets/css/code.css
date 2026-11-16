@@ -284,7 +284,10 @@ details.expected-output pre.code {
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.55;
-  white-space: pre;
+  /* A concept's code block is prose, not a terminal: wrapping beats a scrollbar
+   * that hides the end of a 148-character line. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   overflow: auto;
   tab-size: 2;
 }

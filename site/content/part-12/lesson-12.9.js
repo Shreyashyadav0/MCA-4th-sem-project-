@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The viva: three variants, and how honest each one is",
   "order": 1209,
   "duration_min": 30,
-  "concept_md": "### Three ways to run it, in ascending cost\n\n**A — offline mock.** The 63 rules, no network. This is the one that has been run end to end and captured; the transcripts in `DEMO.md` are real.\n\n**B — local via LM Studio.** The OpenAI-compatible adapter against a model on your machine. Unexercised in this repository: the live branch was verified with the real SDK against a stub server, not a real model. `DEMO.md` shows the output's shape, not a recorded run.\n\n**C — Sarvam.** The same adapter against `https://api.sarvam.ai/v1`. Unverified: no real key was ever used. The failure path is real and reproduced; no successful Sarvam review exists.\n\n### How to say it in a viva\n\nMatch `HANDOFF.md`'s ledger: real, simulated, deferred. A is real. B is simulated — the code path is real, the counterpart is a fake. C is deferred, and what has been captured is the rejection, not a review.\n\n### What not to claim\n\nThat any variant \"works with an LLM\". B and C are written to a protocol; the repository has no capture of either producing a review. Saying so is not modesty — it is the only claim the evidence supports, and a viva rewards the candidate who knows the difference.\n\n### The question you will be asked\n\n\"What happens if the model is unavailable?\" The answer is the whole design: the run degrades to the rule engine, labels itself mock, and logs one WARNING. That is true of all three variants, and it is the part that has been tested.",
+  "concept_md": "### Three ways to run it, in ascending cost\n\n**A — offline mock.** The 63 rules, no network. This is the one that has been run end to end and captured; the transcripts in `DEMO.md` are real.\n\n**B — local via LM Studio.** The OpenAI-compatible adapter against a model on your machine. Unexercised in this repository: the live branch was verified with the real SDK against a stub server, not a real model. `DEMO.md` shows the output's shape, not a recorded run.\n\n**C — Sarvam.** The same adapter against `https://api.sarvam.ai/v1`. No real key was ever used. The failure path is real and reproduced; no successful Sarvam review exists. `DEMO.md` calls it unverified and `HANDOFF.md` files it under simulated — the same fact, two words, and both mean no review was ever captured.\n\n### How to say it in a viva\n\nMatch `HANDOFF.md`'s ledger: real, simulated, deferred. A is real. B is simulated — the code path is real, the counterpart is a fake. C is simulated in `HANDOFF.md`'s ledger — the code path is real, the counterpart is a fake — and what has been captured is the rejection, not a review. The deferred item is the real key, which only a human can supply.\n\n### What not to claim\n\nThat any variant \"works with an LLM\". B and C are written to a protocol; the repository has no capture of either producing a review. Saying so is not modesty — it is the only claim the evidence supports, and a viva rewards the candidate who knows the difference.\n\n### The question you will be asked\n\n\"What happens if the model is unavailable?\" The answer is the whole design: the run degrades to the rule engine, labels itself mock, and logs one WARNING. That is true of all three variants, and it is the part that has been tested.",
   "code_examples": [
     {
       "id": "12.9-ex-0",
@@ -78,12 +78,12 @@ window.LESSONS.push({
     {
       "label": "The three-variant table",
       "path": "DEMO.md",
-      "lines": "11-586"
+      "lines": "11-15"
     },
     {
       "label": "The ledger this frames against",
       "path": "HANDOFF.md",
-      "lines": "5-53"
+      "lines": "5-17"
     }
   ],
   "learn_more": [

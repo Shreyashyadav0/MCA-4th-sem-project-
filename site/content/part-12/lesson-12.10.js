@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Guided read: four surfaces, one engine",
   "order": 1210,
   "duration_min": 30,
-  "concept_md": "### The shape of the last part\n\nFour ways in, one way through. The CLI parses arguments and prints; the API routes and serialises; the webhook verifies and hands over; the GitHub client posts. Every one of them calls `review()` in `app/engine.py` and renders the `ProviderOutcome` it gets back.\n\n### What to read, and in what order\n\n`reviewer.py` first, because it is thirteen lines and shows where the CLI lives. Then `app/cli.py` for the flags and the exit codes. Then `app/main.py` for the routes and the auth split. Then `app/github_client.py` for the posting rules, the marker and the demotion.\n\n### The invariant to look for\n\nNo surface decides which provider runs. Each one passes a `--provider` value or a request body through, and the engine answers. That is why a mock run is labelled the same way whether it came from a terminal, a webhook or a pull request.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_surfaces.py` asks you to reimplement the CLI's exit codes and the marker, which are the two contracts a surface owns. The engine is not your problem there; the shape of what it returns is.\n\n### What the site has covered\n\nTwelve parts, from a first script to the four surfaces in front of you. The last lesson is the one that says which of it has been run and which has not — because that distinction is the difference between a project and a demo.",
+  "concept_md": "### The shape of the last part\n\nFour ways in, one way through. The CLI parses arguments and prints; the API routes and serialises; the webhook verifies and hands over; the GitHub client posts. Every one of them calls `review()` in `app/engine.py` and renders the `ProviderOutcome` it gets back.\n\n### What to read, and in what order\n\n`reviewer.py` first, because it is thirteen lines and shows where the CLI lives. Then `app/cli.py` for the flags and the exit codes. Then `app/main.py` for the routes and the auth split. Then `app/github_client.py` for the posting rules, the marker and the demotion.\n\n### The invariant to look for\n\nNo surface decides which provider runs. Each one passes a `--provider` value or a request body through, and the engine answers. That is why a mock run is labelled the same way whether it came from a terminal, a webhook or a pull request.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_surfaces.py` asks you to reimplement the CLI's exit codes and the marker, which are the two contracts a surface owns. The engine is not your problem there; the shape of what it returns is.\n\n### What the site has covered\n\nThirteen parts, from a first script to the four surfaces in front of you. The last lesson is the one that says which of it has been run and which has not — because that distinction is the difference between a project and a demo.",
   "code_examples": [
     {
       "id": "12.10-ex-0",
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The rebuild suite",
       "path": "rebuild/tests/test_rebuild_surfaces.py",
-      "lines": "1-40"
+      "lines": "1-81"
     },
     {
       "label": "The engine every surface calls",

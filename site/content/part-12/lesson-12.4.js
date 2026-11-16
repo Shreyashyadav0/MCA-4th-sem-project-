@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Auth on the management routes, and only those",
   "order": 1204,
   "duration_min": 20,
-  "concept_md": "### Where the key is required\n\nWhen `API_AUTH_ENABLED` is true, an `X-API-Key` header is required on the management endpoints: `GET /reviews`, `GET /reviews/{id}`, `GET /stats` and the `/users` routes. The review surfaces stay open.\n\n### Why the split\n\nBecause the two jobs are different. Reviewing a diff is the demo, and requiring a key to try it would make the first five minutes harder for no security gain — the diff is the user's own. Reading history is a different matter: those routes expose every review the tool has stored.\n\n### Why it is off by default\n\nA demo that needs a key before it answers is a demo that fails on stage. The default is open, and the README says plainly that a deployment should set it.\n\n### What the header is not\n\nIt is not per-user and it is not a token with a lifetime. It is one shared key compared against `DB_SEED_ADMIN_KEY`, which is the honest scope: enough to keep a deployed instance from being read by anyone who finds the URL, and no more.\n\n### What the split costs\n\nTwo behaviours to explain in the README, and one flag that changes the surface's contract when it is set. That is the price of a demo that answers immediately, and it is worth stating plainly rather than discovering when a deployment returns 401 to a request that worked locally.",
+  "concept_md": "### Where the key is required\n\nWhen `API_AUTH_ENABLED` is true, an `X-API-Key` header is required on the management endpoints: `GET /reviews`, `GET /reviews/{id}`, `GET /stats` and the `/users` routes. The review surfaces stay open.\n\n### Why the split\n\nBecause the two jobs are different. Reviewing a diff is the demo, and requiring a key to try it would make the first five minutes harder for no security gain — the diff is the user's own. Reading history is a different matter: those routes expose every review the tool has stored.\n\n### Why it is off by default\n\nA demo that needs a key before it answers is a demo that fails on stage. The default is open, and the README says plainly that a deployment should set it.\n\n### What the header actually is\n\nA per-user key, stored as a SHA-256 hash in the `users` table and resolved to a role. `POST /users` issues one; `DB_SEED_ADMIN_KEY` only seeds the first admin, and its job ends there. A role shortfall is a 403 — a viewer cannot post, a reviewer cannot manage users.\n\nWhat it is not is a session: there is no lifetime and no refresh, so a key is revoked by changing the row rather than by expiring.\n\n### What the split costs\n\nTwo behaviours to explain in the README, and one flag that changes the surface's contract when it is set. That is the price of a demo that answers immediately, and it is worth stating plainly rather than discovering when a deployment returns 401 to a request that worked locally.",
   "code_examples": [
     {
       "id": "12.4-ex-0",
@@ -48,20 +48,20 @@ window.LESSONS.push({
     {
       "q": "What is the header, honestly?",
       "options": [
-        "A per-user token with a lifetime",
-        "A signed request digest",
-        "One shared key, not per user",
-        "A rotating credential pair"
+        "A per-user hashed key, with no lifetime",
+        "A per-user token that expires daily on every run",
+        "One shared secret for the instance",
+        "A signed request digest per call"
       ],
-      "answer": 2,
-      "why": "It keeps a deployed instance from being read by anyone who finds the URL, and no more."
+      "answer": 0,
+      "why": "Each user gets a key stored as a hash and resolved to a role; there is no lifetime, so revocation is a row change."
     }
   ],
   "try_it": {
     "prompt": "Show the flag that turns the requirement on.",
     "starter": "",
-    "solution": "```console\n$ grep -n 'api_auth_enabled' app/main.py | head -3\n```",
-    "explanation": "One setting, read in the dependency that guards the management routes."
+    "solution": "```console\n$ grep -n 'def require' -A 4 app/auth.py | head -8\n```",
+    "explanation": "The dependency that guards the management routes — it resolves the header to a role."
   },
   "exercise": {
     "prompt": "Which setting holds the key the header is compared against?",

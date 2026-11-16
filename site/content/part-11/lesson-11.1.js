@@ -37,9 +37,9 @@ window.LESSONS.push({
     {
       "q": "Which module holds the live HTTP call?",
       "options": [
-        "app/sarvam_provider.py",
+        "app/rules.py",
         "app/engine.py",
-        "app/mock_provider.py",
+        "app/mock_provider.py on every run",
         "openai_compat_provider"
       ],
       "answer": 3,
