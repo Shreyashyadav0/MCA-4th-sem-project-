@@ -44,3 +44,21 @@ ADRs, report and deck skeletons), the 7-track learning curriculum with rebuild s
 
 **Totals: 598 collected, 582 passing, 1 skipped (a live-LM-Studio test that must not run in
 CI). 30 sub-agents across six waves, each wave gated before the next.**
+
+
+## The learning site — 110 lessons, 13 parts (2026-11-15 to 2026-11-16)
+
+`site/` is a static site that teaches this repository from first principles: parts 0-12,
+110 lessons, each with a concept, an executed example, a quiz and a project link into the
+code. Every example was run at build time and its real stdout recorded; nothing is typed.
+
+Built across eight waves, each gated before the next: parts 0-5, then 6-7, then 8 (the
+rule engine), 9 (configuration and offline-first), 10 (providers and LLM APIs), 11 (the
+engine and the fallback), 12 (the surfaces). Every wave ran a multi-auditor round and a
+re-audit of its own fixes.
+
+Three checkers gate the site and all three run in CI: `validate_lessons.py`,
+`check_ranges.py`, `check_quiz.py`. The last two exist because both defect classes
+recurred: 232 line references and 330 quiz questions, all currently clean.
+
+The test counts above are historical records of each phase and are left as they were.

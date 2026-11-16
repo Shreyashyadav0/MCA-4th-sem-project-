@@ -23,6 +23,7 @@ is the bug.
 | 6b | 2026-11-15 | `89080b0` | 9 added, 4 changed | 8 (`9.1`–`9.8`) | `OK lessons=84 parts_covered=10 manifest_entries=84 ids=0.1,…,9.8` |
 | 7b-1 | 2026-11-16 | `0104fde` | 7 added, 4 changed | 6 (`11.1`–`11.6`) | `OK lessons=100 parts_covered=12 manifest_entries=100` |
 | 7b-2 | 2026-11-16 | `f5b6acf` | 7 added, 4 changed | 10 (`12.1`–`12.10`) | `OK lessons=110 parts_covered=13 manifest_entries=110` |
+| freeze | 2026-11-16 | `ad60b01` | 4 changed | 0 (none added) | `OK lessons=110 parts_covered=13 manifest_entries=110` |
 | 7a | 2026-11-16 | `d5bf954` | 11 added, 4 changed | 10 (`10.1`–`10.10`) | `OK lessons=94 parts_covered=11 manifest_entries=94 ids=0.1,…,10.10` |
 
 A file cannot record the hash of the commit that contains it, so the column above
@@ -1025,3 +1026,19 @@ Two incidental banned numbers had to be removed: a line-number list in 11.5's
 output contained a banned test-count number, and a fingerprint in 12.6 happened to contain it. Neither was
 a test count, but the rule is absolute, so 11.5 now prints counts rather than line
 numbers and 12.6 uses a different made-up finding.
+
+## Freeze — the site is complete
+
+110 lessons, 13 parts, which is what `contracts.js` declared before any of it existed.
+Nothing was added in this pass; every derived artifact was regenerated and every prose
+file reconciled.
+
+Verified mechanically rather than by reading: fifteen keys per lesson, every
+`learn_more` href resolving on `main`, the claim greps empty, and the rule count in the
+lessons matching `app/rules.py` (63) at this commit. The rebuilt guide's per-file line
+counts were grepped out of the PDF and compared against `wc -l` — all six match — and
+`LOCK_PINS` is computed by `_count_pins()` rather than typed.
+
+One deliberate exception to the bare-percentage rule: two captured pytest transcripts
+contain `[100%]`, which is pytest's own progress indicator inside a real run, not a
+claim about accuracy. Removing it would falsify the capture.

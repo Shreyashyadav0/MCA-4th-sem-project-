@@ -2,6 +2,14 @@
 
 This file is the honesty ledger. If any other document disagrees with it, this one is right.
 
+## The learning site — built, gated, and what it does not prove
+
+`site/` holds 110 lessons across 13 parts, every example executed at build time and
+its real stdout recorded. Three checkers gate it: `validate_lessons.py` (schema and
+counts), `check_ranges.py` (every line reference), `check_quiz.py` (option length and
+answer-index spread, per part). It is a teaching aid about this repository; it is not
+evidence that the reviewer works against a live model, and the lessons say so.
+
 ## Real — executed in this environment, output captured
 
 | What | Evidence |
