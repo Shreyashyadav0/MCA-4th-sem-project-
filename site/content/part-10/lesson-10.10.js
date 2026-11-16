@@ -15,34 +15,34 @@ window.LESSONS.push({
       "id": "10.10-ex-0",
       "lang": "console",
       "caption": "The harness is real; the labelled set is not",
-      "code": "import pathlib\n\nb = pathlib.Path(\"benchmarks\")\nprint(\"harness files:\", sorted(p.name for p in b.glob(\"*.py\")))\ndata = [p for p in b.rglob(\"*\") if p.suffix in (\".json\", \".jsonl\", \".csv\") and \"out\" not in p.parts]\nprint(\"labelled data files:\", data or \"none\")",
+      "code": "python - <<'PY'\nimport json, pathlib\n\nb = pathlib.Path(\"benchmarks\")\nprint(\"harness files:\", sorted(p.name for p in b.glob(\"*.py\")))\nmanifest = json.loads((b / \"golden\" / \"manifest.json\").read_text())\nprint(\"evaluation samples:\", manifest.get(\"evaluation_samples\"))\nPY",
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner does not embed the provider modules; this command runs from a checkout instead.",
-      "expected_output": "/bin/sh: 1: import: not found\n/bin/sh: 3: Syntax error: \"(\" unexpected"
+      "expected_output": "harness files: ['__init__.py', 'collect_candidates.py', 'eval.py', 'label_helper.py', 'loader.py', 'matching.py', 'metrics.py', 'report.py', 'runner.py']\nevaluation samples: []"
     }
   ],
   "quiz": [
     {
       "q": "Which figure does this tool have for accuracy?",
       "options": [
-        "None, because no labels exist",
-        "A recall figure from the harness",
         "An F1 score from the sample",
+        "A recall figure from the harness",
+        "None, because no labels exist",
         "A precision estimate from tests"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "The harness needs labels to produce a number, and the labelled set has not been written."
     },
     {
       "q": "Why not estimate a figure from a sample?",
       "options": [
-        "A guess would be cited as measured",
+        "The matcher rejects unlabelled rows",
         "The harness cannot run without labels",
         "The sample is too small to use",
-        "The matcher rejects unlabelled rows"
+        "A guess would be cited as measured"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "A number invented once gets quoted and believed, long after anyone remembers where it came from."
     },
     {
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The matcher that needs labels",
       "path": "benchmarks/matching.py",
-      "lines": "1-244"
+      "lines": "473-587"
     }
   ],
   "learn_more": [

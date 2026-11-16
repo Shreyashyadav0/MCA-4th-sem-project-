@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "One OpenAI-compatible adapter, many endpoints",
   "order": 1003,
   "duration_min": 25,
-  "concept_md": "### One protocol, several servers\n\n`app/openai_compat_provider.py` speaks the OpenAI chat-completions protocol. LM Studio implements it locally; so do many hosted services. The adapter does not know which one it is talking to — it knows an address, a model id and a key.\n\n### The config object\n\n`OpenAICompatConfig` carries what one call needs: the base URL, the model, the key and the timeout. The engine builds it from `Settings` for the local endpoint or for Sarvam, and the adapter takes it as an argument.\n\n### Why this is the interesting design\n\nA second hosted provider would be a new config, not a new adapter. The protocol is the seam, so the work of adding a provider is the work of describing its endpoint — and the code that parses the model's answer is written once.\n\n### What the adapter does not abstract\n\nDifferent servers fail differently. A local server that is not running refuses the connection; a hosted one returns 401 for a bad key. The adapter translates both into one error vocabulary rather than pretending they are the same, which is lesson 10.6.",
+  "concept_md": "### One protocol, several servers\n\n`app/openai_compat_provider.py` speaks the OpenAI chat-completions protocol. LM Studio implements it locally; so do many hosted services. The adapter does not know which one it is talking to — it knows an address, a model id and a key.\n\n### The config object\n\n`OpenAICompatConfig` carries what one call needs: the base URL, the model, the key and the timeout. The engine builds it from `Settings` for the local endpoint or for Sarvam, and the adapter takes it as an argument.\n\n### Why this is the interesting design\n\nA second hosted provider would be a new config, not a new adapter. The protocol is the seam, so the work of adding a provider is the work of describing its endpoint — and the code that parses the model's answer is written once.\n\n### What the adapter does not abstract\n\nDifferent servers fail differently. A local server that is not running refuses the connection; a hosted one returns 401 for a bad key. The adapter translates both into one error vocabulary rather than pretending they are the same, which is lesson 10.6.\n\n### What a second endpoint costs\n\nAdding one is a config object and a name. The parsing of the model's answer, the scrubbing of its errors and the normalisation of its severity are written once, so a new endpoint inherits behaviour that has already been tested rather than starting from a blank parser.",
   "code_examples": [
     {
       "id": "10.3-ex-0",
@@ -37,23 +37,23 @@ window.LESSONS.push({
     {
       "q": "What does the adapter know about its server?",
       "options": [
-        "Only address, model and key",
         "Its vendor and its error codes",
+        "Only address, model and key",
         "Its version and its retry policy",
         "Its model list and its limits"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "The same code talks to a laptop server and a hosted one because it knows nothing vendor-specific."
     },
     {
       "q": "What does the adapter refuse to hide?",
       "options": [
-        "That servers fail differently",
-        "That models answer differently",
         "That keys expire eventually soon",
+        "That models answer differently",
+        "That servers fail differently",
         "That timeouts vary by server type"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A refused connection and a 401 are translated into one vocabulary rather than flattened into one error."
     }
   ],

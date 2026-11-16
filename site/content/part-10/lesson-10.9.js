@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "Timeouts, degradation and the one WARNING",
   "order": 1009,
   "duration_min": 25,
-  "concept_md": "### A bound on every call\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative; the local endpoint has its own, larger timeout because a laptop model is slower. A call without a bound is a hang waiting to happen.\n\n### Degrading, once\n\nWhen a live call fails, the run degrades to the rule engine and logs exactly one WARNING. One, not one per finding, and not silence: a reader of the log sees the degradation and its reason in a single line.\n\n### Why exactly one\n\nBecause a per-finding warning buries the signal in noise, and no warning at all makes a degraded run indistinguishable from a clean one. One line is the amount a person will actually read.\n\n### The outcome keeps the record\n\nThe `ProviderOutcome` carries `mode=\"mock\"` and the reason, so the degradation is visible in the result as well as the log. A caller that reads neither gets a real review with an honest provenance it chose not to look at.",
+  "concept_md": "### A bound on every call\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative; the local endpoint has its own, larger timeout because a laptop model is slower. A call without a bound is a hang waiting to happen.\n\n### Degrading, once\n\nWhen a live call fails, the run degrades to the rule engine and logs exactly one WARNING. One, not one per finding, and not silence: a reader of the log sees the degradation and its reason in a single line.\n\n### Why exactly one\n\nBecause a per-finding warning buries the signal in noise, and no warning at all makes a degraded run indistinguishable from a clean one. One line is the amount a person will actually read.\n\n### The outcome keeps the record\n\nThe `ProviderOutcome` carries `mode=\"mock\"` and the reason, so the degradation is visible in the result as well as the log. A caller that reads neither gets a real review with an honest provenance it chose not to look at.\n\n### Where the warning is written\n\nThe engine logs it once, at the point it decides to degrade, and the outcome carries the same sentence. That is why the CLI, the API and the JSON output all explain a fallback identically — none of them formats the reason, they only print what the engine recorded.",
   "code_examples": [
     {
       "id": "10.9-ex-0",
@@ -26,23 +26,23 @@ window.LESSONS.push({
     {
       "q": "How many warnings does a degraded run log?",
       "options": [
-        "Exactly one, with its reason",
-        "One for every finding",
         "None; the outcome carries it",
+        "One for every finding",
+        "Exactly one, with its reason",
         "One per provider tried"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "A warning per finding buries the signal; none at all hides the degradation."
     },
     {
       "q": "Why does the local endpoint have its own timeout?",
       "options": [
-        "A laptop model answers slower",
+        "The protocol requires one of its own",
         "The protocol requires one",
         "The SDK defaults to it",
-        "The protocol requires one of its own"
+        "A laptop model answers slower"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "One bound cannot suit a hosted endpoint and a model running on someone's machine."
     },
     {

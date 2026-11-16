@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The mock provider: the rule engine, no network",
   "order": 1002,
   "duration_min": 20,
-  "concept_md": "### The one provider that always works\n\n`app/mock_provider.py` is 75 lines. It runs `review_lines` over the diff's added lines and returns a `ProviderOutcome` with `mode=\"mock\"`. No socket, no key, no model.\n\n### Why it is not a stub\n\nA stub would return canned findings. This runs the real 63 rules over the real diff, so the findings a reader sees in mock mode are true findings about their code — they are just not model-assisted. That is why variant A of the demo is the one that is exercised: it produces a real review with no external dependency.\n\n### What mock mode is for\n\nThree things. It lets the tool start on a machine with nothing configured, which is the offline-first promise. It makes the test suite runnable without a network. And it gives the live providers something to be compared against, which is the benchmark that has not been run.\n\n### The label\n\n`mode=\"mock\"` and a `reason` naming why the fallback happened — no key, no local endpoint, or a forced offline run. A caller that ignores the label gets a true review with an honest provenance it did not read.",
+  "concept_md": "### The one provider that always works\n\n`app/mock_provider.py` is 75 lines. `offline_review` and `offline_diff_findings` run the rule engine over the diff and return a `ReviewResult` — mode, target, findings, notes. No socket, no key, no model. The `ProviderOutcome` that reaches a caller is assembled one level up, in `engine._mock_outcome`, so the mock never builds the wrapper itself.\n\n### Why it is not a stub\n\nA stub would return canned findings. This runs the real 63 rules over the real diff, so the findings a reader sees in mock mode are true findings about their code — they are just not model-assisted. That is why variant A of the demo is the one that is exercised: it produces a real review with no external dependency.\n\n### What mock mode is for\n\nThree things. It lets the tool start on a machine with nothing configured, which is the offline-first promise. It makes the test suite runnable without a network. And it gives the live providers something to be compared against, which is the benchmark that has not been run.\n\n### The label\n\n`mode=\"mock\"` and a `reason` naming why the fallback happened — no key, no local endpoint, or a forced offline run. A caller that ignores the label gets a true review with an honest provenance it did not read.",
   "code_examples": [
     {
       "id": "10.2-ex-0",
@@ -26,12 +26,12 @@ window.LESSONS.push({
     {
       "q": "What makes the mock provider more than a stub?",
       "options": [
-        "It runs the real rules",
+        "It calls a tiny local model",
         "It returns canned findings",
         "It caches a previous run",
-        "It calls a tiny local model"
+        "It runs the real rules"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The findings are true findings about the diff; what is absent is the model, not the analysis."
     },
     {
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "What does a mock outcome still carry?",
       "options": [
-        "A mode and a reason",
         "A key and a model name",
+        "A mode and a reason",
         "A retry count and a key",
         "A cache id and a mode"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "The label is what keeps a degraded run honest when the caller reads it."
     }
   ],

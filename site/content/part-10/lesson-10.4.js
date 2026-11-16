@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "`provider_available`: an honest gate before a call",
   "order": 1004,
   "duration_min": 20,
-  "concept_md": "### Ask before calling\n\nEach provider exposes `provider_available`. For the local adapter it checks that a base URL is set; for Sarvam it checks the key and that the SDK is installed. The engine calls it before building a client.\n\n### Why a predicate rather than a try\n\nA call that fails because a key is missing produces an error from deep inside a library, and translating that into \"set SARVAM_API_KEY\" is guesswork. A predicate answers the question before anything is sent, so the reason a provider was skipped is known rather than inferred.\n\n### The two answers it gives the engine\n\nAvailable, so the engine builds a config and runs live. Not available, so the engine records why and degrades to mock. The reason string is user-facing and names the variable that is missing.\n\n### What it cannot check\n\nThat the model is loaded, that the key is valid, or that the server is awake. It answers \"is this configured\", not \"will this work\" — and the difference is why a live call can still fail after a passing check.",
+  "concept_md": "### Ask before calling\n\nThe two live providers expose `provider_available`, and it is stricter than the selector: `openai_compat_provider.provider_available` requires a base URL **and** a non-blank key; `sarvam_provider.provider_available` requires the key and an importable SDK.\n\nThe selector itself does not call it. `config_for_sarvam` checks only that `SARVAM_API_KEY` is non-blank, and `config_for_local` only that a base URL is set — so a key with no SDK installed still selects `sarvam`, and the failure surfaces at call time.\n\n### Why a predicate rather than a try\n\nA call that fails because a key is missing produces an error from deep inside a library, and translating that into \"set SARVAM_API_KEY\" is guesswork. A predicate answers the question before anything is sent, so the reason a provider was skipped is known rather than inferred.\n\n### The two answers it gives the engine\n\nAvailable, so the engine builds a config and runs live. Not available, so the engine records why and degrades to mock. The reason string is user-facing and names the variable that is missing.\n\n### What it cannot check\n\nThat the model is loaded, that the key is valid, or that the server is awake. It answers \"is this configured\", not \"will this work\" — and the difference is why a live call can still fail after a passing check.",
   "code_examples": [
     {
       "id": "10.4-ex-0",
@@ -26,34 +26,34 @@ window.LESSONS.push({
     {
       "q": "What does the gate answer?",
       "options": [
-        "Is this configured",
         "Will this call succeed",
+        "Is this configured",
         "Is the model loaded",
         "Is the key still valid"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "It answers the configuration question, which is why a live call can still fail after it passes."
     },
     {
       "q": "Why a predicate rather than catching an error?",
       "options": [
-        "The reason is known, not inferred",
-        "It is faster than making the call",
         "It avoids importing the vendor SDK",
+        "It is faster than making the call",
+        "The reason is known, not inferred",
         "It removes the need for a key"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Reading a library's error and guessing which variable is missing is guesswork; asking first is not."
     },
     {
       "q": "What does the engine do when the gate says no?",
       "options": [
-        "Records why and degrades",
+        "Raises and stops the run",
         "Retries with a longer timeout",
         "Asks the other provider first",
-        "Raises and stops the run"
+        "Records why and degrades"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "The reason becomes the outcome's reason, so the degraded run explains itself."
     }
   ],

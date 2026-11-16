@@ -9,16 +9,16 @@ window.LESSONS.push({
   "title": "Errors translated, not leaked",
   "order": 1006,
   "duration_min": 25,
-  "concept_md": "### Three vocabularies, one error\n\nA refused connection, a 401 and a timeout arrive as different exception types from different libraries. `_translate_call_error` maps them onto the tool's own errors, so a caller handles one vocabulary.\n\n### Why translation matters\n\nWithout it, an API surface would have to catch `openai.AuthenticationError` and know what to do with it — a vendor name in a route handler. With it, the route catches the tool's error and the vendor stays in the adapter.\n\n### Scrubbing on the way out\n\n`_scrub` and `_present` clean a message before it reaches a human: one line, no key material, no endpoint credentials. An error is the most likely place for a secret to escape, because it quotes the request that failed.\n\n### What is deliberately kept\n\nThe model name and the endpoint label, so a reader can tell which provider failed. Redaction removes credentials, not identity — an error that cannot say which provider failed is not much use.",
+  "concept_md": "### Three vocabularies, one error\n\nA refused connection, a 401 and a timeout arrive as different exception types from different libraries. `_translate_call_error` maps them onto the tool's own errors, so a caller handles one vocabulary.\n\n### Why translation matters\n\nWithout it, an API surface would have to catch `openai.AuthenticationError` and know what to do with it — a vendor name in a route handler. With it, the route catches the tool's error and the vendor stays in the adapter.\n\n### Scrubbing on the way out\n\n`_one_line` flattens a message to a single line, `_scrub` removes the configured key from it, and `_present` composes the two. Scrub with no config and nothing is removed — the key has to be passed in for the redaction to happen. An error is the most likely place for a secret to escape, because it quotes the request that failed.\n\n### What is deliberately kept\n\nThe model name and the endpoint label, so a reader can tell which provider failed. Redaction removes credentials, not identity — an error that cannot say which provider failed is not much use.\n\n### The three helpers, and the order they run in\n\n`_one_line` first, because a message with newlines breaks a log line and an HTTP header. `_scrub` second, because the key has to be present in the text to be removed. `_present` composes both, so a caller cannot apply one and forget the other.",
   "code_examples": [
     {
       "id": "10.6-ex-0",
       "lang": "console",
-      "caption": "A message is scrubbed and flattened before it is shown",
-      "code": "python - <<'PY'\nfrom app.openai_compat_provider import _one_line, _scrub\n\nraw = \"AuthenticationError: bad key sk-live-abc123\\n  on line two\"\nprint(\"one line:\", _one_line(raw))\nprint(\"scrubbed:\", _scrub(raw, None))\nPY",
+      "caption": "Scrubbing removes the key; flattening is a separate step",
+      "code": "python - <<'PY'\nfrom app.openai_compat_provider import OpenAICompatConfig, _one_line, _scrub\n\ncfg = OpenAICompatConfig(base_url=\"http://x/v1\", api_key=\"sk-live-abc123\",\n                         model=\"m\", provider_name=\"local\", timeout=20.0)\nraw = \"AuthenticationError: bad key sk-live-abc123\\n  on line two\"\nprint(\"one line:\", _one_line(raw))\nprint(\"scrubbed:\", _scrub(raw, cfg))\nPY",
       "runnable": false,
       "run_tier": "terminal",
-      "expected_output": "one line: AuthenticationError: bad key sk-live-abc123 on line two\nscrubbed: AuthenticationError: bad key sk-live-abc123\n  on line two",
+      "expected_output": "one line: AuthenticationError: bad key sk-live-abc123 on line two\nscrubbed: AuthenticationError: bad key ***\n  on line two",
       "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
     }
   ],
@@ -26,12 +26,12 @@ window.LESSONS.push({
     {
       "q": "Why translate a library's error type?",
       "options": [
-        "The vendor name stays in the adapter",
+        "The HTTP status code can be dropped from it",
         "The error message becomes much shorter",
         "The retry count can be reset between calls",
-        "The HTTP status code can be dropped from it"
+        "The vendor name stays in the adapter"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "Otherwise a route handler has to know the vendor, which is exactly the coupling the adapter exists to remove."
     },
     {
@@ -48,12 +48,12 @@ window.LESSONS.push({
     {
       "q": "What is deliberately kept in an error?",
       "options": [
-        "Which provider failed",
         "The key that was used for the call",
+        "Which provider failed",
         "The full request body as it was sent",
         "The endpoint credentials and the key"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "Redaction removes credentials, not identity: a reader still needs to know who failed."
     }
   ],

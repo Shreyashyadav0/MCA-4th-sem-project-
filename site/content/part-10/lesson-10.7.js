@@ -6,10 +6,10 @@ window.LESSONS.push({
   "id": "10.7",
   "part": 10,
   "part_title": "Providers and LLM APIs",
-  "title": "Sarvam: a second adapter, and it is unexercised",
+  "title": "Sarvam: the contract module, and why it is unexercised",
   "order": 1007,
   "duration_min": 20,
-  "concept_md": "### What exists\n\n`app/sarvam_provider.py` is 993 lines and speaks Sarvam's API. It defines the wire contract, the outcome, and its own availability check.\n\n### What has been run\n\nThe code has been tested against stubs and a scripted fake client with the real exception classes. It has **never** had a real key or a real model behind it in this repository, and `DEMO.md` says so in its table.\n\n### Why the honesty matters\n\nAn adapter that has never made a real call is a claim about an API's behaviour made from its documentation. The shape of the answer, the error types and the retry policy are all written to a spec that has not been exercised. A reader who is told that can judge the risk; a reader who is not will assume a green test suite means a working integration.\n\n### What a reader should conclude\n\nThat variant C of the demo is unexercised, that no capture of a Sarvam review exists, and that adding a key is the step which would turn this from a spec-faithful adapter into a verified one — and the first thing that step would produce is a bug report, not a confirmation.",
+  "concept_md": "### What exists\n\n`app/sarvam_provider.py` is 993 lines. It defines the wire contract (`LLMFinding`), the outcome (`ProviderOutcome`), the prompt builder and its own availability check. It also holds a `review_with_fallback` — and the engine does not call it. Both live providers run through the OpenAI-compatible adapter instead, so this module is the contract, not a second transport.\n\n### What has been run\n\nThe code has been tested against stubs and a scripted fake client with the real exception classes. It has **never** had a real key or a real model behind it in this repository, and `DEMO.md` says so in its table.\n\n### Why the honesty matters\n\nAn adapter that has never made a real call is a claim about an API's behaviour made from its documentation. The shape of the answer, the error types and the retry policy are all written to a spec that has not been exercised. A reader who is told that can judge the risk; a reader who is not will assume a green test suite means a working integration.\n\n### What a reader should conclude\n\nThat variant C of the demo runs the adapter labelled `sarvam`, that it is unexercised, that no capture of a Sarvam review exists, and that adding a key is the step which would turn this from a spec-faithful adapter into a verified one — and the first thing that step would produce is a bug report, not a confirmation.",
   "code_examples": [
     {
       "id": "10.7-ex-0",
@@ -37,23 +37,23 @@ window.LESSONS.push({
     {
       "q": "What does a green suite mean for this adapter?",
       "options": [
-        "It matches the documented spec",
         "It works against the live API today",
+        "It matches the documented spec",
         "Its key is known to be valid",
         "Its model is known to answer"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "The tests establish fidelity to a written spec, not behaviour of a service nobody has called."
     },
     {
       "q": "What would a real key produce first?",
       "options": [
-        "A bug report, not a confirmation",
-        "A clean pass on the very first try",
         "A benchmark figure at last",
+        "A clean pass on the very first try",
+        "A bug report, not a confirmation",
         "A new provider selection"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "An unexercised integration usually disagrees with its spec somewhere, and that disagreement is the finding."
     }
   ],

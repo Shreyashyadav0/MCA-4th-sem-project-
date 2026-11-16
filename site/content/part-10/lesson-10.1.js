@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The provider contract: one shape, three implementations",
   "order": 1001,
   "duration_min": 25,
-  "concept_md": "### What a provider must return\n\nEvery provider returns a `ProviderOutcome`:\n\n```python\nclass ProviderOutcome(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n    provider: str\n    model: str\n    findings: list[Finding]\n    reason: str = \"\"\n    latency_ms: float = 0.0\n```\n\n`mode` is the honest label. A caller reading an outcome can never mistake a degraded run for a live one, because the field says which it was.\n\n### Why the shape is fixed\n\nThe CLI, the API and the JSON output all read the same object. If a provider could return its own shape, each surface would need its own translation, and one of them would eventually drop `reason` and report a mock run as a live one.\n\n### What the model is asked for\n\n`LLMFinding` is the wire contract: five fields, `extra=\"forbid\"`, and `line` typed `str | int` because models answer `42` and `\"42\"` interchangeably. A `field_validator` upper-cases the severity before validation, so `\"high\"` is accepted and `\"urgent\"` is still rejected.\n\n### Three implementations\n\n`app/mock_provider.py` runs the rule engine with no network. `app/openai_compat_provider.py` speaks the OpenAI-compatible protocol, which LM Studio and many others implement. `app/sarvam_provider.py` speaks Sarvam's API. All three return the same object.",
+  "concept_md": "### What a provider must return\n\nEvery provider returns a `ProviderOutcome`:\n\n```python\nclass ProviderOutcome(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n    provider: str\n    model: str\n    findings: list[Finding]\n    reason: str = \"\"\n    latency_ms: float = 0.0\n```\n\n`mode` is the honest label. A caller reading an outcome can never mistake a degraded run for a live one, because the field says which it was.\n\n### Why the shape is fixed\n\nThe CLI, the API and the JSON output all read the same object. If a provider could return its own shape, each surface would need its own translation, and one of them would eventually drop `reason` and report a mock run as a live one.\n\n### What the model is asked for\n\n`LLMFinding` is the wire contract: five fields, `extra=\"forbid\"`, and `line` typed `str | int` because models answer `42` and `\"42\"` interchangeably. A `field_validator` upper-cases the severity before validation, so `\"high\"` is accepted and `\"urgent\"` is still rejected.\n\n### Two paths, one adapter\n\n`app/mock_provider.py` runs the rule engine with no network. Both live providers — `local` and `sarvam` — go through the single `app/openai_compat_provider.py` adapter, because Sarvam speaks the same protocol. The engine's docstring says so: this module owns no transport.\n\n`app/sarvam_provider.py` supplies the contract itself — `LLMFinding`, `ProviderOutcome`, the prompt builder — and holds a `review_with_fallback` the engine deliberately does not call, so there is exactly one mock implementation.",
   "code_examples": [
     {
       "id": "10.1-ex-0",
@@ -26,34 +26,34 @@ window.LESSONS.push({
     {
       "q": "Which field stops a caller mistaking a fallback for a live run?",
       "options": [
-        "`mode` on the outcome",
         "`provider` on the outcome",
+        "`mode` on the outcome",
         "`model` on the outcome",
         "`latency_ms` on the outcome"
       ],
-      "answer": 0,
+      "answer": 1,
       "why": "It is a literal of live or mock, so a degraded run is labelled rather than inferred from a missing field."
     },
     {
       "q": "Why is `LLMFinding.line` typed `str | int`?",
       "options": [
-        "Models answer 42 and \"42\" alike",
-        "JSON has no integer type in the spec",
         "The line can be a range of lines",
+        "JSON has no integer type in the spec",
+        "Models answer 42 and \"42\" alike",
         "Pydantic cannot coerce to an int"
       ],
-      "answer": 0,
+      "answer": 2,
       "why": "Both spellings are normalised to the `Finding` contract later, so the wire type has to accept either."
     },
     {
       "q": "What does a provider return to its caller?",
       "options": [
-        "One `ProviderOutcome`",
+        "A tuple of mode and findings",
         "A list of findings alone",
         "A dict keyed by provider",
-        "A tuple of mode and findings"
+        "One `ProviderOutcome`"
       ],
-      "answer": 0,
+      "answer": 3,
       "why": "One object with one shape, so no surface needs its own translation and none can drop the mode."
     }
   ],
@@ -97,7 +97,7 @@ window.LESSONS.push({
     }
   ],
   "glossary_terms": [
-    "provider — a module that produces a review outcome",
+    "provider — the thing that produces a review outcome",
     "outcome — the labelled result of one review attempt",
     "wire contract — the shape a model is asked to return"
   ]
