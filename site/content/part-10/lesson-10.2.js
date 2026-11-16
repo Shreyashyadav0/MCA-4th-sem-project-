@@ -38,9 +38,9 @@ window.LESSONS.push({
       "q": "Which promise does mock mode keep?",
       "options": [
         "The tool starts unconfigured",
-        "The model runs faster",
-        "The key stays in memory",
-        "The model runs measurably faster"
+        "The model runs measurably faster",
+        "The key never enters the process",
+        "The rules run in parallel"
       ],
       "answer": 0,
       "why": "Offline-first means a fresh checkout produces a real review with nothing set up."

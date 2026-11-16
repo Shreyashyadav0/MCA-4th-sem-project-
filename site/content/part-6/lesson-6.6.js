@@ -84,7 +84,7 @@ window.LESSONS.push({
     {
       "label": "The line validator",
       "path": "app/models.py",
-      "lines": "87-95"
+      "lines": "86-95"
     },
     {
       "label": "The constraints on file, issue and fix",

@@ -6,7 +6,7 @@ window.LESSONS.push({
   "id": "10.5",
   "part": 10,
   "part_title": "Providers and LLM APIs",
-  "title": "`select_provider`: auto, live and mock",
+  "title": "`select_provider`: auto, sarvam, local, mock",
   "order": 1005,
   "duration_min": 25,
   "concept_md": "### One function decides\n\n`select_provider(settings, requested=\"auto\")` returns a `ProviderSelection`: the provider name, the config it needs, and a one-line reason. Every surface goes through it, so the routing rule exists once.\n\n### The four requests\n\nThe selector accepts `auto`, `sarvam`, `local` and `mock`. `auto` prefers a configured provider and falls back to mock. Naming a provider asks for that one and degrades with a reason if it is unavailable. `mock` forces the rule engine. Anything else raises `ValueError`, listing the four.\n\nForced offline is not a request — it is the `force_offline` flag on `review()`, which stops a live call being made at all.\n\n### Why the reason is part of the return value\n\nBecause a decision without its reason is unauditable. When a run is degraded, the outcome carries the sentence that explains it, and the reader never has to guess whether a key was missing or a mode was forced.\n\n### The ordering\n\nSarvam first when both are configured, because a hosted model is the stronger claim; then local; then mock. The order is written in one place and every surface inherits it.\n\n### Why the selector is one function\n\nThe CLI, the API and the tests all need the same answer to \"which provider runs now\". If each computed it, a demo and a test could disagree about whether a run was live — and the disagreement would show up as a mislabelled outcome rather than an error.",
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The selection record",
       "path": "app/engine.py",
-      "lines": "83-96"
+      "lines": "82-96"
     },
     {
       "label": "The one routing function",

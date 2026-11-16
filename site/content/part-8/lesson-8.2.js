@@ -90,7 +90,7 @@ window.LESSONS.push({
     {
       "label": "The registry the categories describe",
       "path": "app/rules.py",
-      "lines": "113-130"
+      "lines": "112-130"
     }
   ],
   "learn_more": [

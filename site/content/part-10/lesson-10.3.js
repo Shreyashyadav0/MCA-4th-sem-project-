@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The config one call needs",
       "path": "app/openai_compat_provider.py",
-      "lines": "125-142"
+      "lines": "124-142"
     }
   ],
   "learn_more": [

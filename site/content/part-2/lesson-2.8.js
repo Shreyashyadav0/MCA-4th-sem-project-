@@ -54,12 +54,12 @@ window.LESSONS.push({
     {
       "q": "Why does `ReviewResult` need a `mode=\"before\"` validator to drop `verdict`?",
       "options": [
-        "Because a computed field is in the dump and the model never declared it",
-        "Because the dump contains a key whose value is None",
-        "Because the dump contains a computed field the model never declared",
-        "Because `extra=\"forbid\"` rejects every field not set explicitly"
+        "Because a computed field is in the dump and was never declared",
+        "Because `verdict` is a Literal the dump cannot re-validate on the way out",
+        "Because the model was built without validation",
+        "Because the dump sorts its keys first"
       ],
-      "answer": 2,
+      "answer": 0,
       "why": "The model can read its own JSON only if the computed key is removed before the unknown-key check runs."
     }
   ],
@@ -89,7 +89,7 @@ window.LESSONS.push({
     {
       "label": "The computed verdict field",
       "path": "app/models.py",
-      "lines": "180-194"
+      "lines": "186-190"
     }
   ],
   "learn_more": [

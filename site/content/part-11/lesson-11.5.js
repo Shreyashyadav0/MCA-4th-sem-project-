@@ -61,7 +61,7 @@ window.LESSONS.push({
     "prompt": "Find every mention of WARNING in the engine.",
     "starter": "",
     "solution": "```console\n$ grep -n 'logger.warning' app/openai_compat_provider.py\n```",
-    "explanation": "One call site in the adapter. The engine's mentions are prose that states the rule, not code that logs."
+    "explanation": "Two call sites in the adapter — one for a repair retry that failed, one for the degradation. The invariant is per run, not per site."
   },
   "exercise": {
     "prompt": "Which two fields of the outcome make a degraded run visible?",

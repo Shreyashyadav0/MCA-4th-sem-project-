@@ -32,12 +32,12 @@ window.LESSONS.push({
     {
       "q": "Why is `as_row()` a method rather than a dict built at each call site?",
       "options": [
-        "Because a dict cannot hold five keys in a fixed order",
-        "Because a dict cannot hold five keys and keep their order",
         "So the column names cannot disagree",
-        "So the values can be cached"
+        "Because a dict is rebuilt on every call",
+        "Because a dict cannot hold five keys in a fixed order",
+        "Because Pydantic requires a method"
       ],
-      "answer": 2,
+      "answer": 0,
       "why": "One mapping from field names to headings means a rename happens in one place; two call sites would drift."
     },
     {

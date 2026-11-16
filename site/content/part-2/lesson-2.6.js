@@ -44,12 +44,12 @@ window.LESSONS.push({
       "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
         "Because a bare `= []` is shared by every instance that is built",
-        "Because a mutable default is rejected at class definition time",
-        "Because `Field` is the only way to give a list field a default at all",
+        "Because a mutable default is rejected at class definition time outright",
+        "Because `Field` is the only way to give a list a default",
         "Because it is the documented spelling for a fresh list"
       ],
-      "answer": 3,
-      "why": "`Field(default_factory=list)` is the documented spelling, and it also avoids the sharing that a bare `= []` would cause in a plain dataclass — though Pydantic deep-copies a bare default per instance anyway."
+      "answer": 0,
+      "why": "A bare `= []` would be shared by every instance in a plain dataclass; `default_factory` builds a fresh list per instance."
     },
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",

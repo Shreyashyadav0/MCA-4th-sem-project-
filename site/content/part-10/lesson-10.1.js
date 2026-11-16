@@ -6,7 +6,7 @@ window.LESSONS.push({
   "id": "10.1",
   "part": 10,
   "part_title": "Providers and LLM APIs",
-  "title": "The provider contract: one shape, three implementations",
+  "title": "The provider contract: one shape, three providers",
   "order": 1001,
   "duration_min": 25,
   "concept_md": "### What a provider must return\n\nEvery provider returns a `ProviderOutcome`:\n\n```python\nclass ProviderOutcome(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n    provider: str\n    model: str\n    findings: list[Finding]\n    reason: str = \"\"\n    latency_ms: float = 0.0\n```\n\n`mode` is the honest label. A caller reading an outcome can never mistake a degraded run for a live one, because the field says which it was.\n\n### Why the shape is fixed\n\nThe CLI, the API and the JSON output all read the same object. If a provider could return its own shape, each surface would need its own translation, and one of them would eventually drop `reason` and report a mock run as a live one.\n\n### What the model is asked for\n\n`LLMFinding` is the wire contract: five fields, `extra=\"forbid\"`, and `line` typed `str | int` because models answer `42` and `\"42\"` interchangeably. A `field_validator` upper-cases the severity before validation, so `\"high\"` is accepted and `\"urgent\"` is still rejected.\n\n### Two paths, one adapter\n\n`app/mock_provider.py` runs the rule engine with no network. Both live providers — `local` and `sarvam` — go through the single `app/openai_compat_provider.py` adapter, because Sarvam speaks the same protocol. The engine's docstring says so: this module owns no transport.\n\n`app/sarvam_provider.py` supplies the contract itself — `LLMFinding`, `ProviderOutcome`, the prompt builder — and holds a `review_with_fallback` the engine deliberately does not call, so there is exactly one mock implementation.",
@@ -26,12 +26,12 @@ window.LESSONS.push({
     {
       "q": "Which field stops a caller mistaking a fallback for a live run?",
       "options": [
-        "`findings` on the outcome",
         "`mode` on the outcome",
-        "`mode` on the outcome",
+        "`provider` on the outcome",
+        "`reason` on the outcome",
         "`latency_ms` on the outcome"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "It is a literal of live or mock, so a degraded run is labelled rather than inferred from a missing field."
     },
     {
@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The outcome every provider returns",
       "path": "app/sarvam_provider.py",
-      "lines": "102-166"
+      "lines": "102-117"
     },
     {
       "label": "The wire contract",

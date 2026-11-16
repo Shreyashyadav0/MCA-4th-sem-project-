@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The header parameters",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     },
     {
       "label": "The signature check",
@@ -88,7 +88,7 @@ window.LESSONS.push({
     {
       "label": "The guard that decides whether to check",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     }
   ],
   "learn_more": [

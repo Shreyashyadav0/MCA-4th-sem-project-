@@ -90,7 +90,7 @@ window.LESSONS.push({
     {
       "label": "scan_text and the regex budget",
       "path": "app/rules.py",
-      "lines": "93-103"
+      "lines": "92-103"
     }
   ],
   "learn_more": [

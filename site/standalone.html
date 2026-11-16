@@ -4988,7 +4988,7 @@ window.LESSONS.push({
   "title": "What this project is and what you'll know by the end",
   "order": 1,
   "duration_min": 10,
-  "concept_md": "### What this project is\n\nAn offline-first AI code reviewer. Point it at a unified diff or a source file and it returns findings with exactly five fields — file, line, severity, issue, suggested fix — and it can post them to a pull request as inline comments. The posting path is exercised against a fake HTTP client, not against GitHub itself — `HANDOFF.md` is the ledger on that.\n\nThe deterministic part is the product: **63 OWASP-mapped rules** that read added lines only, with no API key, no network and no model. The model is an upgrade on top of that, never a dependency. If the key is missing, the endpoint is down, or the answer does not parse, the review still completes — with one `WARNING` that says what happened, never an exception and never a silent downgrade.\n\n### What you will be able to do by the end\n\n- Read every module in `app/` without a guide beside you.\n- Rebuild `models.py`, `parser.py`, `rules.py` and `engine.py` from memory, each one proved by the test suite rather than by feeling.\n- Explain the fallback architecture: what degrades, where the single `WARNING` comes from, and why the degraded path calls the rule engine directly (ADR 0004).\n- State the provider precedence — `sarvam > local > mock` — and name the one function that decides it.\n- Defend the honesty limits in `HANDOFF.md` at a viva, including the things that are simulated rather than real.\n\n### The shape of the thing\n\n| Stage | Module | What it decides |\n|---|---|---|\n| Parse | `app/parser.py` | which lines the diff actually added |\n| Review | `app/rules.py` | which of the 63 deterministic rules fire |\n| Choose | `app/engine.py` | sarvam, local or mock — in one place |\n| Anchor | `app/parser.py` | whether a comment can attach to a line |\n| Post | `app/github_client.py` | inline comments, or a summary when anchoring fails |\n\n### Start here\n\n```console\npython -m pytest -q tests\npython reviewer.py samples/sample.diff\n```\n\nThe first command tells you whether the environment is sound. The second shows the whole pipeline on a real diff: mode `mock`, four findings, verdict `block`, exit code 0.\n\n> 640 passed, 1 skipped is the number to expect at this commit. If yours differs, stop and fix the pins in `requirements.lock` before learning anything — otherwise you are studying a different program from the one this site describes.\n\n### How to read this site\n\nEvery lesson has a concept, a worked example, something to try, an exercise, and the mistakes people actually make. The links at the bottom point at the exact file and line range the lesson is about: read that code, close it, and write it again from memory.\n\nThe site is a learning aid. `HANDOFF.md` is the ledger; `docs/learning/` is the curriculum.",
+  "concept_md": "### What this project is\n\nAn offline-first AI code reviewer. Point it at a unified diff or a source file and it returns findings with exactly five fields — file, line, severity, issue, suggested fix — and it can post them to a pull request as inline comments. The posting path is exercised against a fake HTTP client, not against GitHub itself — `HANDOFF.md` is the ledger on that.\n\nThe deterministic part is the product: **63 OWASP-mapped rules** that read added lines only, with no API key, no network and no model. The model is an upgrade on top of that, never a dependency. If the key is missing, the endpoint is down, or the answer does not parse, the review still completes — with one `WARNING` that says what happened, never an exception and never a silent downgrade.\n\n### What you will be able to do by the end\n\n- Read every module in `app/` without a guide beside you.\n- Rebuild four of the seven tracks — `models.py`, `parser.py`, `rules.py` and `engine.py` — from memory, each one proved by the test suite rather than by feeling.\n- Explain the fallback architecture: what degrades, where the single `WARNING` comes from, and why the degraded path calls the rule engine directly (ADR 0004).\n- State the provider precedence — `sarvam > local > mock` — and name the one function that decides it.\n- Defend the honesty limits in `HANDOFF.md` at a viva, including the things that are simulated rather than real.\n\n### The shape of the thing\n\n| Stage | Module | What it decides |\n|---|---|---|\n| Parse | `app/parser.py` | which lines the diff actually added |\n| Review | `app/rules.py` | which of the 63 deterministic rules fire |\n| Choose | `app/engine.py` | sarvam, local or mock — in one place |\n| Anchor | `app/parser.py` | whether a comment can attach to a line |\n| Post | `app/github_client.py` | inline comments, or a summary when anchoring fails |\n\n### Start here\n\n```console\npython -m pytest -q tests\npython reviewer.py samples/sample.diff\n```\n\nThe first command tells you whether the environment is sound. The second shows the whole pipeline on a real diff: mode `mock`, four findings, verdict `block`, exit code 0.\n\n> 640 passed, 1 skipped is the number to expect at this commit. If yours differs, stop and fix the pins in `requirements.lock` before learning anything — otherwise you are studying a different program from the one this site describes.\n\n### How to read this site\n\nEvery lesson has a concept, a worked example, something to try, an exercise, and the mistakes people actually make. The links at the bottom point at the exact file and line range the lesson is about: read that code, close it, and write it again from memory.\n\nThe site is a learning aid. `HANDOFF.md` is the ledger; `docs/learning/` is the curriculum.",
   "code_examples": [
     {
       "id": "0.1-ex-0",
@@ -5087,7 +5087,7 @@ window.LESSONS.push({
     {
       "label": "The recovery checklist for picking the project back up",
       "path": "RESUME.md",
-      "lines": "1-25"
+      "lines": "1-23"
     }
   ],
   "learn_more": [
@@ -5171,7 +5171,7 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Press `/` and search for `provider`. Then search for `zzzz`. Read the two results screens and note the difference: one lists lessons, the other explains the empty state instead of leaving a blank box.",
     "starter": "# The two keys this site writes, and the shape of the progress value.\nPROGRESS_KEY = \"ai-reviewer-learning-progress-v1\"\nTHEME_KEY = \"ai-reviewer-learning-theme-v1\"\nprint({\"version\": 1, \"done\": {\"0.2\": True}})\n",
-    "solution": "```text\n`provider` matches five lessons — 0.1, 0.4, 1.1, 1.3 and 1.12 — because each one names the provider or its precedence somewhere in its concept text. `zzzz` matches nothing, and the page says so and suggests browsing the parts instead of showing an empty list.\n```",
+    "solution": "```text\n`provider` matches thirty lessons — 0.1, 0.4, 1.1, 1.3 and 1.12 — because each one names the provider or its precedence somewhere in its concept text. `zzzz` matches nothing, and the page says so and suggests browsing the parts instead of showing an empty list.\n```",
     "explanation": "Search runs entirely in the page over `window.LESSONS`, so it works with the network off. That is also why it can only see what the page has loaded."
   },
   "exercise": {
@@ -5409,7 +5409,7 @@ window.LESSONS.push({
     {
       "label": "The module graph, the fallback chain and the frozen interfaces",
       "path": "ARCHITECTURE.md",
-      "lines": "1-60"
+      "lines": "1-58"
     },
     {
       "label": "PROVIDERS and the selection result",
@@ -6195,7 +6195,7 @@ window.LESSONS.push({
     {
       "label": "The rule that recommends `with open(...)` to other people's code",
       "path": "app/rules.py",
-      "lines": "1225-1293"
+      "lines": "1218-1293"
     }
   ],
   "learn_more": [
@@ -7339,12 +7339,12 @@ window.LESSONS.push({
       "q": "Why does this repository write `Field(default_factory=list)` rather than `= []`?",
       "options": [
         "Because a bare `= []` is shared by every instance that is built",
-        "Because a mutable default is rejected at class definition time",
-        "Because `Field` is the only way to give a list field a default at all",
+        "Because a mutable default is rejected at class definition time outright",
+        "Because `Field` is the only way to give a list a default",
         "Because it is the documented spelling for a fresh list"
       ],
-      "answer": 3,
-      "why": "`Field(default_factory=list)` is the documented spelling, and it also avoids the sharing that a bare `= []` would cause in a plain dataclass — though Pydantic deep-copies a bare default per instance anyway."
+      "answer": 0,
+      "why": "A bare `= []` would be shared by every instance in a plain dataclass; `default_factory` builds a fresh list per instance."
     },
     {
       "q": "What does an error path of `('findings', 1, 'line')` tell you?",
@@ -7573,12 +7573,12 @@ window.LESSONS.push({
     {
       "q": "Why does `ReviewResult` need a `mode=\"before\"` validator to drop `verdict`?",
       "options": [
-        "Because a computed field is in the dump and the model never declared it",
-        "Because the dump contains a key whose value is None",
-        "Because the dump contains a computed field the model never declared",
-        "Because `extra=\"forbid\"` rejects every field not set explicitly"
+        "Because a computed field is in the dump and was never declared",
+        "Because `verdict` is a Literal the dump cannot re-validate on the way out",
+        "Because the model was built without validation",
+        "Because the dump sorts its keys first"
       ],
-      "answer": 2,
+      "answer": 0,
       "why": "The model can read its own JSON only if the computed key is removed before the unknown-key check runs."
     }
   ],
@@ -7608,7 +7608,7 @@ window.LESSONS.push({
     {
       "label": "The computed verdict field",
       "path": "app/models.py",
-      "lines": "180-194"
+      "lines": "186-190"
     }
   ],
   "learn_more": [
@@ -8210,14 +8210,14 @@ window.LESSONS.push({
       "why": "Each value becomes its own collected test with its own id, which is why a failure names the input."
     },
     {
-      "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
+      "q": "`parametrize(\"a, b\", [(1, 2, 3)])` — what happens?",
       "options": [
-        "pytest splits the tuple and runs the test once per element in the tuple",
-        "pytest splits the tuple",
-        "It passes",
-        "Collection fails: the tuple length does not match the names"
+        "Collection fails: the tuple length does not match the names",
+        "pytest splits the tuple and runs the test once per element",
+        "The extra value is silently dropped at collection, so only two are bound",
+        "It passes, because only the first two are bound"
       ],
-      "answer": 3,
+      "answer": 0,
       "why": "The arity is checked at collection, which is the good failure — before any test runs."
     },
     {
@@ -9233,7 +9233,7 @@ window.LESSONS.push({
     {
       "label": "The signature 401",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     }
   ],
   "learn_more": [
@@ -9336,7 +9336,7 @@ window.LESSONS.push({
     {
       "label": "The header parameters",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     },
     {
       "label": "The signature check",
@@ -9346,7 +9346,7 @@ window.LESSONS.push({
     {
       "label": "The guard that decides whether to check",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     }
   ],
   "learn_more": [
@@ -10651,7 +10651,7 @@ window.LESSONS.push({
   "title": "file and line, and why line is a string",
   "order": 602,
   "duration_min": 20,
-  "concept_md": "### `line` is a string, and that is deliberate\n\nA finding may concern one line or a range. The model stores both as text:\n\n```text\n\"42\"      one line\n\"42-45\"   four lines\n```\n\nAn `int` could not hold the second, and a tuple would need its own serialisation in every consumer. A string that matches `^\\d+(?:-\\d+)?$` holds both, sorts predictably once split, and survives JSON without a custom encoder.\n\n### The validator is the only gate\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\nIt rejects anything that is not a number or an ascending range. `\"4-2\"` fails because a range that descends is a caller bug, not a finding, and `\"line 42\"` fails because prose is not a line number. `\"42-42\"` passes: it ascends, and it names one line.\n\n### `file` is a path, or `<snippet>`\n\n`file` is relative to the project root so a comment can be posted against the right file. When the input was pasted code rather than a diff, the tool uses the sentinel `<snippet>`, which is not a path and must never be treated as one.\n\n### Why this matters downstream\n\nThe anchorer calls `_parse_range` on the value to get `(start, end)`, so the format is not decoration: it is the interface between the finding and the diff.",
+  "concept_md": "### `line` is a string, and that is deliberate\n\nA finding may concern one line or a range. The model stores both as text:\n\n```text\n\"42\"      one line\n\"42-45\"   four lines\n```\n\nAn `int` could not hold the second, and a tuple would need its own serialisation in every consumer. A string that matches `^\\d+(?:-\\d+)?$` holds both, sorts predictably once split, and survives JSON without a custom encoder.\n\n### The validator is the only gate\n\n```python\n@field_validator(\"line\")\n@classmethod\ndef _check_line(cls, value: str) -> str:\n```\n\nIt rejects anything that is not a number or an ascending range. `\"4-2\"` fails because a range that descends is a caller bug, not a finding, and `\"line 42\"` fails because prose is not a line number. `\"42-42\"` passes: it ascends, and it names one line.\n\n### `file` is a path, or `<snippet>`\n\n`file` is relative to the project root so a comment can be posted against the right file. When the input was pasted code rather than a diff, the finding is reported under `ReviewRequest.filename`, which defaults to `submission.py`, which is not a path and must never be treated as one.\n\n### Why this matters downstream\n\nThe anchorer calls `_parse_range` on the value to get `(start, end)`, so the format is not decoration: it is the interface between the finding and the diff.",
   "code_examples": [
     {
       "id": "6.2-ex-0",
@@ -10731,7 +10731,7 @@ window.LESSONS.push({
     {
       "label": "The validator that enforces it",
       "path": "app/models.py",
-      "lines": "87-95"
+      "lines": "86-95"
     }
   ],
   "learn_more": [
@@ -11182,7 +11182,7 @@ window.LESSONS.push({
     {
       "label": "The line validator",
       "path": "app/models.py",
-      "lines": "87-95"
+      "lines": "86-95"
     },
     {
       "label": "The constraints on file, issue and fix",
@@ -11244,12 +11244,12 @@ window.LESSONS.push({
     {
       "q": "Why is `as_row()` a method rather than a dict built at each call site?",
       "options": [
-        "Because a dict cannot hold five keys in a fixed order",
-        "Because a dict cannot hold five keys and keep their order",
         "So the column names cannot disagree",
-        "So the values can be cached"
+        "Because a dict is rebuilt on every call",
+        "Because a dict cannot hold five keys in a fixed order",
+        "Because Pydantic requires a method"
       ],
-      "answer": 2,
+      "answer": 0,
       "why": "One mapping from field names to headings means a rename happens in one place; two call sites would drift."
     },
     {
@@ -12459,12 +12459,12 @@ window.LESSONS.push({
     {
       "label": "RuleHit, the two strings a rule returns",
       "path": "app/rules.py",
-      "lines": "75-79"
+      "lines": "74-79"
     },
     {
       "label": "LineContext, what a rule is given",
       "path": "app/rules.py",
-      "lines": "83-109"
+      "lines": "82-109"
     }
   ],
   "learn_more": [
@@ -12579,7 +12579,7 @@ window.LESSONS.push({
     {
       "label": "The registry the categories describe",
       "path": "app/rules.py",
-      "lines": "113-130"
+      "lines": "112-130"
     }
   ],
   "learn_more": [
@@ -12809,7 +12809,7 @@ window.LESSONS.push({
     {
       "label": "scan_text and the regex budget",
       "path": "app/rules.py",
-      "lines": "93-103"
+      "lines": "92-103"
     }
   ],
   "learn_more": [
@@ -13264,7 +13264,7 @@ window.LESSONS.push({
     {
       "label": "The registry list",
       "path": "app/rules.py",
-      "lines": "113-130"
+      "lines": "112-130"
     },
     {
       "label": "Lookup by id",
@@ -14263,7 +14263,7 @@ window.LESSONS.push({
     {
       "label": "The builder stage",
       "path": "Dockerfile",
-      "lines": "22"
+      "lines": "22-41"
     },
     {
       "label": "The runtime stage",
@@ -14422,7 +14422,7 @@ window.LESSONS.push({
   "id": "10.1",
   "part": 10,
   "part_title": "Providers and LLM APIs",
-  "title": "The provider contract: one shape, three implementations",
+  "title": "The provider contract: one shape, three providers",
   "order": 1001,
   "duration_min": 25,
   "concept_md": "### What a provider must return\n\nEvery provider returns a `ProviderOutcome`:\n\n```python\nclass ProviderOutcome(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n    provider: str\n    model: str\n    findings: list[Finding]\n    reason: str = \"\"\n    latency_ms: float = 0.0\n```\n\n`mode` is the honest label. A caller reading an outcome can never mistake a degraded run for a live one, because the field says which it was.\n\n### Why the shape is fixed\n\nThe CLI, the API and the JSON output all read the same object. If a provider could return its own shape, each surface would need its own translation, and one of them would eventually drop `reason` and report a mock run as a live one.\n\n### What the model is asked for\n\n`LLMFinding` is the wire contract: five fields, `extra=\"forbid\"`, and `line` typed `str | int` because models answer `42` and `\"42\"` interchangeably. A `field_validator` upper-cases the severity before validation, so `\"high\"` is accepted and `\"urgent\"` is still rejected.\n\n### Two paths, one adapter\n\n`app/mock_provider.py` runs the rule engine with no network. Both live providers — `local` and `sarvam` — go through the single `app/openai_compat_provider.py` adapter, because Sarvam speaks the same protocol. The engine's docstring says so: this module owns no transport.\n\n`app/sarvam_provider.py` supplies the contract itself — `LLMFinding`, `ProviderOutcome`, the prompt builder — and holds a `review_with_fallback` the engine deliberately does not call, so there is exactly one mock implementation.",
@@ -14442,12 +14442,12 @@ window.LESSONS.push({
     {
       "q": "Which field stops a caller mistaking a fallback for a live run?",
       "options": [
-        "`findings` on the outcome",
         "`mode` on the outcome",
-        "`mode` on the outcome",
+        "`provider` on the outcome",
+        "`reason` on the outcome",
         "`latency_ms` on the outcome"
       ],
-      "answer": 1,
+      "answer": 0,
       "why": "It is a literal of live or mock, so a degraded run is labelled rather than inferred from a missing field."
     },
     {
@@ -14494,7 +14494,7 @@ window.LESSONS.push({
     {
       "label": "The outcome every provider returns",
       "path": "app/sarvam_provider.py",
-      "lines": "102-166"
+      "lines": "102-117"
     },
     {
       "label": "The wire contract",
@@ -14562,9 +14562,9 @@ window.LESSONS.push({
       "q": "Which promise does mock mode keep?",
       "options": [
         "The tool starts unconfigured",
-        "The model runs faster",
-        "The key stays in memory",
-        "The model runs measurably faster"
+        "The model runs measurably faster",
+        "The key never enters the process",
+        "The rules run in parallel"
       ],
       "answer": 0,
       "why": "Offline-first means a fresh checkout produces a real review with nothing set up."
@@ -14710,7 +14710,7 @@ window.LESSONS.push({
     {
       "label": "The config one call needs",
       "path": "app/openai_compat_provider.py",
-      "lines": "125-142"
+      "lines": "124-142"
     }
   ],
   "learn_more": [
@@ -14849,7 +14849,7 @@ window.LESSONS.push({
   "id": "10.5",
   "part": 10,
   "part_title": "Providers and LLM APIs",
-  "title": "`select_provider`: auto, live and mock",
+  "title": "`select_provider`: auto, sarvam, local, mock",
   "order": 1005,
   "duration_min": 25,
   "concept_md": "### One function decides\n\n`select_provider(settings, requested=\"auto\")` returns a `ProviderSelection`: the provider name, the config it needs, and a one-line reason. Every surface goes through it, so the routing rule exists once.\n\n### The four requests\n\nThe selector accepts `auto`, `sarvam`, `local` and `mock`. `auto` prefers a configured provider and falls back to mock. Naming a provider asks for that one and degrades with a reason if it is unavailable. `mock` forces the rule engine. Anything else raises `ValueError`, listing the four.\n\nForced offline is not a request — it is the `force_offline` flag on `review()`, which stops a live call being made at all.\n\n### Why the reason is part of the return value\n\nBecause a decision without its reason is unauditable. When a run is degraded, the outcome carries the sentence that explains it, and the reader never has to guess whether a key was missing or a mode was forced.\n\n### The ordering\n\nSarvam first when both are configured, because a hosted model is the stronger claim; then local; then mock. The order is written in one place and every surface inherits it.\n\n### Why the selector is one function\n\nThe CLI, the API and the tests all need the same answer to \"which provider runs now\". If each computed it, a demo and a test could disagree about whether a run was live — and the disagreement would show up as a mislabelled outcome rather than an error.",
@@ -14921,7 +14921,7 @@ window.LESSONS.push({
     {
       "label": "The selection record",
       "path": "app/engine.py",
-      "lines": "83-96"
+      "lines": "82-96"
     },
     {
       "label": "The one routing function",
@@ -15289,7 +15289,7 @@ window.LESSONS.push({
   "title": "Timeouts, degradation and the one WARNING",
   "order": 1009,
   "duration_min": 25,
-  "concept_md": "### A bound on every call\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative; the local endpoint has its own, larger timeout because a laptop model is slower. A call without a bound is a hang waiting to happen.\n\n### Degrading, once\n\nWhen a live call fails, the run degrades to the rule engine and logs exactly one WARNING. One, not one per finding, and not silence: a reader of the log sees the degradation and its reason in a single line.\n\n### Why exactly one\n\nBecause a per-finding warning buries the signal in noise, and no warning at all makes a degraded run indistinguishable from a clean one. One line is the amount a person will actually read.\n\n### The outcome keeps the record\n\nThe `ProviderOutcome` carries `mode=\"mock\"` and the reason, so the degradation is visible in the result as well as the log. A caller that reads neither gets a real review with an honest provenance it chose not to look at.\n\n### Where the warning is written\n\nThe engine logs it once, at the point it decides to degrade, and the outcome carries the same sentence. That is why the CLI, the API and the JSON output all explain a fallback identically — none of them formats the reason, they only print what the engine recorded.",
+  "concept_md": "### A bound on every call\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative; the local endpoint has its own, larger timeout because a laptop model is slower. A call without a bound is a hang waiting to happen.\n\n### Degrading, once\n\nWhen a live call fails, the run degrades to the rule engine and logs exactly one WARNING. One, not one per finding, and not silence: a reader of the log sees the degradation and its reason in a single line.\n\n### Why exactly one\n\nBecause a per-finding warning buries the signal in noise, and no warning at all makes a degraded run indistinguishable from a clean one. One line is the amount a person will actually read.\n\n### The outcome keeps the record\n\nThe `ProviderOutcome` carries `mode=\"mock\"` and the reason, so the degradation is visible in the result as well as the log. A caller that reads neither gets a real review with an honest provenance it chose not to look at.\n\n### Where the warning is written\n\nThe line is emitted by the provider adapter, `app/openai_compat_provider.py`, under the logger `reviewer.openai_compat`. `app/engine.py` has no logger at all — its mentions of WARNING are docstrings stating the invariant. The engine carries the same sentence into `ProviderOutcome.reason`, which is why the CLI, the API and the JSON output all explain a fallback identically.",
   "code_examples": [
     {
       "id": "10.9-ex-0",
@@ -15317,12 +15317,12 @@ window.LESSONS.push({
     {
       "q": "Why does the local endpoint have its own timeout?",
       "options": [
+        "A laptop model answers slower",
         "The protocol requires one of its own",
-        "The protocol requires one",
-        "The SDK defaults to it",
-        "A laptop model answers slower"
+        "The SDK exposes no timeout field",
+        "The key check needs a bound"
       ],
-      "answer": 3,
+      "answer": 0,
       "why": "One bound cannot suit a hosted endpoint and a model running on someone's machine."
     },
     {
@@ -15979,7 +15979,7 @@ window.LESSONS.push({
     "prompt": "Find every mention of WARNING in the engine.",
     "starter": "",
     "solution": "```console\n$ grep -n 'logger.warning' app/openai_compat_provider.py\n```",
-    "explanation": "One call site in the adapter. The engine's mentions are prose that states the rule, not code that logs."
+    "explanation": "Two call sites in the adapter — one for a repair retry that failed, one for the degradation. The invariant is per run, not per site."
   },
   "exercise": {
     "prompt": "Which two fields of the outcome make a degraded run visible?",
@@ -16104,7 +16104,7 @@ window.LESSONS.push({
     {
       "label": "The selection record",
       "path": "app/engine.py",
-      "lines": "83-96"
+      "lines": "82-96"
     },
     {
       "label": "The rebuild suite",
@@ -16786,7 +16786,7 @@ window.LESSONS.push({
   "title": "The webhook: verify the signature, or say you did not",
   "order": 1207,
   "duration_min": 25,
-  "concept_md": "### What a webhook has to do\n\nAnswer GitHub within its timeout, verify that the request really came from GitHub, and hand the payload to the same engine every other surface uses.\n\n### The signature\n\nGitHub signs the body with the webhook secret and sends the digest in a header. The route recomputes it and compares. `GITHUB_WEBHOOK_SECRET` supplies the key; `WEBHOOK_ALLOW_UNSIGNED` is the escape hatch for a local test.\n\n### Why the escape hatch exists, and why it is loud\n\nA local demo cannot produce a valid signature without the secret GitHub generated. The flag lets a developer test the route without one — and it is a flag rather than a default so that a deployment which forgets the secret does not post on the operator's identity.\n\nWhat it gates is posting, not reviewing. With no secret and no flag, the review still runs and the route still answers 200; what stops is the comment on the pull request. The code's own comment says it: the review still runs, only posting stops.\n\n### What the route must not do\n\nTrust the payload's claim about which repository it came from. The signature covers the body, so a valid signature plus the configured token is what makes the request actionable; the body is data to be parsed, not an instruction.\n\n### The timeout\n\nGitHub gives a webhook a short window. The route answers and the review proceeds, which is why a degraded review is better than a slow one here — a 500 because a key was missing costs the whole review and shows as a failed check.",
+  "concept_md": "### What a webhook has to do\n\nAnswer GitHub within its timeout, verify that the request really came from GitHub, and hand the payload to the same engine every other surface uses.\n\n### The signature\n\nGitHub signs the body with the webhook secret and sends the digest in a header. The route recomputes it and compares. `GITHUB_WEBHOOK_SECRET` supplies the key; `WEBHOOK_ALLOW_UNSIGNED` is the escape hatch for a local test.\n\n### Why the escape hatch exists, and why it is loud\n\nA local demo cannot produce a valid signature without the secret GitHub generated. The flag lets a developer test the route without one — and it is a flag rather than a default so that a deployment which forgets the secret does not post on the operator's identity.\n\nWhat it gates is posting, not reviewing. With no secret and no flag, the review still runs and the route still answers 200; what stops is the comment on the pull request. The code's own comment says it: the review still runs, only posting stops.\n\n### What the route must not do\n\nTrust the payload's claim about which repository it came from. The signature covers the body, so a valid signature plus the configured token is what makes the request actionable; the body is data to be parsed, not an instruction.\n\n### The timeout\n\nGitHub gives a webhook a short window, and this route reviews synchronously and returns the review in its response — there is no background task. That is exactly why degradation matters here: a 500 because a key was missing costs the whole review and shows as a failed check, while a degraded review still arrives inside the window.",
   "code_examples": [
     {
       "id": "12.7-ex-0",
@@ -16823,7 +16823,7 @@ window.LESSONS.push({
       "why": "A developer cannot produce a valid signature without the secret GitHub generated."
     },
     {
-      "q": "Why answer before reviewing?",
+      "q": "Why does a degraded review beat a failed one here?",
       "options": [
         "The engine is asynchronous",
         "GitHub's timeout is short",
@@ -16831,7 +16831,7 @@ window.LESSONS.push({
         "The token expires quickly"
       ],
       "answer": 1,
-      "why": "A degraded review that arrives beats a slow one that misses the window."
+      "why": "The handler reviews synchronously, so a 500 costs the whole review and shows as a failed check."
     }
   ],
   "try_it": {

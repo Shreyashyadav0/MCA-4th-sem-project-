@@ -35,14 +35,14 @@ window.LESSONS.push({
       "why": "Each value becomes its own collected test with its own id, which is why a failure names the input."
     },
     {
-      "q": "`parametrize(\"a, b\", [(1, 2)])` with a tuple of three values — what happens?",
+      "q": "`parametrize(\"a, b\", [(1, 2, 3)])` — what happens?",
       "options": [
-        "pytest splits the tuple and runs the test once per element in the tuple",
-        "pytest splits the tuple",
-        "It passes",
-        "Collection fails: the tuple length does not match the names"
+        "Collection fails: the tuple length does not match the names",
+        "pytest splits the tuple and runs the test once per element",
+        "The extra value is silently dropped at collection, so only two are bound",
+        "It passes, because only the first two are bound"
       ],
-      "answer": 3,
+      "answer": 0,
       "why": "The arity is checked at collection, which is the good failure — before any test runs."
     },
     {

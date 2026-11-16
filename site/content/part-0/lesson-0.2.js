@@ -61,7 +61,7 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "Press `/` and search for `provider`. Then search for `zzzz`. Read the two results screens and note the difference: one lists lessons, the other explains the empty state instead of leaving a blank box.",
     "starter": "# The two keys this site writes, and the shape of the progress value.\nPROGRESS_KEY = \"ai-reviewer-learning-progress-v1\"\nTHEME_KEY = \"ai-reviewer-learning-theme-v1\"\nprint({\"version\": 1, \"done\": {\"0.2\": True}})\n",
-    "solution": "```text\n`provider` matches five lessons — 0.1, 0.4, 1.1, 1.3 and 1.12 — because each one names the provider or its precedence somewhere in its concept text. `zzzz` matches nothing, and the page says so and suggests browsing the parts instead of showing an empty list.\n```",
+    "solution": "```text\n`provider` matches thirty lessons — 0.1, 0.4, 1.1, 1.3 and 1.12 — because each one names the provider or its precedence somewhere in its concept text. `zzzz` matches nothing, and the page says so and suggests browsing the parts instead of showing an empty list.\n```",
     "explanation": "Search runs entirely in the page over `window.LESSONS`, so it works with the network off. That is also why it can only see what the page has loaded."
   },
   "exercise": {

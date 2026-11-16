@@ -88,7 +88,7 @@ window.LESSONS.push({
     {
       "label": "The signature 401",
       "path": "app/main.py",
-      "lines": "1146-1284"
+      "lines": "1135-1261"
     }
   ],
   "learn_more": [

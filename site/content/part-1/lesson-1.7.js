@@ -83,7 +83,7 @@ window.LESSONS.push({
     {
       "label": "The rule that recommends `with open(...)` to other people's code",
       "path": "app/rules.py",
-      "lines": "1225-1293"
+      "lines": "1218-1293"
     }
   ],
   "learn_more": [

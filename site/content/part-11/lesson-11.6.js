@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The selection record",
       "path": "app/engine.py",
-      "lines": "83-96"
+      "lines": "82-96"
     },
     {
       "label": "The rebuild suite",

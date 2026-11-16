@@ -79,7 +79,7 @@ window.LESSONS.push({
     {
       "label": "The module graph, the fallback chain and the frozen interfaces",
       "path": "ARCHITECTURE.md",
-      "lines": "1-60"
+      "lines": "1-58"
     },
     {
       "label": "PROVIDERS and the selection result",

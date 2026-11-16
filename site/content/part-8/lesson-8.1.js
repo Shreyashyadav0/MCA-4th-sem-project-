@@ -90,12 +90,12 @@ window.LESSONS.push({
     {
       "label": "RuleHit, the two strings a rule returns",
       "path": "app/rules.py",
-      "lines": "75-79"
+      "lines": "74-79"
     },
     {
       "label": "LineContext, what a rule is given",
       "path": "app/rules.py",
-      "lines": "83-109"
+      "lines": "82-109"
     }
   ],
   "learn_more": [

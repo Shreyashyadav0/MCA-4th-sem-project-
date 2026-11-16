@@ -78,7 +78,7 @@ window.LESSONS.push({
     {
       "label": "The builder stage",
       "path": "Dockerfile",
-      "lines": "22"
+      "lines": "22-41"
     },
     {
       "label": "The runtime stage",

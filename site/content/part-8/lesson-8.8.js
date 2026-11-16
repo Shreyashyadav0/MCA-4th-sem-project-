@@ -85,7 +85,7 @@ window.LESSONS.push({
     {
       "label": "The registry list",
       "path": "app/rules.py",
-      "lines": "113-130"
+      "lines": "112-130"
     },
     {
       "label": "Lookup by id",
