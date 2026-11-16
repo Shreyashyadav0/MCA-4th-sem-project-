@@ -21,6 +21,7 @@ is the bug.
 | 5 | 2026-11-15 | `66006dd` | 17 added, 4 changed | 16 (`6.1`–`6.8`, `7.1`–`7.8`) | `OK lessons=66 parts_covered=8 manifest_entries=66 ids=0.1,…,7.8` |
 | 6a | 2026-11-15 | `423fd33` | 11 added, 4 changed | 10 (`8.1`–`8.10`) | `OK lessons=76 parts_covered=9 manifest_entries=76 ids=0.1,…,8.10` |
 | 6b | 2026-11-15 | `89080b0` | 9 added, 4 changed | 8 (`9.1`–`9.8`) | `OK lessons=84 parts_covered=10 manifest_entries=84 ids=0.1,…,9.8` |
+| 7a | 2026-11-16 | `d5bf954` | 11 added, 4 changed | 10 (`10.1`–`10.10`) | `OK lessons=94 parts_covered=11 manifest_entries=94 ids=0.1,…,10.10` |
 
 A file cannot record the hash of the commit that contains it, so the column above
 names the commit the wave was built on. The wave commit itself is whatever
@@ -975,3 +976,19 @@ build file requires, and the generator refuses to write a question whose correct
 option is the unique longest. That guard fired eleven times across eight lessons
 and each set was rebalanced before writing — the first time in five waves the
 tell was caught at authoring time rather than after.
+
+## Wave 7a — Part 10, "Providers and LLM APIs"
+
+Ten lessons, the site at 94 across eleven parts. Built and gated; the nine-auditor
+round has not run, so it is not a finished wave.
+
+Three of my own errors the build caught before they shipped, all from executing
+rather than reading: `mock_provider` exposes `offline_review`, not `review_mock`;
+`OpenAICompatConfig` is a frozen dataclass, so it has no `model_fields`; and
+`select_provider` accepts `auto, sarvam, local, mock` — I had taught a `live`
+request that raises `ValueError`. Forced offline is a flag on `review()`, not a
+request, and 10.5 now says so.
+
+10.10 carries the hard constraint: the benchmark harness is real, the labelled set
+is not, so no precision, recall or F1 figure exists and the lesson states that in
+those words. No percentage appears anywhere in Part 10.

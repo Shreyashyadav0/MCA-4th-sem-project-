@@ -103,6 +103,16 @@
     "content/part-9/lesson-9.5.js",
     "content/part-9/lesson-9.6.js",
     "content/part-9/lesson-9.7.js",
-    "content/part-9/lesson-9.8.js"
+    "content/part-9/lesson-9.8.js",
+    "content/part-10/lesson-10.1.js",
+    "content/part-10/lesson-10.2.js",
+    "content/part-10/lesson-10.3.js",
+    "content/part-10/lesson-10.4.js",
+    "content/part-10/lesson-10.5.js",
+    "content/part-10/lesson-10.6.js",
+    "content/part-10/lesson-10.7.js",
+    "content/part-10/lesson-10.8.js",
+    "content/part-10/lesson-10.9.js",
+    "content/part-10/lesson-10.10.js"
   ];
 })();

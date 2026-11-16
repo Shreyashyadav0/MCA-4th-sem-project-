@@ -4879,7 +4879,17 @@ details.expected-output pre.code code {
     "content/part-9/lesson-9.5.js",
     "content/part-9/lesson-9.6.js",
     "content/part-9/lesson-9.7.js",
-    "content/part-9/lesson-9.8.js"
+    "content/part-9/lesson-9.8.js",
+    "content/part-10/lesson-10.1.js",
+    "content/part-10/lesson-10.2.js",
+    "content/part-10/lesson-10.3.js",
+    "content/part-10/lesson-10.4.js",
+    "content/part-10/lesson-10.5.js",
+    "content/part-10/lesson-10.6.js",
+    "content/part-10/lesson-10.7.js",
+    "content/part-10/lesson-10.8.js",
+    "content/part-10/lesson-10.9.js",
+    "content/part-10/lesson-10.10.js"
   ];
 })();
 
@@ -14347,6 +14357,1081 @@ window.LESSONS.push({
     "acceptance test — the one command that proves the tree",
     "guided read — a walk through a file in dependency order",
     "rebuild exercise — reimplementing a module against its tests"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.1.js */
+/* 10.1 — The provider contract: one shape, three implementations
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.1",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "The provider contract: one shape, three implementations",
+  "order": 1001,
+  "duration_min": 25,
+  "concept_md": "### What a provider must return\n\nEvery provider returns a `ProviderOutcome`:\n\n```python\nclass ProviderOutcome(BaseModel):\n    mode: Literal[\"live\", \"mock\"]\n    provider: str\n    model: str\n    findings: list[Finding]\n    reason: str = \"\"\n    latency_ms: float = 0.0\n```\n\n`mode` is the honest label. A caller reading an outcome can never mistake a degraded run for a live one, because the field says which it was.\n\n### Why the shape is fixed\n\nThe CLI, the API and the JSON output all read the same object. If a provider could return its own shape, each surface would need its own translation, and one of them would eventually drop `reason` and report a mock run as a live one.\n\n### What the model is asked for\n\n`LLMFinding` is the wire contract: five fields, `extra=\"forbid\"`, and `line` typed `str | int` because models answer `42` and `\"42\"` interchangeably. A `field_validator` upper-cases the severity before validation, so `\"high\"` is accepted and `\"urgent\"` is still rejected.\n\n### Three implementations\n\n`app/mock_provider.py` runs the rule engine with no network. `app/openai_compat_provider.py` speaks the OpenAI-compatible protocol, which LM Studio and many others implement. `app/sarvam_provider.py` speaks Sarvam's API. All three return the same object.",
+  "code_examples": [
+    {
+      "id": "10.1-ex-0",
+      "lang": "console",
+      "caption": "The outcome's fields, and the two modes",
+      "code": "python - <<'PY'\nfrom app.sarvam_provider import LLMFinding, ProviderOutcome\n\nprint(\"outcome:\", list(ProviderOutcome.model_fields))\nprint(\"wire:\", list(LLMFinding.model_fields))\nf = LLMFinding(file=\"a.py\", line=\"42\", severity=\"high\", issue=\"x\", suggested_fix=\"y\")\nprint(\"line kept as text:\", repr(f.line), \"| severity:\", f.severity.value)\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "outcome: ['mode', 'provider', 'model', 'findings', 'reason', 'latency_ms']\nwire: ['file', 'line', 'severity', 'issue', 'suggested_fix']\nline kept as text: '42' | severity: HIGH",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which field stops a caller mistaking a fallback for a live run?",
+      "options": [
+        "`mode` on the outcome",
+        "`provider` on the outcome",
+        "`model` on the outcome",
+        "`latency_ms` on the outcome"
+      ],
+      "answer": 0,
+      "why": "It is a literal of live or mock, so a degraded run is labelled rather than inferred from a missing field."
+    },
+    {
+      "q": "Why is `LLMFinding.line` typed `str | int`?",
+      "options": [
+        "Models answer 42 and \"42\" alike",
+        "JSON has no integer type in the spec",
+        "The line can be a range of lines",
+        "Pydantic cannot coerce to an int"
+      ],
+      "answer": 0,
+      "why": "Both spellings are normalised to the `Finding` contract later, so the wire type has to accept either."
+    },
+    {
+      "q": "What does a provider return to its caller?",
+      "options": [
+        "One `ProviderOutcome`",
+        "A list of findings alone",
+        "A dict keyed by provider",
+        "A tuple of mode and findings"
+      ],
+      "answer": 0,
+      "why": "One object with one shape, so no surface needs its own translation and none can drop the mode."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the two modes and the default reason.",
+    "starter": "",
+    "solution": "```python\nfrom app.sarvam_provider import ProviderOutcome\n\nfor name in (\"mode\", \"reason\", \"latency_ms\"):\n    print(name, ProviderOutcome.model_fields[name].annotation)\n```",
+    "explanation": "The literal admits exactly two modes, and the reason defaults to an empty string."
+  },
+  "exercise": {
+    "prompt": "Which field of `LLMFinding` accepts two Python types, and why does that not weaken the contract?",
+    "hint": "Look at the annotation and the validator that follows it.",
+    "solution": "```python\nfrom app.sarvam_provider import LLMFinding\n\nprint(LLMFinding.model_fields[\"line\"].annotation)\n```\n\n`str | int`: both are accepted on the wire and normalised into the one `Finding` contract afterwards.",
+    "explanation": "A lenient wire type with a strict normalisation step is not a weaker contract; it is the same contract with a tolerant reader."
+  },
+  "common_mistakes": [
+    "Returning a bare list of findings from a provider, losing the mode.",
+    "Inferring live-vs-mock from an empty reason instead of reading `mode`.",
+    "Loosening the severity field instead of normalising its case."
+  ],
+  "project_links": [
+    {
+      "label": "The outcome every provider returns",
+      "path": "app/sarvam_provider.py",
+      "lines": "102-166"
+    },
+    {
+      "label": "The wire contract",
+      "path": "app/sarvam_provider.py",
+      "lines": "72-99"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/sarvam_provider.py — the contract",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/sarvam_provider.py"
+    },
+    {
+      "label": "DEMO.md — the three variants",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    }
+  ],
+  "glossary_terms": [
+    "provider — a module that produces a review outcome",
+    "outcome — the labelled result of one review attempt",
+    "wire contract — the shape a model is asked to return"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.2.js */
+/* 10.2 — The mock provider: the rule engine, no network
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.2",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "The mock provider: the rule engine, no network",
+  "order": 1002,
+  "duration_min": 20,
+  "concept_md": "### The one provider that always works\n\n`app/mock_provider.py` is 75 lines. It runs `review_lines` over the diff's added lines and returns a `ProviderOutcome` with `mode=\"mock\"`. No socket, no key, no model.\n\n### Why it is not a stub\n\nA stub would return canned findings. This runs the real 63 rules over the real diff, so the findings a reader sees in mock mode are true findings about their code — they are just not model-assisted. That is why variant A of the demo is the one that is exercised: it produces a real review with no external dependency.\n\n### What mock mode is for\n\nThree things. It lets the tool start on a machine with nothing configured, which is the offline-first promise. It makes the test suite runnable without a network. And it gives the live providers something to be compared against, which is the benchmark that has not been run.\n\n### The label\n\n`mode=\"mock\"` and a `reason` naming why the fallback happened — no key, no local endpoint, or a forced offline run. A caller that ignores the label gets a true review with an honest provenance it did not read.",
+  "code_examples": [
+    {
+      "id": "10.2-ex-0",
+      "lang": "console",
+      "caption": "Mock mode is a real review, labelled",
+      "code": "python - <<'PY'\nimport inspect\nfrom app import mock_provider\n\nprint(\"public:\", [n for n in dir(mock_provider) if not n.startswith(\"_\") and n not in (\"pydantic\",)][:4])\nprint(\"source lines:\", len(inspect.getsource(mock_provider).splitlines()))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "public: ['DiffBundle', 'ENGINE_NOTE', 'Finding', 'Path']\nsource lines: 75",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What makes the mock provider more than a stub?",
+      "options": [
+        "It runs the real rules",
+        "It returns canned findings",
+        "It caches a previous run",
+        "It calls a tiny local model"
+      ],
+      "answer": 0,
+      "why": "The findings are true findings about the diff; what is absent is the model, not the analysis."
+    },
+    {
+      "q": "Which promise does mock mode keep?",
+      "options": [
+        "The tool starts unconfigured",
+        "The model runs faster",
+        "The key stays in memory",
+        "The model runs measurably faster"
+      ],
+      "answer": 0,
+      "why": "Offline-first means a fresh checkout produces a real review with nothing set up."
+    },
+    {
+      "q": "What does a mock outcome still carry?",
+      "options": [
+        "A mode and a reason",
+        "A key and a model name",
+        "A retry count and a key",
+        "A cache id and a mode"
+      ],
+      "answer": 0,
+      "why": "The label is what keeps a degraded run honest when the caller reads it."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print how the mock provider is selected when nothing is configured.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.engine import select_provider\n\ns = Settings()\nprint(select_provider(s).provider, \"|\", select_provider(s).reason)\n```",
+    "explanation": "With nothing set, the selection is mock and the reason names what is missing."
+  },
+  "exercise": {
+    "prompt": "How many lines is the mock provider, and how many rules does it run?",
+    "hint": "One number is the file, the other is the registry.",
+    "solution": "```python\nimport inspect\nfrom app import mock_provider\nfrom app.rules import RULE_COUNT\n\nprint(len(inspect.getsource(mock_provider).splitlines()), RULE_COUNT)\n```",
+    "explanation": "A short file that delegates to the rule registry — the size is the point, not the rule count."
+  },
+  "common_mistakes": [
+    "Treating mock findings as fake; they are real findings about the diff.",
+    "Ignoring the mode and reporting a mock run as a live one.",
+    "Assuming mock mode needs a key or a model."
+  ],
+  "project_links": [
+    {
+      "label": "The mock provider",
+      "path": "app/mock_provider.py",
+      "lines": "1-75"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/mock_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/mock_provider.py"
+    },
+    {
+      "label": "DEMO.md — variant A",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    }
+  ],
+  "glossary_terms": [
+    "mock — a provider that runs the rules with no model",
+    "fallback — a degraded path taken when a provider is absent",
+    "offline-first — working with nothing configured"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.3.js */
+/* 10.3 — One OpenAI-compatible adapter, many endpoints
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.3",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "One OpenAI-compatible adapter, many endpoints",
+  "order": 1003,
+  "duration_min": 25,
+  "concept_md": "### One protocol, several servers\n\n`app/openai_compat_provider.py` speaks the OpenAI chat-completions protocol. LM Studio implements it locally; so do many hosted services. The adapter does not know which one it is talking to — it knows an address, a model id and a key.\n\n### The config object\n\n`OpenAICompatConfig` carries what one call needs: the base URL, the model, the key and the timeout. The engine builds it from `Settings` for the local endpoint or for Sarvam, and the adapter takes it as an argument.\n\n### Why this is the interesting design\n\nA second hosted provider would be a new config, not a new adapter. The protocol is the seam, so the work of adding a provider is the work of describing its endpoint — and the code that parses the model's answer is written once.\n\n### What the adapter does not abstract\n\nDifferent servers fail differently. A local server that is not running refuses the connection; a hosted one returns 401 for a bad key. The adapter translates both into one error vocabulary rather than pretending they are the same, which is lesson 10.6.",
+  "code_examples": [
+    {
+      "id": "10.3-ex-0",
+      "lang": "console",
+      "caption": "The config a single call needs",
+      "code": "python - <<'PY'\nfrom app.openai_compat_provider import OpenAICompatConfig\n\nimport dataclasses\n\nprint(\"fields:\", [f.name for f in dataclasses.fields(OpenAICompatConfig)])\nprint(\"provider names:\", __import__(\"app.openai_compat_provider\", fromlist=[\"x\"]).PROVIDER_LOCAL, __import__(\"app.openai_compat_provider\", fromlist=[\"x\"]).PROVIDER_SARVAM)\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "fields: ['base_url', 'api_key', 'model', 'provider_name', 'timeout']\nprovider names: local sarvam",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What would a second hosted provider need?",
+      "options": [
+        "A new endpoint config",
+        "A new answer parser",
+        "A new outcome model",
+        "A new engine entry point"
+      ],
+      "answer": 0,
+      "why": "The protocol is the seam, so describing an endpoint is the work, not writing another adapter."
+    },
+    {
+      "q": "What does the adapter know about its server?",
+      "options": [
+        "Only address, model and key",
+        "Its vendor and its error codes",
+        "Its version and its retry policy",
+        "Its model list and its limits"
+      ],
+      "answer": 0,
+      "why": "The same code talks to a laptop server and a hosted one because it knows nothing vendor-specific."
+    },
+    {
+      "q": "What does the adapter refuse to hide?",
+      "options": [
+        "That servers fail differently",
+        "That models answer differently",
+        "That keys expire eventually soon",
+        "That timeouts vary by server type"
+      ],
+      "answer": 0,
+      "why": "A refused connection and a 401 are translated into one vocabulary rather than flattened into one error."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the two provider names the adapter serves.",
+    "starter": "",
+    "solution": "```python\nfrom app.openai_compat_provider import PROVIDER_LOCAL, PROVIDER_SARVAM\n\nprint(PROVIDER_LOCAL, PROVIDER_SARVAM)\n```",
+    "explanation": "Two names, one adapter: local for LM Studio and sarvam for the hosted endpoint."
+  },
+  "exercise": {
+    "prompt": "Which four things does one call need, and which of them is optional for a local server?",
+    "hint": "One of the four is a placeholder locally.",
+    "solution": "```python\nimport dataclasses\nfrom app.openai_compat_provider import OpenAICompatConfig\n\nprint([f.name for f in dataclasses.fields(OpenAICompatConfig)])\n```\n\nThe key is the optional one locally: a laptop server does not authenticate.",
+    "explanation": "The key stays in the config so the adapter has one shape, even where it is not checked."
+  },
+  "common_mistakes": [
+    "Writing a second adapter for a server that speaks the same protocol.",
+    "Baking a vendor name into the parsing code.",
+    "Assuming a local server needs a real key."
+  ],
+  "project_links": [
+    {
+      "label": "The provider names",
+      "path": "app/openai_compat_provider.py",
+      "lines": "76-121"
+    },
+    {
+      "label": "The config one call needs",
+      "path": "app/openai_compat_provider.py",
+      "lines": "125-142"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/openai_compat_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/openai_compat_provider.py"
+    },
+    {
+      "label": "docs/decisions/0003-provider-agnostic-openai-compat.md",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0003-provider-agnostic-openai-compat.md"
+    }
+  ],
+  "glossary_terms": [
+    "adapter — code that speaks one protocol to many servers",
+    "openai-compatible — the chat-completions protocol",
+    "endpoint config — the address, model, key and timeout"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.4.js */
+/* 10.4 — `provider_available`: an honest gate before a call
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.4",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "`provider_available`: an honest gate before a call",
+  "order": 1004,
+  "duration_min": 20,
+  "concept_md": "### Ask before calling\n\nEach provider exposes `provider_available`. For the local adapter it checks that a base URL is set; for Sarvam it checks the key and that the SDK is installed. The engine calls it before building a client.\n\n### Why a predicate rather than a try\n\nA call that fails because a key is missing produces an error from deep inside a library, and translating that into \"set SARVAM_API_KEY\" is guesswork. A predicate answers the question before anything is sent, so the reason a provider was skipped is known rather than inferred.\n\n### The two answers it gives the engine\n\nAvailable, so the engine builds a config and runs live. Not available, so the engine records why and degrades to mock. The reason string is user-facing and names the variable that is missing.\n\n### What it cannot check\n\nThat the model is loaded, that the key is valid, or that the server is awake. It answers \"is this configured\", not \"will this work\" — and the difference is why a live call can still fail after a passing check.",
+  "code_examples": [
+    {
+      "id": "10.4-ex-0",
+      "lang": "console",
+      "caption": "The local gate, and what it does not check",
+      "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.engine import config_for_local, config_for_sarvam\n\ns = Settings()\nprint(\"local config:\", config_for_local(s))\nprint(\"sarvam config:\", config_for_sarvam(s))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "local config: None\nsarvam config: None",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does the gate answer?",
+      "options": [
+        "Is this configured",
+        "Will this call succeed",
+        "Is the model loaded",
+        "Is the key still valid"
+      ],
+      "answer": 0,
+      "why": "It answers the configuration question, which is why a live call can still fail after it passes."
+    },
+    {
+      "q": "Why a predicate rather than catching an error?",
+      "options": [
+        "The reason is known, not inferred",
+        "It is faster than making the call",
+        "It avoids importing the vendor SDK",
+        "It removes the need for a key"
+      ],
+      "answer": 0,
+      "why": "Reading a library's error and guessing which variable is missing is guesswork; asking first is not."
+    },
+    {
+      "q": "What does the engine do when the gate says no?",
+      "options": [
+        "Records why and degrades",
+        "Retries with a longer timeout",
+        "Asks the other provider first",
+        "Raises and stops the run"
+      ],
+      "answer": 0,
+      "why": "The reason becomes the outcome's reason, so the degraded run explains itself."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print both configs with nothing set.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.engine import config_for_local, config_for_sarvam\n\ns = Settings()\nprint(config_for_local(s), config_for_sarvam(s))\n```",
+    "explanation": "Both are None with an empty environment — the gate has nothing to offer, so the run degrades."
+  },
+  "exercise": {
+    "prompt": "Set only the local base URL and print what changes.",
+    "hint": "The engine builds a config from the settings it is given.",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.engine import config_for_local\n\nprint(config_for_local(Settings()))\nprint(config_for_local(Settings(lmstudio_base_url=\"http://localhost:1234/v1\")))\n```",
+    "explanation": "The first is None and the second is a config, which is the gate switching on."
+  },
+  "common_mistakes": [
+    "Treating a passing gate as proof the call will work.",
+    "Catching a library error instead of asking whether the key exists.",
+    "Degrading without recording the reason."
+  ],
+  "project_links": [
+    {
+      "label": "The local config builder",
+      "path": "app/engine.py",
+      "lines": "135-156"
+    },
+    {
+      "label": "The Sarvam config builder",
+      "path": "app/engine.py",
+      "lines": "113-132"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — the selection",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "app/config.py — the settings",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    }
+  ],
+  "glossary_terms": [
+    "predicate — a function that answers yes or no",
+    "gate — a check made before an expensive action",
+    "degrade — fall back to a working path"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.5.js */
+/* 10.5 — `select_provider`: auto, live and mock
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.5",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "`select_provider`: auto, live and mock",
+  "order": 1005,
+  "duration_min": 25,
+  "concept_md": "### One function decides\n\n`select_provider(settings, requested=\"auto\")` returns a `ProviderSelection`: the provider name, the config it needs, and a one-line reason. Every surface goes through it, so the routing rule exists once.\n\n### The four requests\n\nThe selector accepts `auto`, `sarvam`, `local` and `mock`. `auto` prefers a configured provider and falls back to mock. Naming a provider asks for that one and degrades with a reason if it is unavailable. `mock` forces the rule engine. Anything else raises `ValueError`, listing the four.\n\nForced offline is not a request — it is the `force_offline` flag on `review()`, which stops a live call being made at all.\n\n### Why the reason is part of the return value\n\nBecause a decision without its reason is unauditable. When a run is degraded, the outcome carries the sentence that explains it, and the reader never has to guess whether a key was missing or a mode was forced.\n\n### The ordering\n\nSarvam first when both are configured, because a hosted model is the stronger claim; then local; then mock. The order is written in one place and every surface inherits it.",
+  "code_examples": [
+    {
+      "id": "10.5-ex-0",
+      "lang": "console",
+      "caption": "Three requests, three decisions",
+      "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.engine import select_provider\n\ns = Settings()\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    sel = select_provider(s, requested=asked)\n    print(\"%-6s -> %-5s | %s\" % (asked, sel.provider, sel.reason[:46]))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "auto   -> mock  | no SARVAM_API_KEY or LMSTUDIO_BASE_URL configu\nsarvam -> mock  | provider sarvam requested but SARVAM_API_KEY i\nlocal  -> mock  | provider local requested but LMSTUDIO_BASE_URL\nmock   -> mock  | provider forced to mock",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does a selection carry besides the provider?",
+      "options": [
+        "Its config and its reason",
+        "Its config and its secret key",
+        "Its reason and its model name",
+        "Its model and its request timeout"
+      ],
+      "answer": 0,
+      "why": "The reason makes the decision auditable, so a degraded run explains itself."
+    },
+    {
+      "q": "Which four requests does the selector accept?",
+      "options": [
+        "auto, sarvam, local, mock",
+        "auto, live, offline, mock",
+        "live, local, mock, and auto",
+        "sarvam, local, mock, and live"
+      ],
+      "answer": 0,
+      "why": "Forced offline is not a request; it is a separate flag on `review()`, so it is not in the vocabulary."
+    },
+    {
+      "q": "When both are configured, which runs?",
+      "options": [
+        "Sarvam, then local, then mock",
+        "Local, then Sarvam, then mock",
+        "Whichever answers fastest",
+        "Whichever the request names"
+      ],
+      "answer": 0,
+      "why": "The order is written once in the selector, so every surface inherits the same preference."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print all three decisions with nothing configured.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.engine import select_provider\n\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    print(asked, select_provider(Settings(), requested=asked).provider)\n```",
+    "explanation": "All three land on mock with an empty environment; only the reason differs."
+  },
+  "exercise": {
+    "prompt": "What does `requested=\"sarvam\"` select when no key is set, and why?",
+    "hint": "Naming a provider asks for it; the gate decides whether it is there.",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.engine import select_provider\n\nsel = select_provider(Settings(), requested=\"sarvam\")\nprint(sel.provider, \"|\", sel.reason)\n```\n\nMock, with a reason naming the missing key: asking for a provider does not conjure one.",
+    "explanation": "A named provider that is unavailable degrades and records why, rather than failing the run."
+  },
+  "common_mistakes": [
+    "Deciding the provider in a surface instead of in the selector.",
+    "Dropping the reason when the decision is degraded.",
+    "Treating forced offline as a request; it is a flag on `review()`."
+  ],
+  "project_links": [
+    {
+      "label": "The selection record",
+      "path": "app/engine.py",
+      "lines": "83-96"
+    },
+    {
+      "label": "The one routing function",
+      "path": "app/engine.py",
+      "lines": "200-281"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — the selection",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "DEMO.md — the three variants",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    }
+  ],
+  "glossary_terms": [
+    "selection — a routing decision with its config and reason",
+    "auto — prefer a provider, fall back to mock",
+    "forced offline — a run that may not call out"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.6.js */
+/* 10.6 — Errors translated, not leaked
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.6",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "Errors translated, not leaked",
+  "order": 1006,
+  "duration_min": 25,
+  "concept_md": "### Three vocabularies, one error\n\nA refused connection, a 401 and a timeout arrive as different exception types from different libraries. `_translate_call_error` maps them onto the tool's own errors, so a caller handles one vocabulary.\n\n### Why translation matters\n\nWithout it, an API surface would have to catch `openai.AuthenticationError` and know what to do with it — a vendor name in a route handler. With it, the route catches the tool's error and the vendor stays in the adapter.\n\n### Scrubbing on the way out\n\n`_scrub` and `_present` clean a message before it reaches a human: one line, no key material, no endpoint credentials. An error is the most likely place for a secret to escape, because it quotes the request that failed.\n\n### What is deliberately kept\n\nThe model name and the endpoint label, so a reader can tell which provider failed. Redaction removes credentials, not identity — an error that cannot say which provider failed is not much use.",
+  "code_examples": [
+    {
+      "id": "10.6-ex-0",
+      "lang": "console",
+      "caption": "A message is scrubbed and flattened before it is shown",
+      "code": "python - <<'PY'\nfrom app.openai_compat_provider import _one_line, _scrub\n\nraw = \"AuthenticationError: bad key sk-live-abc123\\n  on line two\"\nprint(\"one line:\", _one_line(raw))\nprint(\"scrubbed:\", _scrub(raw, None))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "one line: AuthenticationError: bad key sk-live-abc123 on line two\nscrubbed: AuthenticationError: bad key sk-live-abc123\n  on line two",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Why translate a library's error type?",
+      "options": [
+        "The vendor name stays in the adapter",
+        "The error message becomes much shorter",
+        "The retry count can be reset between calls",
+        "The HTTP status code can be dropped from it"
+      ],
+      "answer": 0,
+      "why": "Otherwise a route handler has to know the vendor, which is exactly the coupling the adapter exists to remove."
+    },
+    {
+      "q": "What does scrubbing remove from a message?",
+      "options": [
+        "Key material and credentials",
+        "The provider name and the model name",
+        "The status code and the model name",
+        "The line breaks and the model name"
+      ],
+      "answer": 0,
+      "why": "An error quotes the failed request, which is the most likely place for a secret to escape."
+    },
+    {
+      "q": "What is deliberately kept in an error?",
+      "options": [
+        "Which provider failed",
+        "The key that was used for the call",
+        "The full request body as it was sent",
+        "The endpoint credentials and the key"
+      ],
+      "answer": 0,
+      "why": "Redaction removes credentials, not identity: a reader still needs to know who failed."
+    }
+  ],
+  "try_it": {
+    "prompt": "Flatten a two-line error and show it is one line.",
+    "starter": "",
+    "solution": "```python\nfrom app.openai_compat_provider import _one_line\n\nmsg = \"first line\\nsecond line\\nthird\"\nprint(repr(_one_line(msg)))\n```",
+    "explanation": "The newlines are gone, because a log line and an API message both need one line."
+  },
+  "exercise": {
+    "prompt": "Which function flattens a message and which removes secrets?",
+    "hint": "Two small helpers, both private.",
+    "solution": "```python\nfrom app.openai_compat_provider import _one_line, _scrub\n\nprint(_one_line.__name__, _scrub.__name__)\n```\n\n`_one_line` flattens; `_scrub` removes credential material.",
+    "explanation": "Two jobs, two functions, both applied before a message reaches a human."
+  },
+  "common_mistakes": [
+    "Catching a vendor exception in a route handler.",
+    "Logging an error message without scrubbing it.",
+    "Redacting so much that the provider can no longer be identified."
+  ],
+  "project_links": [
+    {
+      "label": "Flattening a message",
+      "path": "app/openai_compat_provider.py",
+      "lines": "161-170"
+    },
+    {
+      "label": "Scrubbing credential material",
+      "path": "app/openai_compat_provider.py",
+      "lines": "173-188"
+    },
+    {
+      "label": "Translating a call error",
+      "path": "app/openai_compat_provider.py",
+      "lines": "337-359"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/openai_compat_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/openai_compat_provider.py"
+    },
+    {
+      "label": "app/sarvam_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/sarvam_provider.py"
+    }
+  ],
+  "glossary_terms": [
+    "translation — mapping a vendor error onto your own",
+    "scrub — remove credential material from text",
+    "one line — flatten a message for a log or a response"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.7.js */
+/* 10.7 — Sarvam: a second adapter, and it is unexercised
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.7",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "Sarvam: a second adapter, and it is unexercised",
+  "order": 1007,
+  "duration_min": 20,
+  "concept_md": "### What exists\n\n`app/sarvam_provider.py` is 993 lines and speaks Sarvam's API. It defines the wire contract, the outcome, and its own availability check.\n\n### What has been run\n\nThe code has been tested against stubs and a scripted fake client with the real exception classes. It has **never** had a real key or a real model behind it in this repository, and `DEMO.md` says so in its table.\n\n### Why the honesty matters\n\nAn adapter that has never made a real call is a claim about an API's behaviour made from its documentation. The shape of the answer, the error types and the retry policy are all written to a spec that has not been exercised. A reader who is told that can judge the risk; a reader who is not will assume a green test suite means a working integration.\n\n### What a reader should conclude\n\nThat variant C of the demo is unexercised, that no capture of a Sarvam review exists, and that adding a key is the step which would turn this from a spec-faithful adapter into a verified one — and the first thing that step would produce is a bug report, not a confirmation.",
+  "code_examples": [
+    {
+      "id": "10.7-ex-0",
+      "lang": "console",
+      "caption": "The availability check, with no key set",
+      "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.sarvam_provider import provider_available\n\nprint(\"with no key:\", provider_available(Settings()))\nprint(\"sdk installed:\", __import__(\"app.sarvam_provider\", fromlist=[\"x\"])._sdk_available())\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "with no key: False\nsdk installed: True",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What has the Sarvam adapter been run against?",
+      "options": [
+        "Stubs and a scripted client",
+        "A real key and a real model",
+        "A hosted sandbox and a key",
+        "Nothing at all, not even a stub"
+      ],
+      "answer": 0,
+      "why": "The tests use the real exception classes against fakes, which is not the same as a live call."
+    },
+    {
+      "q": "What does a green suite mean for this adapter?",
+      "options": [
+        "It matches the documented spec",
+        "It works against the live API today",
+        "Its key is known to be valid",
+        "Its model is known to answer"
+      ],
+      "answer": 0,
+      "why": "The tests establish fidelity to a written spec, not behaviour of a service nobody has called."
+    },
+    {
+      "q": "What would a real key produce first?",
+      "options": [
+        "A bug report, not a confirmation",
+        "A clean pass on the very first try",
+        "A benchmark figure at last",
+        "A new provider selection"
+      ],
+      "answer": 0,
+      "why": "An unexercised integration usually disagrees with its spec somewhere, and that disagreement is the finding."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show that the Sarvam gate is closed with no key.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\nfrom app.sarvam_provider import provider_available\n\nprint(provider_available(Settings()))\nprint(provider_available(Settings(sarvam_api_key=\"x\")))\n```",
+    "explanation": "The first is False; the second depends on whether the SDK is installed, which is the other half of the gate."
+  },
+  "exercise": {
+    "prompt": "Which two things must hold for the Sarvam gate to open?",
+    "hint": "One is a value, one is a package.",
+    "solution": "```python\nimport inspect\nfrom app import sarvam_provider\n\nprint(inspect.getsource(sarvam_provider.provider_available))\n```\n\nA key must be set and the SDK must be importable.",
+    "explanation": "Both halves are checked, because a key without the SDK cannot make a call either."
+  },
+  "common_mistakes": [
+    "Reading a green suite as proof the integration works.",
+    "Assuming a documented API and an exercised API behave alike.",
+    "Adding a key and expecting a confirmation rather than a discrepancy."
+  ],
+  "project_links": [
+    {
+      "label": "The Sarvam gate",
+      "path": "app/sarvam_provider.py",
+      "lines": "188-198"
+    },
+    {
+      "label": "The SDK availability check",
+      "path": "app/sarvam_provider.py",
+      "lines": "169-185"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/sarvam_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/sarvam_provider.py"
+    },
+    {
+      "label": "DEMO.md — variant C is unexercised",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/DEMO.md"
+    }
+  ],
+  "glossary_terms": [
+    "unexercised — written to a spec, never run against the service",
+    "stub — a fake that answers the way a spec says",
+    "sdk — the vendor's client library"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.8.js */
+/* 10.8 — What leaves the process, and what does not
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.8",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "What leaves the process, and what does not",
+  "order": 1008,
+  "duration_min": 25,
+  "concept_md": "### The prompt is the boundary\n\nA live review sends the diff's added lines to a model. That is the one moment data leaves the machine, and it is worth knowing exactly what goes.\n\n### What is sent\n\nThe added lines with their file paths and line numbers, and the instructions that ask for the five-field shape. Not the repository, not the history, not the `.env`, not the keys.\n\n### What is not\n\nAnything not in the diff. A rule engine sees only added lines, and the prompt is built from the same bundle, so a live review cannot leak a file the diff did not touch.\n\n### Why the boundary is documented rather than assumed\n\nBecause \"we only send the diff\" is the kind of claim that quietly stops being true. Writing it down, and keeping the prompt builder reading the same bundle the rules read, is what makes it checkable — and it is what a reader should verify before pointing this at a private repository.",
+  "code_examples": [
+    {
+      "id": "10.8-ex-0",
+      "lang": "console",
+      "caption": "The bundle a prompt is built from holds only the diff",
+      "code": "from app.parser import parse_diff_file\n\nbundle = parse_diff_file(\"samples/sample.diff\")\nprint(\"files:\", [f.path for f in bundle.files])\nprint(\"added lines:\", sum(len(f.added_spans) for f in bundle.files))",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner does not embed the provider modules; this command runs from a checkout instead.",
+      "expected_output": "/bin/sh: 1: from: not found\n/bin/sh: 3: Syntax error: \"(\" unexpected"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What leaves the process on a live review?",
+      "options": [
+        "The added lines and their paths",
+        "The whole repository tree",
+        "The whole repository tree as text",
+        "The diff and the keys"
+      ],
+      "answer": 0,
+      "why": "The prompt is built from the same bundle the rules read, so nothing outside the diff goes out."
+    },
+    {
+      "q": "Why is the boundary written down?",
+      "options": [
+        "A quiet assumption stops being true",
+        "The vendor requires a written statement",
+        "The tests need a description",
+        "The prompt must be versioned"
+      ],
+      "answer": 0,
+      "why": "Keeping the claim visible and the builder reading the same bundle is what makes it checkable later."
+    },
+    {
+      "q": "What does a rule engine see?",
+      "options": [
+        "Only the added lines",
+        "The whole file it sits in",
+        "The file and its history",
+        "The diff and the repository"
+      ],
+      "answer": 0,
+      "why": "The same restriction applies to the prompt, because both read one bundle."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print the paths the sample diff touches.",
+    "starter": "",
+    "solution": "```console\n$ python -c \"from app.parser import parse_diff_file; print([f.path for f in parse_diff_file('samples/sample.diff').files])\"\n```",
+    "explanation": "Two paths, which is the whole of what a live review would send for that sample."
+  },
+  "exercise": {
+    "prompt": "How many added lines would the sample diff send, and which function counts them?",
+    "hint": "The bundle carries spans per file.",
+    "solution": "```console\n$ python -c \"from app.parser import parse_diff_file; b=parse_diff_file('samples/sample.diff'); print(sum(len(f.added_spans) for f in b.files))\"\n```",
+    "explanation": "The count is small, which is the point: a review sends the change, not the codebase."
+  },
+  "common_mistakes": [
+    "Assuming a live review sends the file rather than the diff.",
+    "Building the prompt from something other than the bundle the rules read.",
+    "Treating the boundary as obvious instead of writing it down."
+  ],
+  "project_links": [
+    {
+      "label": "The bundle a prompt is built from",
+      "path": "app/parser.py",
+      "lines": "518-572"
+    },
+    {
+      "label": "Where the provider is called",
+      "path": "app/engine.py",
+      "lines": "320-387"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — the entry point",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "app/parser.py — the bundle",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/parser.py"
+    }
+  ],
+  "glossary_terms": [
+    "prompt — the text sent to a model",
+    "boundary — the point where data leaves the process",
+    "bundle — the parsed diff both rules and prompts read"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.9.js */
+/* 10.9 — Timeouts, degradation and the one WARNING
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.9",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "Timeouts, degradation and the one WARNING",
+  "order": 1009,
+  "duration_min": 25,
+  "concept_md": "### A bound on every call\n\n`request_timeout_s` defaults to 20 seconds and refuses zero or negative; the local endpoint has its own, larger timeout because a laptop model is slower. A call without a bound is a hang waiting to happen.\n\n### Degrading, once\n\nWhen a live call fails, the run degrades to the rule engine and logs exactly one WARNING. One, not one per finding, and not silence: a reader of the log sees the degradation and its reason in a single line.\n\n### Why exactly one\n\nBecause a per-finding warning buries the signal in noise, and no warning at all makes a degraded run indistinguishable from a clean one. One line is the amount a person will actually read.\n\n### The outcome keeps the record\n\nThe `ProviderOutcome` carries `mode=\"mock\"` and the reason, so the degradation is visible in the result as well as the log. A caller that reads neither gets a real review with an honest provenance it chose not to look at.",
+  "code_examples": [
+    {
+      "id": "10.9-ex-0",
+      "lang": "console",
+      "caption": "Both timeouts, and the constraint on the hosted one",
+      "code": "python - <<'PY'\nfrom app.config import Settings\n\nfor name in (\"request_timeout_s\", \"lmstudio_timeout\"):\n    f = Settings.model_fields[name]\n    print(\"%-18s %r %s\" % (name, f.default, [str(m) for m in f.metadata]))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "request_timeout_s  20.0 ['Gt(gt=0)']\nlmstudio_timeout   120.0 ['Gt(gt=0)']",
+      "why_not": "the browser runner does not embed app/config.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "How many warnings does a degraded run log?",
+      "options": [
+        "Exactly one, with its reason",
+        "One for every finding",
+        "None; the outcome carries it",
+        "One per provider tried"
+      ],
+      "answer": 0,
+      "why": "A warning per finding buries the signal; none at all hides the degradation."
+    },
+    {
+      "q": "Why does the local endpoint have its own timeout?",
+      "options": [
+        "A laptop model answers slower",
+        "The protocol requires one",
+        "The SDK defaults to it",
+        "The protocol requires one of its own"
+      ],
+      "answer": 0,
+      "why": "One bound cannot suit a hosted endpoint and a model running on someone's machine."
+    },
+    {
+      "q": "What carries the record besides the log?",
+      "options": [
+        "The outcome's mode and reason",
+        "The finding's severity",
+        "The finding's severity and its count",
+        "The diff's file count"
+      ],
+      "answer": 0,
+      "why": "Both surfaces say the same thing, so a caller reading the result is not misled."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print both timeouts and confirm neither accepts zero.",
+    "starter": "",
+    "solution": "```python\nfrom app.config import Settings\n\nfor n in (\"request_timeout_s\", \"lmstudio_timeout\"):\n    print(n, Settings.model_fields[n].default)\n```",
+    "explanation": "The hosted bound carries `gt=0`; the local one is larger, as a slower model needs."
+  },
+  "exercise": {
+    "prompt": "Which timeout is larger, and what does the difference assume?",
+    "hint": "Compare the two defaults.",
+    "solution": "```python\nfrom app.config import Settings\n\nprint(Settings.model_fields[\"lmstudio_timeout\"].default,\n      Settings.model_fields[\"request_timeout_s\"].default)\n```\n\nThe local one is larger, which assumes a model on a laptop is slower than a hosted endpoint.",
+    "explanation": "The assumption is stated in the default rather than discovered as a timeout in production."
+  },
+  "common_mistakes": [
+    "Logging a warning per finding, so the degradation is lost in noise.",
+    "Giving both endpoints the same timeout.",
+    "Setting a timeout to zero to disable it, which the field refuses."
+  ],
+  "project_links": [
+    {
+      "label": "The hosted timeout and its bound",
+      "path": "app/config.py",
+      "lines": "61"
+    },
+    {
+      "label": "The local timeout",
+      "path": "app/config.py",
+      "lines": "78-82"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — where the fallback happens",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "app/config.py — the timeouts",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    }
+  ],
+  "glossary_terms": [
+    "timeout — the bound on one call",
+    "degradation — a working path taken when a provider fails",
+    "warning — one line in the log, not one per finding"
+  ]
+});
+
+</script>
+<script>
+/* content/part-10/lesson-10.10.js */
+/* 10.10 — The benchmark that has not been run
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "10.10",
+  "part": 10,
+  "part_title": "Providers and LLM APIs",
+  "title": "The benchmark that has not been run",
+  "order": 1010,
+  "duration_min": 30,
+  "concept_md": "### What exists\n\nA harness under `benchmarks/` that can compare findings against a labelled set, and a matcher that pairs a predicted finding with an expected one. What does not exist is the labelled set.\n\n### What that means\n\n**There is no precision, recall or F1 figure for this tool, and no percentage of any kind.** Not a low one, not an estimate — none. The number cannot be computed without labels, and the labels have not been written.\n\n### Why not approximate it\n\nA figure produced from an unlabelled sample would be a guess wearing a number's clothes. It would be quoted, then cited, then believed, and nobody downstream would know it came from a harness with an empty input.\n\n### What would change it\n\nA labelled set: a sample of diffs, each with the findings a careful reader agrees are there. Then the harness produces real numbers, and the honest sentence becomes a measured one. Until then, the honest sentence is the one above — and any document that states a percentage is stating something this repository cannot support.\n\n### The habit worth keeping\n\nWhen a measurement is missing, write that it is missing. A gap that is named is a task; a gap that is filled with an estimate is a defect that will outlive everyone who knew.",
+  "code_examples": [
+    {
+      "id": "10.10-ex-0",
+      "lang": "console",
+      "caption": "The harness is real; the labelled set is not",
+      "code": "import pathlib\n\nb = pathlib.Path(\"benchmarks\")\nprint(\"harness files:\", sorted(p.name for p in b.glob(\"*.py\")))\ndata = [p for p in b.rglob(\"*\") if p.suffix in (\".json\", \".jsonl\", \".csv\") and \"out\" not in p.parts]\nprint(\"labelled data files:\", data or \"none\")",
+      "runnable": false,
+      "run_tier": "terminal",
+      "why_not": "the browser runner does not embed the provider modules; this command runs from a checkout instead.",
+      "expected_output": "/bin/sh: 1: import: not found\n/bin/sh: 3: Syntax error: \"(\" unexpected"
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which figure does this tool have for accuracy?",
+      "options": [
+        "None, because no labels exist",
+        "A recall figure from the harness",
+        "An F1 score from the sample",
+        "A precision estimate from tests"
+      ],
+      "answer": 0,
+      "why": "The harness needs labels to produce a number, and the labelled set has not been written."
+    },
+    {
+      "q": "Why not estimate a figure from a sample?",
+      "options": [
+        "A guess would be cited as measured",
+        "The harness cannot run without labels",
+        "The sample is too small to use",
+        "The matcher rejects unlabelled rows"
+      ],
+      "answer": 0,
+      "why": "A number invented once gets quoted and believed, long after anyone remembers where it came from."
+    },
+    {
+      "q": "What turns the honest sentence into a measured one?",
+      "options": [
+        "A labelled set of diffs",
+        "A larger sample of diffs",
+        "A faster matcher implementation",
+        "A second provider to compare"
+      ],
+      "answer": 0,
+      "why": "Labels are the missing input; more unlabelled data changes nothing about what can be computed."
+    }
+  ],
+  "try_it": {
+    "prompt": "List the harness files and show there is no labelled data.",
+    "starter": "",
+    "solution": "```console\n$ ls benchmarks/*.py\n$ find benchmarks -name '*.json' -o -name '*.jsonl' | grep -v out\n```",
+    "explanation": "The harness is there; the data it would read is not, which is the whole finding."
+  },
+  "exercise": {
+    "prompt": "Which module pairs a predicted finding with an expected one, and what does it need to run?",
+    "hint": "The matcher is under benchmarks/.",
+    "solution": "```console\n$ grep -n 'def ' benchmarks/matching.py | head -5\n```\n\nIt needs an expected finding for each predicted one — that is the labelled set that does not exist.",
+    "explanation": "The pairing logic is written and tested; the input it pairs against is what is missing."
+  },
+  "common_mistakes": [
+    "Quoting a precision or recall figure this repository cannot produce.",
+    "Reading a green benchmark test as a benchmark result.",
+    "Filling the gap with an estimate instead of naming it."
+  ],
+  "project_links": [
+    {
+      "label": "The matcher that needs labels",
+      "path": "benchmarks/matching.py",
+      "lines": "1-244"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "benchmarks/ — the harness",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/benchmarks/matching.py"
+    },
+    {
+      "label": "HANDOFF.md — what is deferred",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/HANDOFF.md"
+    }
+  ],
+  "glossary_terms": [
+    "labelled set — diffs with agreed findings, the missing input",
+    "precision — of the findings reported, how many were right",
+    "harness — the code that would compute a figure if it had input"
   ]
 });
 
