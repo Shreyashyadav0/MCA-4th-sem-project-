@@ -217,17 +217,17 @@
 
       var toggle = el("button", "side-toggle");
       toggle.type = "button";
-      /* Three rules, in order. A part the reader explicitly closed stays
-       * closed. The part being read opens, so aria-current is visible. With no
-       * lesson selected — index.html, tryit.html — every part with lessons
-       * opens, because a permanent topic list is what that page is for. */
+      /* Everything starts closed and a part opens when the reader clicks it.
+       * The one exception is the part being read on a lesson page: it opens so
+       * the aria-current link is visible, and the reader never has to hunt for
+       * where they are. A part the reader closed stays closed. */
       var openByDefault;
       if (collapsed[part.n] === false) {
         openByDefault = false;
       } else if (currentPart !== null) {
         openByDefault = String(part.n) === String(currentPart);
       } else {
-        openByDefault = lessons.length > 0;
+        openByDefault = false;
       }
       toggle.setAttribute("aria-expanded", openByDefault ? "true" : "false");
       toggle.appendChild(el("span", "side-part-label", "Part " + part.n + " · " + part.title));
