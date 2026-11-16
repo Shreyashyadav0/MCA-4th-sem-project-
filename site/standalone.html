@@ -4921,7 +4921,13 @@ details.expected-output pre.code code {
     "content/part-10/lesson-10.7.js",
     "content/part-10/lesson-10.8.js",
     "content/part-10/lesson-10.9.js",
-    "content/part-10/lesson-10.10.js"
+    "content/part-10/lesson-10.10.js",
+    "content/part-11/lesson-11.1.js",
+    "content/part-11/lesson-11.2.js",
+    "content/part-11/lesson-11.3.js",
+    "content/part-11/lesson-11.4.js",
+    "content/part-11/lesson-11.5.js",
+    "content/part-11/lesson-11.6.js"
   ];
 })();
 
@@ -15464,6 +15470,649 @@ window.LESSONS.push({
     "labelled set — diffs with agreed findings, the missing input",
     "precision — of the findings reported, how many were right",
     "harness — the code that would compute a figure if it had input"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.1.js */
+/* 11.1 — The engine owns no transport
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.1",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "The engine owns no transport",
+  "order": 1101,
+  "duration_min": 25,
+  "concept_md": "### One function, one decision\n\n`app/engine.py` is 387 lines and it contains no HTTP call, no socket and no SDK import. Its own docstring says so: this module owns no transport. Both live providers run through the single `app.openai_compat_provider.py` adapter, and the degraded path calls `app.mock_provider.offline_diff_findings` directly.\n\n### What the engine actually does\n\nIt reads `Settings`, decides which provider runs, builds the config that provider needs, calls one function, and relabels the result honestly. Routing and labelling — that is the whole job.\n\n### Why the separation is worth it\n\nBecause a surface that also routed would be a second place the rule lives. The CLI, the API and the webhook all call `review()` and nothing else, so a run that says `mode=\"mock\"` says it for the same reason everywhere.\n\n### What this rules out\n\nAdding a provider means adding an endpoint config, not a transport. If the engine held the HTTP call, every new provider would be a branch inside it — and the branches would drift.\n\n### The claim you can check\n\nGrep the file for `requests`, `httpx`, `openai` or `socket`. The only provider names that appear are the constants it imports, and the only call it makes is `review_with_fallback` from the adapter.",
+  "code_examples": [
+    {
+      "id": "11.1-ex-0",
+      "lang": "console",
+      "caption": "The engine imports no transport",
+      "code": "python - <<'PY'\nimport pathlib, re\n\nsrc = pathlib.Path(\"app/engine.py\").read_text()\nhits = sorted({m for m in (\"requests\", \"httpx\", \"socket\", \"import openai\") if m in src})\nprint(\"transport references:\", hits or \"none\")\nprint(\"lines:\", len(src.splitlines()))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "transport references: none\nlines: 387",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does app/engine.py own?",
+      "options": [
+        "The retry loop",
+        "Routing, labelling and the fallback",
+        "Routing and labelling",
+        "The prompt text"
+      ],
+      "answer": 2,
+      "why": "It decides which provider runs and labels the result; the transport lives in the adapter."
+    },
+    {
+      "q": "Which module holds the live HTTP call?",
+      "options": [
+        "app/sarvam_provider.py",
+        "app/engine.py",
+        "app/mock_provider.py",
+        "openai_compat_provider"
+      ],
+      "answer": 3,
+      "why": "Both live providers run through that one adapter, which is why the engine needs no transport."
+    },
+    {
+      "q": "What do all three surfaces call?",
+      "options": [
+        "review(), and nothing else",
+        "Their own copy of the routing",
+        "The adapter directly",
+        "The mock provider first"
+      ],
+      "answer": 0,
+      "why": "One entry point means a run labelled mock says so for the same reason on every surface."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show that the engine names no transport library.",
+    "starter": "",
+    "solution": "```console\n$ grep -nE 'requests|httpx|socket|import openai' app/engine.py\n```",
+    "explanation": "No output: the file does not import or name a transport at all."
+  },
+  "exercise": {
+    "prompt": "Which single function does the engine call for a live review, and from where is it imported?",
+    "hint": "Read the import block at the top of the file.",
+    "solution": "```console\n$ sed -n '45,56p' app/engine.py\n```\n\n`review_with_fallback`, imported from `app.openai_compat_provider` — the adapter, not a provider module.",
+    "explanation": "The import is the proof: the engine reaches the network only through the adapter."
+  },
+  "common_mistakes": [
+    "Describing the engine as owning the transport; it owns the decision.",
+    "Adding a provider by branching inside the engine.",
+    "Calling the adapter from a surface instead of the engine."
+  ],
+  "project_links": [
+    {
+      "label": "The docstring that says it owns no transport",
+      "path": "app/engine.py",
+      "lines": "21-26"
+    },
+    {
+      "label": "The one live call",
+      "path": "app/engine.py",
+      "lines": "382-387"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "ADR 0002 — every entry point degrades",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0002-offline-first-fallback.md"
+    }
+  ],
+  "glossary_terms": [
+    "transport — the code that actually makes a network call",
+    "surface — a caller: CLI, API, webhook",
+    "routing — deciding which provider runs"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.2.js */
+/* 11.2 — review(): the single entry point
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.2",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "review(): the single entry point",
+  "order": 1102,
+  "duration_min": 25,
+  "concept_md": "### One signature, four knobs\n\n```python\ndef review(bundle, settings, *, provider=\"auto\",\n           force_offline=False, min_severity=None, categories=None) -> ProviderOutcome\n```\n\nA parsed diff, the settings, and four things a caller may narrow: which provider is asked for, whether a live call is forbidden, a severity floor, and a category filter.\n\n### The order the branches run in\n\n`force_offline` is checked first and wins outright — a caller that forbids the network does not get a live call even with a valid key. Then an unknown provider name degrades with a reason rather than raising. Then a mock selection or a missing config degrades. Only then does the live call happen.\n\n### Why that order matters\n\nBecause each branch is a promise. Forbidding the network is the strongest, so nothing overrides it. An unknown name is a programming error that still must produce a review, so it degrades. Everything else is a configuration fact.\n\n### What a caller gets back\n\nOne `ProviderOutcome` with `mode`, `provider`, `model`, the findings, a `reason` and `latency_ms`. There is no exception path for a missing key, which is ADR 0002's point: absence is data.\n\n### What a caller should never do\n\nBuild a second entry point. A surface that calls the adapter itself skips the selection, the offline flag and the relabel — and the run it produces will still look like an outcome, so nothing will complain until a demo reports a live review that never happened.",
+  "code_examples": [
+    {
+      "id": "11.2-ex-0",
+      "lang": "console",
+      "caption": "The branch order, read from the source",
+      "code": "python - <<'PY'\nimport inspect\nfrom app.engine import review\n\nsrc = inspect.getsource(review)\nfor line in src.splitlines():\n    s = line.strip()\n    if s.startswith((\"if \", \"return \")) and \"(\" in s:\n        print(s[:64])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "return _mock_outcome(\nreturn _mock_outcome(\nreturn review_with_fallback(",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which branch wins outright?",
+      "options": [
+        "categories",
+        "provider=\"auto\"",
+        "min_severity",
+        "force_offline"
+      ],
+      "answer": 3,
+      "why": "A caller that forbids the network gets no live call, even with a valid key."
+    },
+    {
+      "q": "What does an unknown provider name do?",
+      "options": [
+        "Degrades with a reason",
+        "Raises ValueError to the caller",
+        "Falls through to Sarvam",
+        "Retries with auto"
+      ],
+      "answer": 0,
+      "why": "A request must still get a review, so a programming error degrades rather than failing the run."
+    },
+    {
+      "q": "How does a missing key reach the caller?",
+      "options": [
+        "As an exception from the SDK",
+        "As a reason on the outcome",
+        "As a 500 from the route",
+        "As an empty findings list"
+      ],
+      "answer": 1,
+      "why": "Absence is data: the outcome says mock and explains which variable was missing."
+    }
+  ],
+  "try_it": {
+    "prompt": "Print review()'s signature.",
+    "starter": "",
+    "solution": "```console\n$ python -c \"import inspect, app.engine; print(inspect.signature(app.engine.review))\"\n```",
+    "explanation": "Four keyword-only knobs after the diff and the settings."
+  },
+  "exercise": {
+    "prompt": "With a valid key set but force_offline=True, which provider runs?",
+    "hint": "The first branch decides.",
+    "solution": "```console\n$ python -c \"from app.config import Settings; from app.engine import select_provider; print(select_provider(Settings(sarvam_api_key='x')).provider)\"\n```\n\nSelection says sarvam, but `review(..., force_offline=True)` returns mock regardless — the flag is checked before the selection is used.",
+    "explanation": "Two decisions, two places: the selector answers which provider, and force_offline overrules it."
+  },
+  "common_mistakes": [
+    "Expecting force_offline to be a provider name; it is a flag.",
+    "Raising for a missing key instead of degrading.",
+    "Reading the selection as the final answer without the offline flag."
+  ],
+  "project_links": [
+    {
+      "label": "The single entry point",
+      "path": "app/engine.py",
+      "lines": "320-387"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — review()",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "ADR 0002 — absence is data",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0002-offline-first-fallback.md"
+    }
+  ],
+  "glossary_terms": [
+    "entry point — the one function every surface calls",
+    "forced offline — a flag that forbids a live call",
+    "knob — a keyword argument that narrows a run"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.3.js */
+/* 11.3 — Absence as data: what config_for_* actually checks
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.3",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "Absence as data: what config_for_* actually checks",
+  "order": 1103,
+  "duration_min": 25,
+  "concept_md": "### Two builders, two different tests\n\n`config_for_sarvam` returns a config only when `SARVAM_API_KEY` is non-blank. `config_for_local` returns one only when `LMSTUDIO_BASE_URL` is non-blank **and** `LMSTUDIO_API_KEY` is non-blank.\n\n### Why the local check looks redundant\n\nBecause `LMSTUDIO_API_KEY` defaults to the placeholder `lm-studio`, so in practice the base URL decides. The key check is still there — a caller who blanks it deliberately gets no local config, which is the escape hatch.\n\n### What \"absence is data\" means here\n\nA missing variable is not an error to raise; it is the input that decides the mode. `Settings` defaults every field, so the builders are reading presence, not existence. That is why a fresh checkout produces a review rather than a traceback.\n\n### What the builders do not check\n\nThat the key is valid, that the server is awake, or that the SDK is installed. `sarvam_provider.provider_available` checks the SDK, and the selector does not call it — so a key with no SDK still selects sarvam and fails at call time, as lesson 10.4 records.\n\n### Why the check is written even when it looks redundant\n\nA default that satisfies a check is not the same as a check that is unnecessary. Blanking `LMSTUDIO_API_KEY` is how a caller says \"do not use the local server even though a URL is set\", and the builder honours that because the test is on the value, not on whether it was provided.",
+  "code_examples": [
+    {
+      "id": "11.3-ex-0",
+      "lang": "console",
+      "caption": "Both builders, with nothing and then with a value",
+      "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.engine import config_for_local, config_for_sarvam\n\nprint(\"empty   :\", config_for_local(Settings()), config_for_sarvam(Settings()))\nprint(\"local   :\", bool(config_for_local(Settings(lmstudio_base_url=\"http://x/v1\"))))\nprint(\"sarvam  :\", bool(config_for_sarvam(Settings(sarvam_api_key=\"k\"))))\nprint(\"key blank:\", config_for_local(Settings(lmstudio_base_url=\"http://x/v1\", lmstudio_api_key=\"\")))\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "empty   : None None\nlocal   : True\nsarvam  : True\nkey blank: None",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "What does config_for_sarvam test?",
+      "options": [
+        "A non-blank key",
+        "A base URL",
+        "An installed SDK",
+        "A loaded model"
+      ],
+      "answer": 0,
+      "why": "Only the key; the SDK is checked by provider_available, which the selector never calls."
+    },
+    {
+      "q": "Why does the local key check look redundant?",
+      "options": [
+        "The key defaults to a placeholder value",
+        "The key defaults to a placeholder",
+        "The SDK supplies the key",
+        "The base URL implies a key"
+      ],
+      "answer": 1,
+      "why": "LMSTUDIO_API_KEY defaults to lm-studio, so in practice the base URL decides."
+    },
+    {
+      "q": "What does a missing variable become?",
+      "options": [
+        "A 500 from the route",
+        "The input that decides which mode runs",
+        "The input that picks the mode",
+        "A warning and a retry"
+      ],
+      "answer": 2,
+      "why": "Absence is data: the builders read presence, and every field has a default."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show that blanking the local key removes the config.",
+    "starter": "",
+    "solution": "```console\n$ python -c \"from app.config import Settings; from app.engine import config_for_local; print(config_for_local(Settings(lmstudio_base_url='http://x/v1', lmstudio_api_key='')))\"\n```",
+    "explanation": "None — the key check is real, even though the default makes it rarely visible."
+  },
+  "exercise": {
+    "prompt": "Which two settings does config_for_local require, and which one has a default?",
+    "hint": "Read the function rather than the settings class.",
+    "solution": "```console\n$ sed -n '135,158p' app/engine.py\n```\n\nA base URL and a non-blank key; the key defaults to `lm-studio`, so only the URL is usually set by hand.",
+    "explanation": "A defaulted field still participates in the check — which is why blanking it is a deliberate act."
+  },
+  "common_mistakes": [
+    "Saying the local builder checks only the URL; it checks the key too.",
+    "Assuming a selected provider implies a working SDK.",
+    "Treating a missing variable as an error rather than a mode."
+  ],
+  "project_links": [
+    {
+      "label": "The Sarvam builder",
+      "path": "app/engine.py",
+      "lines": "113-132"
+    },
+    {
+      "label": "The local builder",
+      "path": "app/engine.py",
+      "lines": "135-156"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py — the builders",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "app/config.py — the defaults",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/config.py"
+    }
+  ],
+  "glossary_terms": [
+    "presence — whether a value is non-blank",
+    "builder — the function that turns settings into a config",
+    "placeholder — a default value that satisfies a check"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.4.js */
+/* 11.4 — The degraded path calls the rule engine directly
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.4",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "The degraded path calls the rule engine directly",
+  "order": 1104,
+  "duration_min": 25,
+  "concept_md": "### ADR 0004's decision\n\nTwo functions can produce the rule engine's findings: `sarvam_provider.review_with_fallback(..., force_offline=True)` and `mock_provider.offline_diff_findings`. The adapter's degraded path calls the second directly, and `review_with_fallback` itself calls it too.\n\n### Why one implementation\n\nTwo call paths to the same findings means two places to keep honest, and one of them will eventually log a second warning or return a differently labelled outcome. Calling `offline_diff_findings` directly keeps exactly one mock implementation and exactly one WARNING per degraded run.\n\n### What `_mock_outcome` adds\n\nIt calls `review_with_fallback(bundle, None, ...)` — config `None` means no live attempt — and then replaces only the `reason`. The adapter can describe its own decision (\"no provider selected\"); the caller knows the more useful fact (\"offline mode requested\").\n\n### Why the reason is worth replacing\n\nBecause a reader of the log needs to know why this run was degraded. \"No provider selected\" is true for every degraded run; \"offline mode requested\" says the caller asked for it, which is a different diagnosis.\n\n### What the tests pin\n\nThat the relabel happens only when the reason differs, and that the findings are untouched. Both are checked by comparing two outcomes field by field — which is why a change to the reason text is a visible edit rather than a silent one.",
+  "code_examples": [
+    {
+      "id": "11.4-ex-0",
+      "lang": "console",
+      "caption": "The relabel, and what the adapter would have said",
+      "code": "python - <<'PY'\nimport inspect\nfrom app.engine import _mock_outcome\n\nsrc = inspect.getsource(_mock_outcome)\nfor line in src.splitlines():\n    s = line.strip()\n    if \"review_with_fallback\" in s or \"model_copy\" in s or s.startswith(\"return\"):\n        print(s[:70])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "The findings come from :func:`app.openai_compat_provider.review_with_f\noutcome = review_with_fallback(\nreturn outcome.model_copy(update={\"reason\": reason})\nreturn outcome",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which function does the degraded path call?",
+      "options": [
+        "offline_diff_findings directly",
+        "offline_diff_findings",
+        "select_provider",
+        "review()"
+      ],
+      "answer": 1,
+      "why": "Calling it directly keeps one mock implementation and one WARNING per degraded run."
+    },
+    {
+      "q": "What does _mock_outcome replace?",
+      "options": [
+        "The provider and the model",
+        "The findings and the mode",
+        "Only the reason",
+        "The latency and the mode"
+      ],
+      "answer": 2,
+      "why": "The adapter can describe its own decision; the caller knows the more useful one."
+    },
+    {
+      "q": "Why is one mock implementation worth keeping?",
+      "options": [
+        "The tests require a single one",
+        "It is fewer lines of code",
+        "The adapter cannot import it",
+        "Two paths drift apart"
+      ],
+      "answer": 3,
+      "why": "Two paths to the same findings means two places to keep honest, and one will fall behind."
+    }
+  ],
+  "try_it": {
+    "prompt": "Show the config the relabel passes to the adapter.",
+    "starter": "",
+    "solution": "```console\n$ grep -n 'review_with_fallback(' -A 4 app/engine.py | head -8\n```",
+    "explanation": "The second argument is None, which is how the adapter knows not to attempt a live call."
+  },
+  "exercise": {
+    "prompt": "What reason does the adapter itself produce for a degraded run, and what does the caller replace it with?",
+    "hint": "One is generic, one names the cause.",
+    "solution": "```console\n$ grep -n 'offline mode requested\\|local rule engine used' app/engine.py\n```\n\nThe adapter says no provider was selected; the caller substitutes the specific cause, such as offline mode being requested.",
+    "explanation": "The replacement is a diagnosis, not a decoration — it distinguishes a forced offline run from an unconfigured one."
+  },
+  "common_mistakes": [
+    "Adding a second path to the rule engine's findings.",
+    "Logging a warning in both the adapter and the caller.",
+    "Keeping the adapter's generic reason when the caller knows the cause."
+  ],
+  "project_links": [
+    {
+      "label": "The relabel",
+      "path": "app/engine.py",
+      "lines": "284-316"
+    },
+    {
+      "label": "The direct call it relies on",
+      "path": "app/mock_provider.py",
+      "lines": "59-75"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "ADR 0004 — the direct call",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0004-degraded-path-calls-offline-findings-directly.md"
+    },
+    {
+      "label": "app/mock_provider.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/mock_provider.py"
+    }
+  ],
+  "glossary_terms": [
+    "degraded path — the branch that runs without a model",
+    "relabel — replace a generic reason with a specific one",
+    "single implementation — one function that produces the findings"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.5.js */
+/* 11.5 — One WARNING per degraded run
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.5",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "One WARNING per degraded run",
+  "order": 1105,
+  "duration_min": 20,
+  "concept_md": "### The count is the design\n\nA degraded run logs exactly one WARNING. Not one per finding, not one per provider tried, and not silence.\n\n### Why exactly one\n\nA warning per finding buries the signal: a 40-finding review would produce 40 lines saying the same thing. Silence is worse, because a degraded run would then be indistinguishable from a clean one in the log. One line is what a person reads.\n\n### Where it is written\n\nOnce, at the point the decision to degrade is made. That is why the CLI, the API and the JSON output all explain a fallback identically — none of them formats the reason; they print what the engine recorded.\n\n### What the outcome carries\n\nThe same sentence, on `ProviderOutcome.reason`, with `mode=\"mock\"`. A caller that reads neither the log nor the outcome gets a real review with an honest provenance it chose not to look at — which is the failure mode this design cannot prevent, only make visible.\n\n### Why it is a WARNING and not an INFO\n\nBecause a degraded run is not the normal case for a configured deployment. The level says \"this worked, but not the way it was meant to\", which is exactly the distinction a reader of the log needs at three in the morning.",
+  "code_examples": [
+    {
+      "id": "11.5-ex-0",
+      "lang": "console",
+      "caption": "Where the single warning is described",
+      "code": "python - <<'PY'\nimport pathlib\n\nsrc = pathlib.Path(\"app/engine.py\").read_text()\nfor n, line in enumerate(src.splitlines(), 1):\n    if \"WARNING\" in line:\n        print(n, line.strip()[:64])\nPY",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "25 one mock implementation while logging exactly one WARNING per de\n295 WARNING. Only the ``reason`` is replaced: the adapter can only d\n332 decision, the honest labels and the single degraded-run WARNING ",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "How many warnings does a degraded run log?",
+      "options": [
+        "One per provider",
+        "One per finding",
+        "Exactly one",
+        "None at all"
+      ],
+      "answer": 2,
+      "why": "A warning per finding buries the signal; none at all hides the degradation."
+    },
+    {
+      "q": "Why is silence the worse failure?",
+      "options": [
+        "The findings become invalid",
+        "The log file grows larger",
+        "The caller cannot retry",
+        "A degraded run looks clean"
+      ],
+      "answer": 3,
+      "why": "Without the line, a run without a model is indistinguishable from one with it."
+    },
+    {
+      "q": "What else carries the same sentence?",
+      "options": [
+        "ProviderOutcome.reason",
+        "The findings list",
+        "The HTTP status code",
+        "ProviderOutcome.reason, the same text"
+      ],
+      "answer": 0,
+      "why": "Both surfaces say the same thing, so a caller reading the result is not misled."
+    }
+  ],
+  "try_it": {
+    "prompt": "Find every mention of WARNING in the engine.",
+    "starter": "",
+    "solution": "```console\n$ grep -n WARNING app/engine.py\n```",
+    "explanation": "The mentions are in the docstrings that state the rule, which is where the invariant is written down."
+  },
+  "exercise": {
+    "prompt": "Which two fields of the outcome make a degraded run visible?",
+    "hint": "One is a mode, one is a sentence.",
+    "solution": "```console\n$ python -c \"from app.sarvam_provider import ProviderOutcome; print([f for f in ('mode','reason') if f in ProviderOutcome.model_fields])\"\n```\n\n`mode` says mock, and `reason` says why.",
+    "explanation": "A caller needs both: the mode to branch on and the reason to report."
+  },
+  "common_mistakes": [
+    "Logging a warning per finding.",
+    "Degrading silently so the log looks clean.",
+    "Formatting the reason in each surface instead of printing the engine's."
+  ],
+  "project_links": [
+    {
+      "label": "The invariant, in the module docstring",
+      "path": "app/engine.py",
+      "lines": "21-26"
+    },
+    {
+      "label": "The reason the caller keeps",
+      "path": "app/engine.py",
+      "lines": "284-317"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "ADR 0002 — the fallback decision",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/docs/decisions/0002-offline-first-fallback.md"
+    }
+  ],
+  "glossary_terms": [
+    "degraded run — a review produced without a model",
+    "invariant — a rule that must hold on every run",
+    "provenance — where a result came from"
+  ]
+});
+
+</script>
+<script>
+/* content/part-11/lesson-11.6.js */
+/* 11.6 — Guided read: the engine in five blocks
+ * One lesson per file. Do not add a second push() here.
+ */
+window.LESSONS = window.LESSONS || [];
+window.LESSONS.push({
+  "id": "11.6",
+  "part": 11,
+  "part_title": "The engine and the fallback",
+  "title": "Guided read: the engine in five blocks",
+  "order": 1106,
+  "duration_min": 30,
+  "concept_md": "### Reading `app/engine.py` in order\n\n**The constants and the docstring** first — `PROVIDERS`, `REQUEST_AUTO`, and the sentence that says the module owns no transport. **The selection record** — `ProviderSelection`, a dataclass of provider, config and reason. **The two config builders** — what each provider needs before it can be called. **The selector** — one function, four accepted requests, a reason for every answer. **The entry point** — `review()` with its four knobs and its branch order, plus `_mock_outcome` for the relabel.\n\n### Why that order\n\nBecause no name is used before it is defined, and the file reads as a decision followed by its implementation. The docstring at the top is the claim; the last block is the code that keeps it.\n\n### What to look for as you read\n\nEvery branch returns a `ProviderOutcome`, never raises for a configuration reason. Every reason names something a reader can act on. And the live call appears exactly once, at the end.\n\n### The rebuild exercise\n\n`rebuild/tests/test_rebuild_engine.py` asks you to reimplement the selection and the fallback against a small suite. Start with `ProviderSelection`, then the builders, then the branch order in `review()` — the order is what the tests check most closely.",
+  "code_examples": [
+    {
+      "id": "11.6-ex-0",
+      "lang": "console",
+      "caption": "The five blocks, in file order",
+      "code": "grep -n '^class \\|^def \\|^PROVIDERS\\|^REQUEST_AUTO' app/engine.py",
+      "runnable": false,
+      "run_tier": "terminal",
+      "expected_output": "66:PROVIDERS: tuple[str, ...] = (\"sarvam\", \"local\", \"mock\")\n72:REQUEST_AUTO: str = \"auto\"\n83:class ProviderSelection:\n99:def _non_blank(value: str | None) -> bool:\n113:def config_for_sarvam(settings: Settings) -> OpenAICompatConfig | None:\n135:def config_for_local(settings: Settings) -> OpenAICompatConfig | None:\n159:def _local_missing(settings: Settings) -> str:\n174:def _mock_selection(reason: str) -> ProviderSelection:\n186:def _live_selection(provider: str, config: OpenAICompatConfig, reason: str) -> ProviderSelection:\n200:def select_provider(settings: Settings, *, requested: str = \"auto\") -> ProviderSelection:\n284:def _mock_outcome(\n320:def review(",
+      "why_not": "the browser runner does not embed app/engine.py or the provider modules; this command runs from a checkout instead."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Which block comes first in the file?",
+      "options": [
+        "The entry point",
+        "The constants and the module docstring",
+        "The selector function",
+        "The constants and docstring"
+      ],
+      "answer": 3,
+      "why": "The docstring is the claim about transport ownership; the blocks below implement it."
+    },
+    {
+      "q": "How many times does the live call appear?",
+      "options": [
+        "Once, at the end",
+        "Once per provider",
+        "Twice, for local and sarvam",
+        "Never in this file"
+      ],
+      "answer": 0,
+      "why": "A single call site is what makes the transport claim checkable by reading."
+    },
+    {
+      "q": "What does every branch return?",
+      "options": [
+        "A list of findings",
+        "A ProviderOutcome",
+        "A boolean and a reason",
+        "An exception"
+      ],
+      "answer": 1,
+      "why": "No configuration reason raises, so a surface never has to catch one."
+    }
+  ],
+  "try_it": {
+    "prompt": "List the file's top-level definitions in order.",
+    "starter": "",
+    "solution": "```console\n$ grep -n '^class \\|^def ' app/engine.py\n```",
+    "explanation": "The selection record, the builders, the selector and the entry point — five blocks in dependency order."
+  },
+  "exercise": {
+    "prompt": "Which function is defined last, and why does that matter for the transport claim?",
+    "hint": "The last definition is the one a surface calls.",
+    "solution": "```console\n$ grep -n '^def ' app/engine.py | tail -2\n```\n\n`review()` — and its single live call at the end is the only place the network is reached.",
+    "explanation": "Reading to the end is enough to confirm that the engine delegates rather than transports."
+  },
+  "common_mistakes": [
+    "Reimplementing the selector before the selection record.",
+    "Reading the branch order as arbitrary; it encodes which promise wins.",
+    "Assuming a rebuild needs the adapter to pass its tests."
+  ],
+  "project_links": [
+    {
+      "label": "The selection record",
+      "path": "app/engine.py",
+      "lines": "83-96"
+    },
+    {
+      "label": "The rebuild suite",
+      "path": "rebuild/tests/test_rebuild_engine.py",
+      "lines": "1-41"
+    }
+  ],
+  "learn_more": [
+    {
+      "label": "app/engine.py",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/app/engine.py"
+    },
+    {
+      "label": "rebuild/README.md — the rebuild exercises",
+      "href": "https://github.com/Shreyashyadav0/ai-code-reviewer/blob/main/rebuild/README.md"
+    }
+  ],
+  "glossary_terms": [
+    "guided read — a walk through a file in dependency order",
+    "block — a group of definitions that belong together",
+    "rebuild exercise — reimplementing a module against its tests"
   ]
 });
 

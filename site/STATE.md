@@ -992,3 +992,18 @@ request, and 10.5 now says so.
 10.10 carries the hard constraint: the benchmark harness is real, the labelled set
 is not, so no precision, recall or F1 figure exists and the lesson states that in
 those words. No percentage appears anywhere in Part 10.
+
+## Wave 7b, first half — Part 11, "The engine and the fallback"
+
+Six lessons, the site at 100 across twelve parts. Built and gated; the nine-auditor
+round is owed, so it is not a finished wave.
+
+Written against the source, and the brief's warning was worth having: `app/engine.py`
+owns no transport, both live providers run through `openai_compat_provider`, and
+11.1, 11.2 and 11.4 say so. 11.3's absence-as-data claim matches what the builders
+actually test — `config_for_local` wants a base URL *and* a non-blank key, which is
+invisible only because `LMSTUDIO_API_KEY` defaults to the placeholder `lm-studio`.
+
+`check_quiz.py` gained the per-part rule in this run, and it fired on Part 11's own
+first draft: 18 of 18 keys at index 0. That is the rule doing exactly what it was
+added for — the site-wide spread was healthy at the time.

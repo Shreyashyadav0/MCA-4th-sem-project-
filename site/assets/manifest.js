@@ -113,6 +113,12 @@
     "content/part-10/lesson-10.7.js",
     "content/part-10/lesson-10.8.js",
     "content/part-10/lesson-10.9.js",
-    "content/part-10/lesson-10.10.js"
+    "content/part-10/lesson-10.10.js",
+    "content/part-11/lesson-11.1.js",
+    "content/part-11/lesson-11.2.js",
+    "content/part-11/lesson-11.3.js",
+    "content/part-11/lesson-11.4.js",
+    "content/part-11/lesson-11.5.js",
+    "content/part-11/lesson-11.6.js"
   ];
 })();
