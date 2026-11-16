@@ -4,7 +4,7 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Part 11 audited: `f5b6acf`. Site at 100 lessons, 12 of 13 parts.
+Part 12 committed: `47c5e58`. **THE SITE IS COMPLETE — 110 lessons, 13 parts.**
 
 ## Validator
 
@@ -48,19 +48,21 @@ Part 0.
 
 ## Next stage
 
-**Part 12 — ten lessons, 12.1-12.10, site to 110.** The last content wave.
+**Stage 2 — the nine-lane audit over Parts 11 and 12 together**, then the freeze,
+the release and MAINTAINING.md.
 
-First concrete action: read `reviewer.py`, `app/cli.py`, `app/main.py` and
-`app/github_client.py`, then write the ten lessons with the generator discipline:
-quiz options drafted at equal length AND distinct from each other, executed captures,
-construct-aligned ranges, `part_title` exactly "Surfaces: CLI, API, webhook, GitHub".
+First concrete action: package the tree and run all nine lanes (schema, anchors,
+claims, quiz, prose, links, accessibility, layout, consistency and honesty) over
+`site/content/part-11/` and `part-12/`. Six of the nine never ran for Part 11.
 
-12.9 carries the viva material — three demo variants from DEMO.md, and Sarvam is
-unexercised, never claimed to work. 12.5 is ADR 0005, the 422 demotion. 12.6 is the
-idempotency marker and its exact HTML comment form.
+Then, in order: fix every CRITICAL and HIGH and re-run each motivating check;
+re-audit with three auditors (anchors, claims, layout); the final integrity pass at
+110; `git tag -a v1.1-site`; `git archive` to a zip plus SHA256SUMS.txt;
+MAINTAINING.md; and the benchmark labelling tool.
 
-Part 11 was audited by three of nine lanes (18 findings, all fixed); six lanes
-remain and should run with Part 12's round.
+Watch for the defect class that has appeared in every round: my own fixes
+introducing duplicates, most recently five option pairs created by lengthening a
+copy of the key instead of writing a distinct claim.
 
 Deferred: four word-count paragraphs (10.3, 10.6, 10.8, 10.9) restate a section the
 lesson already had. Not false, but redundant; removing them drops those lessons under
