@@ -9,7 +9,7 @@ window.LESSONS.push({
   "title": "The benchmark that has not been run",
   "order": 1010,
   "duration_min": 30,
-  "concept_md": "### What exists\n\nA harness under `benchmarks/` that can compare findings against a labelled set, and a matcher that pairs a predicted finding with an expected one. What does not exist is the labelled set.\n\n### What that means\n\n**There is no precision, recall or F1 figure for this tool, and no percentage of any kind.** Not a low one, not an estimate — none. The number cannot be computed without labels, and the labels have not been written.\n\n### Why not approximate it\n\nA figure produced from an unlabelled sample would be a guess wearing a number's clothes. It would be quoted, then cited, then believed, and nobody downstream would know it came from a harness with an empty input.\n\n### What would change it\n\nA labelled set: a sample of diffs, each with the findings a careful reader agrees are there. Then the harness produces real numbers, and the honest sentence becomes a measured one. Until then, the honest sentence is the one above — and any document that states a percentage is stating something this repository cannot support.\n\n### The habit worth keeping\n\nWhen a measurement is missing, write that it is missing. A gap that is named is a task; a gap that is filled with an estimate is a defect that will outlive everyone who knew.",
+  "concept_md": "### What exists\n\nA harness under `benchmarks/` that can compare findings against a labelled set, and a matcher that pairs a predicted finding with an expected one. `benchmarks/golden/` ships two format examples — `example_01` and `example_02` — which exist to show the file shape and are excluded from every metric; the manifest's `evaluation_samples` is empty. What does not exist is the labelled set.\n\n### What that means\n\n**There is no precision, recall or F1 figure for this tool, and no percentage of any kind.** Not a low one, not an estimate — none. The number cannot be computed without labels, and the labels have not been written.\n\n### Why not approximate it\n\nA figure produced from an unlabelled sample would be a guess wearing a number's clothes. It would be quoted, then cited, then believed, and nobody downstream would know it came from a harness with an empty input.\n\n### What would change it\n\nA labelled set: a sample of diffs, each with the findings a careful reader agrees are there. Then the harness produces real numbers, and the honest sentence becomes a measured one. Until then, the honest sentence is the one above — and any document that states a percentage is stating something this repository cannot support.\n\n### The habit worth keeping\n\nWhen a measurement is missing, write that it is missing. A gap that is named is a task; a gap that is filled with an estimate is a defect that will outlive everyone who knew.",
   "code_examples": [
     {
       "id": "10.10-ex-0",
@@ -60,8 +60,8 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "List the harness files and show there is no labelled data.",
     "starter": "",
-    "solution": "```console\n$ ls benchmarks/*.py\n$ find benchmarks -name '*.json' -o -name '*.jsonl' | grep -v out\n```",
-    "explanation": "The harness is there; the data it would read is not, which is the whole finding."
+    "solution": "```console\n$ python -c \"import json,pathlib; print(json.loads(pathlib.Path('benchmarks/golden/manifest.json').read_text())['evaluation_samples'])\"\n[]\n```",
+    "explanation": "The manifest's sample list is empty: the two example folders are format demonstrations, not labels."
   },
   "exercise": {
     "prompt": "Which module pairs a predicted finding with an expected one, and what does it need to run?",

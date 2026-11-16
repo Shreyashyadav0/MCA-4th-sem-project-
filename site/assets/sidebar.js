@@ -188,7 +188,19 @@
 
     var scroller = el("div", "sidebar-scroll");
     var current = String(currentId || "");
+
+    /* Resolve the current part BEFORE the render loop. Computing it inside the
+     * loop meant every part before the current one saw null and expanded, so a
+     * Part 10 lesson opened 11 of 13 groups and the reader never saw Part 10. */
     var currentPart = null;
+    C.PARTS.forEach(function (part) {
+      var found = lessonsOf(part).some(function (lesson) {
+        return String(lesson.id) === current;
+      });
+      if (found && currentPart === null) {
+        currentPart = part.n;
+      }
+    });
 
     C.PARTS.forEach(function (part) {
       var lessons = lessonsOf(part);
@@ -282,4 +294,19 @@
   window.Sidebar = {
     render: render
   };
+})();
+
+/* Keep the reader's place: after a render, centre the active link in the scroller
+ * so a long list does not open at Part 0 while the lesson is Part 10. */
+(function () {
+  function centre() {
+    var sc = document.querySelector(".sidebar-scroll");
+    var active = sc && sc.querySelector('[aria-current="page"]');
+    if (sc && active && sc.clientHeight) {
+      sc.scrollTop = Math.max(0, active.offsetTop - sc.clientHeight / 2);
+    }
+  }
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(centre, 120); });
+  }
 })();

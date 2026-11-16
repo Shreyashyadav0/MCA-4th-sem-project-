@@ -428,4 +428,9 @@ details.expected-output pre.code code {
  * measure — the caption strip and action row already are. */
 .code-figure > pre.code {
   max-width: none;
+  /* A heredoc line runs past 100 characters; scrolling hid the end of every
+   * command at 1440. The terminal panel already wraps, so one command used to
+   * render two ways forty pixels apart. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

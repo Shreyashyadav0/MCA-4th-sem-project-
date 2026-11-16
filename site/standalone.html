@@ -1808,6 +1808,11 @@ details.expected-output pre.code code {
  * measure — the caption strip and action row already are. */
 .code-figure > pre.code {
   max-width: none;
+  /* A heredoc line runs past 100 characters; scrolling hid the end of every
+   * command at 1440. The terminal panel already wraps, so one command used to
+   * render two ways forty pixels apart. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 </style>
@@ -4132,7 +4137,19 @@ details.expected-output pre.code code {
 
     var scroller = el("div", "sidebar-scroll");
     var current = String(currentId || "");
+
+    /* Resolve the current part BEFORE the render loop. Computing it inside the
+     * loop meant every part before the current one saw null and expanded, so a
+     * Part 10 lesson opened 11 of 13 groups and the reader never saw Part 10. */
     var currentPart = null;
+    C.PARTS.forEach(function (part) {
+      var found = lessonsOf(part).some(function (lesson) {
+        return String(lesson.id) === current;
+      });
+      if (found && currentPart === null) {
+        currentPart = part.n;
+      }
+    });
 
     C.PARTS.forEach(function (part) {
       var lessons = lessonsOf(part);
@@ -4226,6 +4243,21 @@ details.expected-output pre.code code {
   window.Sidebar = {
     render: render
   };
+})();
+
+/* Keep the reader's place: after a render, centre the active link in the scroller
+ * so a long list does not open at Part 0 while the lesson is Part 10. */
+(function () {
+  function centre() {
+    var sc = document.querySelector(".sidebar-scroll");
+    var active = sc && sc.querySelector('[aria-current="page"]');
+    if (sc && active && sc.clientHeight) {
+      sc.scrollTop = Math.max(0, active.offsetTop - sc.clientHeight / 2);
+    }
+  }
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(centre, 120); });
+  }
 })();
 
 </script>
@@ -14391,9 +14423,9 @@ window.LESSONS.push({
     {
       "q": "Which field stops a caller mistaking a fallback for a live run?",
       "options": [
-        "`provider` on the outcome",
+        "`findings` on the outcome",
         "`mode` on the outcome",
-        "`model` on the outcome",
+        "`mode` on the outcome",
         "`latency_ms` on the outcome"
       ],
       "answer": 1,
@@ -14482,7 +14514,7 @@ window.LESSONS.push({
   "title": "The mock provider: the rule engine, no network",
   "order": 1002,
   "duration_min": 20,
-  "concept_md": "### The one provider that always works\n\n`app/mock_provider.py` is 75 lines. `offline_review` and `offline_diff_findings` run the rule engine over the diff and return a `ReviewResult` — mode, target, findings, notes. No socket, no key, no model. The `ProviderOutcome` that reaches a caller is assembled one level up, in `engine._mock_outcome`, so the mock never builds the wrapper itself.\n\n### Why it is not a stub\n\nA stub would return canned findings. This runs the real 63 rules over the real diff, so the findings a reader sees in mock mode are true findings about their code — they are just not model-assisted. That is why variant A of the demo is the one that is exercised: it produces a real review with no external dependency.\n\n### What mock mode is for\n\nThree things. It lets the tool start on a machine with nothing configured, which is the offline-first promise. It makes the test suite runnable without a network. And it gives the live providers something to be compared against, which is the benchmark that has not been run.\n\n### The label\n\n`mode=\"mock\"` and a `reason` naming why the fallback happened — no key, no local endpoint, or a forced offline run. A caller that ignores the label gets a true review with an honest provenance it did not read.",
+  "concept_md": "### The one provider that always works\n\n`app/mock_provider.py` is 75 lines. `offline_review` runs the rule engine over one file and returns a `ReviewResult` — mode, target, findings, notes. `offline_diff_findings` takes the diff and returns a plain `list[Finding]`. No socket, no key, no model. The `ProviderOutcome` that reaches a caller is built by the adapter's `_mock_outcome`, and `engine._mock_outcome` then rewrites its reason. The mock never builds the wrapper itself.\n\n### Why it is not a stub\n\nA stub would return canned findings. This runs the real 63 rules over the real diff, so the findings a reader sees in mock mode are true findings about their code — they are just not model-assisted. That is why variant A of the demo is the one that is exercised: it produces a real review with no external dependency.\n\n### What mock mode is for\n\nThree things. It lets the tool start on a machine with nothing configured, which is the offline-first promise. It makes the test suite runnable without a network. And it gives the live providers something to be compared against, which is the benchmark that has not been run.\n\n### The label\n\n`mode=\"mock\"` and a `reason` naming why the fallback happened — no key, no local endpoint, or a forced offline run. A caller that ignores the label gets a true review with an honest provenance it did not read.",
   "code_examples": [
     {
       "id": "10.2-ex-0",
@@ -14693,7 +14725,7 @@ window.LESSONS.push({
   "title": "`provider_available`: an honest gate before a call",
   "order": 1004,
   "duration_min": 20,
-  "concept_md": "### Ask before calling\n\nThe two live providers expose `provider_available`, and it is stricter than the selector: `openai_compat_provider.provider_available` requires a base URL **and** a non-blank key; `sarvam_provider.provider_available` requires the key and an importable SDK.\n\nThe selector itself does not call it. `config_for_sarvam` checks only that `SARVAM_API_KEY` is non-blank, and `config_for_local` only that a base URL is set — so a key with no SDK installed still selects `sarvam`, and the failure surfaces at call time.\n\n### Why a predicate rather than a try\n\nA call that fails because a key is missing produces an error from deep inside a library, and translating that into \"set SARVAM_API_KEY\" is guesswork. A predicate answers the question before anything is sent, so the reason a provider was skipped is known rather than inferred.\n\n### The two answers it gives the engine\n\nAvailable, so the engine builds a config and runs live. Not available, so the engine records why and degrades to mock. The reason string is user-facing and names the variable that is missing.\n\n### What it cannot check\n\nThat the model is loaded, that the key is valid, or that the server is awake. It answers \"is this configured\", not \"will this work\" — and the difference is why a live call can still fail after a passing check.",
+  "concept_md": "### Ask before calling\n\nThe two live providers expose `provider_available`, and it is stricter than the selector: `openai_compat_provider.provider_available` requires a base URL **and** a non-blank key; `sarvam_provider.provider_available` requires the key and an importable SDK.\n\nThe selector itself does not call it. `config_for_sarvam` checks only that `SARVAM_API_KEY` is non-blank, so a key with no SDK installed still selects `sarvam` and the failure surfaces at call time. `config_for_local` wants a base URL **and** a non-blank key — which is rarely noticed, because `LMSTUDIO_API_KEY` defaults to the placeholder `lm-studio`.\n\n### Why a predicate rather than a try\n\nA call that fails because a key is missing produces an error from deep inside a library, and translating that into \"set SARVAM_API_KEY\" is guesswork. A predicate answers the question before anything is sent, so the reason a provider was skipped is known rather than inferred.\n\n### The two answers it gives the engine\n\nAvailable, so the engine builds a config and runs live. Not available, so the engine records why and degrades to mock. The reason string is user-facing and names the variable that is missing.\n\n### What it cannot check\n\nThat the model is loaded, that the key is valid, or that the server is awake. It answers \"is this configured\", not \"will this work\" — and the difference is why a live call can still fail after a passing check.",
   "code_examples": [
     {
       "id": "10.4-ex-0",
@@ -14806,7 +14838,7 @@ window.LESSONS.push({
     {
       "id": "10.5-ex-0",
       "lang": "console",
-      "caption": "Three requests, three decisions",
+      "caption": "Four requests, four decisions",
       "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.engine import select_provider\n\ns = Settings()\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    sel = select_provider(s, requested=asked)\n    print(\"%-6s -> %-5s | %s\" % (asked, sel.provider, sel.reason[:46]))\nPY",
       "runnable": false,
       "run_tier": "terminal",
@@ -14853,7 +14885,7 @@ window.LESSONS.push({
     "prompt": "Print all three decisions with nothing configured.",
     "starter": "",
     "solution": "```python\nfrom app.config import Settings\nfrom app.engine import select_provider\n\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    print(asked, select_provider(Settings(), requested=asked).provider)\n```",
-    "explanation": "All three land on mock with an empty environment; only the reason differs."
+    "explanation": "All four land on mock with an empty environment; only the reason differs."
   },
   "exercise": {
     "prompt": "What does `requested=\"sarvam\"` select when no key is set, and why?",
@@ -15147,10 +15179,10 @@ window.LESSONS.push({
     {
       "q": "What leaves the process on a live review?",
       "options": [
-        "The whole repository tree",
         "The added lines and their paths",
-        "The whole repository tree as text",
-        "The diff and the keys"
+        "The whole repository tree",
+        "The changed files in full",
+        "The diff and the environment"
       ],
       "answer": 1,
       "why": "The prompt is built from the same bundle the rules read, so nothing outside the diff goes out."
@@ -15346,7 +15378,7 @@ window.LESSONS.push({
   "title": "The benchmark that has not been run",
   "order": 1010,
   "duration_min": 30,
-  "concept_md": "### What exists\n\nA harness under `benchmarks/` that can compare findings against a labelled set, and a matcher that pairs a predicted finding with an expected one. What does not exist is the labelled set.\n\n### What that means\n\n**There is no precision, recall or F1 figure for this tool, and no percentage of any kind.** Not a low one, not an estimate — none. The number cannot be computed without labels, and the labels have not been written.\n\n### Why not approximate it\n\nA figure produced from an unlabelled sample would be a guess wearing a number's clothes. It would be quoted, then cited, then believed, and nobody downstream would know it came from a harness with an empty input.\n\n### What would change it\n\nA labelled set: a sample of diffs, each with the findings a careful reader agrees are there. Then the harness produces real numbers, and the honest sentence becomes a measured one. Until then, the honest sentence is the one above — and any document that states a percentage is stating something this repository cannot support.\n\n### The habit worth keeping\n\nWhen a measurement is missing, write that it is missing. A gap that is named is a task; a gap that is filled with an estimate is a defect that will outlive everyone who knew.",
+  "concept_md": "### What exists\n\nA harness under `benchmarks/` that can compare findings against a labelled set, and a matcher that pairs a predicted finding with an expected one. `benchmarks/golden/` ships two format examples — `example_01` and `example_02` — which exist to show the file shape and are excluded from every metric; the manifest's `evaluation_samples` is empty. What does not exist is the labelled set.\n\n### What that means\n\n**There is no precision, recall or F1 figure for this tool, and no percentage of any kind.** Not a low one, not an estimate — none. The number cannot be computed without labels, and the labels have not been written.\n\n### Why not approximate it\n\nA figure produced from an unlabelled sample would be a guess wearing a number's clothes. It would be quoted, then cited, then believed, and nobody downstream would know it came from a harness with an empty input.\n\n### What would change it\n\nA labelled set: a sample of diffs, each with the findings a careful reader agrees are there. Then the harness produces real numbers, and the honest sentence becomes a measured one. Until then, the honest sentence is the one above — and any document that states a percentage is stating something this repository cannot support.\n\n### The habit worth keeping\n\nWhen a measurement is missing, write that it is missing. A gap that is named is a task; a gap that is filled with an estimate is a defect that will outlive everyone who knew.",
   "code_examples": [
     {
       "id": "10.10-ex-0",
@@ -15397,8 +15429,8 @@ window.LESSONS.push({
   "try_it": {
     "prompt": "List the harness files and show there is no labelled data.",
     "starter": "",
-    "solution": "```console\n$ ls benchmarks/*.py\n$ find benchmarks -name '*.json' -o -name '*.jsonl' | grep -v out\n```",
-    "explanation": "The harness is there; the data it would read is not, which is the whole finding."
+    "solution": "```console\n$ python -c \"import json,pathlib; print(json.loads(pathlib.Path('benchmarks/golden/manifest.json').read_text())['evaluation_samples'])\"\n[]\n```",
+    "explanation": "The manifest's sample list is empty: the two example folders are format demonstrations, not labels."
   },
   "exercise": {
     "prompt": "Which module pairs a predicted finding with an expected one, and what does it need to run?",

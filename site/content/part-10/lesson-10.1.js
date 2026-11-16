@@ -26,9 +26,9 @@ window.LESSONS.push({
     {
       "q": "Which field stops a caller mistaking a fallback for a live run?",
       "options": [
-        "`provider` on the outcome",
+        "`findings` on the outcome",
         "`mode` on the outcome",
-        "`model` on the outcome",
+        "`mode` on the outcome",
         "`latency_ms` on the outcome"
       ],
       "answer": 1,

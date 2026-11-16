@@ -26,10 +26,10 @@ window.LESSONS.push({
     {
       "q": "What leaves the process on a live review?",
       "options": [
-        "The whole repository tree",
         "The added lines and their paths",
-        "The whole repository tree as text",
-        "The diff and the keys"
+        "The whole repository tree",
+        "The changed files in full",
+        "The diff and the environment"
       ],
       "answer": 1,
       "why": "The prompt is built from the same bundle the rules read, so nothing outside the diff goes out."

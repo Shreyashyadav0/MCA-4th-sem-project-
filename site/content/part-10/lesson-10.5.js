@@ -14,7 +14,7 @@ window.LESSONS.push({
     {
       "id": "10.5-ex-0",
       "lang": "console",
-      "caption": "Three requests, three decisions",
+      "caption": "Four requests, four decisions",
       "code": "python - <<'PY'\nfrom app.config import Settings\nfrom app.engine import select_provider\n\ns = Settings()\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    sel = select_provider(s, requested=asked)\n    print(\"%-6s -> %-5s | %s\" % (asked, sel.provider, sel.reason[:46]))\nPY",
       "runnable": false,
       "run_tier": "terminal",
@@ -61,7 +61,7 @@ window.LESSONS.push({
     "prompt": "Print all three decisions with nothing configured.",
     "starter": "",
     "solution": "```python\nfrom app.config import Settings\nfrom app.engine import select_provider\n\nfor asked in (\"auto\", \"sarvam\", \"local\", \"mock\"):\n    print(asked, select_provider(Settings(), requested=asked).provider)\n```",
-    "explanation": "All three land on mock with an empty environment; only the reason differs."
+    "explanation": "All four land on mock with an empty environment; only the reason differs."
   },
   "exercise": {
     "prompt": "What does `requested=\"sarvam\"` select when no key is set, and why?",
