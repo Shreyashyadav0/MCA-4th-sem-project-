@@ -68,7 +68,7 @@
   --text-2xl: 2.75rem;    /* 44px */
   --leading: 1.5;
   --leading-tight: 1.25;
-  --measure: 68ch; /* a lesson is read start to finish; their full width is for reference pages */
+  --measure: 100%; /* W3Schools fills the content area; there is no reading-width cap */
 
   /* --- space: a 4px scale, and nothing outside it ------------------------ */
   --space-1: 0.25rem;

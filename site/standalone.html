@@ -91,7 +91,7 @@
   --text-2xl: 2.75rem;    /* 44px */
   --leading: 1.5;
   --leading-tight: 1.25;
-  --measure: 68ch; /* a lesson is read start to finish; their full width is for reference pages */
+  --measure: 100%; /* W3Schools fills the content area; there is no reading-width cap */
 
   /* --- space: a 4px scale, and nothing outside it ------------------------ */
   --space-1: 0.25rem;
@@ -283,14 +283,26 @@ a:hover {
   color: var(--accent-contrast);
 }
 
-.site-header-inner,
+.site-header-inner {
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: 0 16px;
+}
+
+/* The page is capped and centred as a whole, so the sidebar and the content
+ * move together. W3Schools' own pages do this: one shell, one width. */
+.layout {
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
 .page {
-  max-width: 78rem;
-  /* auto margins beat stretch in a grid, so the column shrank to fit and
-   * drifted sideways between lessons; the track should fill instead. */
+  /* Everything inside fills this one column: prose, code figures, tables and the
+   * section hairlines. The old 68ch cap left 54% of the area empty while the
+   * hairlines ran the full width. */
+  max-width: none;
   margin-inline: 0;
-  justify-self: stretch;
-  padding: 0 var(--space-5);
+  padding-inline: 16px;
 }
 
 .site-header-inner {
@@ -326,7 +338,6 @@ a:hover {
 }
 
 .lede {
-  max-width: var(--measure);
   color: var(--muted);
   margin: 0 0 var(--space-5);
 }
@@ -338,16 +349,19 @@ h1 {
   font-weight: 400;
   font-size: var(--text-xl);
   line-height: var(--leading-tight);
+  letter-spacing: -0.015em;
   margin: 0 0 var(--space-3);
-  max-width: var(--measure);
   color: var(--text);
 }
 
 h2 {
   font-weight: 400;
   font-size: var(--text-lg);
+  letter-spacing: -0.015em;
   line-height: 1.3;
-  margin: var(--space-6) 0 var(--space-3);
+  /* 40px of air above each section, so sections separate without relying on
+   * the hairline. The shorthand used to reset this to 0. */
+  margin: 40px 0 var(--space-3);
 }
 
 h3 {
@@ -387,13 +401,15 @@ h6 {
   margin: var(--space-3) 0 var(--space-1);
 }
 
+/* One width for everything. A rule, a code card and a paragraph all span the
+ * same content column; nothing is narrower than the column it sits in. */
 p,
 ul,
 ol,
 blockquote,
 pre,
 figure {
-  max-width: var(--measure);
+  max-width: none;
 }
 
 
@@ -442,7 +458,13 @@ figure {
 }
 
 .lesson-section > h2 {
+  /* The section supplies the separation: 40px of air above it, and its own
+   * hairline. An h2 inside must not add a second gap. */
   margin-top: 0;
+}
+
+.lesson-section {
+  margin-top: 40px;
 }
 
 .lesson-section[hidden] {
@@ -706,6 +728,10 @@ figure {
 
 @media (max-width: 900px) {
   .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout {
     display: block;
   }
 
@@ -837,6 +863,33 @@ figure {
     font-size: 0.75rem;
     white-space: nowrap;
   }
+}
+
+/* The eyebrow repeated the part: the breadcrumb says "Part 6 — The five-field
+ * contract" and the meta bar said it again on the same line. Keep the
+ * breadcrumb, drop the duplicate, and set what remains as a small-caps label. */
+.lesson-meta-bar .meta-part {
+  display: none;
+}
+
+.breadcrumb {
+  /* Small caps, tracked out, muted — an eyebrow, not a link farm. The links
+   * inherit the muted colour so the line reads as one label. */
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover,
+.breadcrumb a:focus-visible {
+  color: var(--accent-strong);
+  text-decoration: underline;
 }
 
 </style>
@@ -1199,7 +1252,6 @@ details.solution[open] summary {
 /* ------------------------------------------------------------------ quiz */
 
 .quiz {
-  max-width: var(--measure);
 }
 
 .quiz-question {
@@ -1280,7 +1332,6 @@ details.solution[open] summary {
 /* ---------------------------------------------------------------- noscript */
 
 .noscript-note {
-  max-width: var(--measure);
   padding: var(--space-3) var(--space-4);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
@@ -1387,7 +1438,6 @@ mark,
  * shape, with its editor's three dots in the strip. */
 .code-figure {
   margin: var(--space-5) 0;
-  max-width: var(--measure);
   border: 1px solid var(--code-border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -1578,7 +1628,6 @@ pre.code.example-output {
  * to run it, but there when a reader wants to know what to look for. */
 details.expected-output {
   margin-top: var(--space-2);
-  max-width: var(--measure);
 }
 
 details.expected-output summary {
@@ -1596,7 +1645,6 @@ details.expected-output pre.code {
   font-size: 0.875rem;
   /* the terminal panel's ground is grey, where the slate is only 4.21:1 */
   color: var(--muted-on-surface);
-  max-width: var(--measure);
 }
 
 

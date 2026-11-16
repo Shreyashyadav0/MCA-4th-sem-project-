@@ -7,7 +7,6 @@
  * shape, with its editor's three dots in the strip. */
 .code-figure {
   margin: var(--space-5) 0;
-  max-width: var(--measure);
   border: 1px solid var(--code-border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -198,7 +197,6 @@ pre.code.example-output {
  * to run it, but there when a reader wants to know what to look for. */
 details.expected-output {
   margin-top: var(--space-2);
-  max-width: var(--measure);
 }
 
 details.expected-output summary {
@@ -216,7 +214,6 @@ details.expected-output pre.code {
   font-size: 0.875rem;
   /* the terminal panel's ground is grey, where the slate is only 4.21:1 */
   color: var(--muted-on-surface);
-  max-width: var(--measure);
 }
 
 
