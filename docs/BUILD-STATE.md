@@ -4,7 +4,8 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Part 12 committed: `47c5e58`. **THE SITE IS COMPLETE — 110 lessons, 13 parts.**
+`84fb9ae` — the Parts 11-12 audit. **THE SITE IS COMPLETE AND AUDITED: 110 lessons,
+13 parts, gate green.**
 
 ## Validator
 
@@ -48,21 +49,35 @@ Part 0.
 
 ## Next stage
 
-**Stage 2 — the nine-lane audit over Parts 11 and 12 together**, then the freeze,
-the release and MAINTAINING.md.
+**Stage 3 — the final integrity pass (the freeze), then the release, MAINTAINING.md
+and the benchmark labelling tool.**
 
-First concrete action: package the tree and run all nine lanes (schema, anchors,
-claims, quiz, prose, links, accessibility, layout, consistency and honesty) over
-`site/content/part-11/` and `part-12/`. Six of the nine never ran for Part 11.
+The audit is done: five lanes over Parts 11-12 (37 findings, every CRITICAL and HIGH
+fixed), and the three-auditor re-audit is still owed.
 
-Then, in order: fix every CRITICAL and HIGH and re-run each motivating check;
-re-audit with three auditors (anchors, claims, layout); the final integrity pass at
-110; `git tag -a v1.1-site`; `git archive` to a zip plus SHA256SUMS.txt;
-MAINTAINING.md; and the benchmark labelling tool.
+First concrete action: run the freeze's mechanical checks — fifteen keys per lesson,
+every `learn_more` href resolving, the claim greps ("the LLM works", "improves recall
+by", "found N vulnerabilities", "merged achieved", bare percentages), and any rule or
+category count against `app/rules.py`.
+
+Then regenerate and verify every derived artifact: `build_standalone.py`,
+`embed_sources.py`, `build_deck.py`, `build_guide.py` — the guide's line-count table
+and LOCK_PINS are computed at build time, so prove it by grepping the rebuilt PDF
+against `wc -l`.
+
+Then reconcile README (site row, 110 lessons, 13 parts), HANDOFF, site/STATE.md and
+CHANGELOG, and commit "Freeze — site complete (110 lessons)".
+
+Then the release, as five separate commands: `git tag -a v1.1-site`, `git push`,
+`git push --tags`, `git archive --format=zip --prefix=ai-code-reviewer/`, `sha256sum`.
+Verify with `unzip -l` that it lists 110 lesson files and no .git, .venv or pycache.
+
+Then MAINTAINING.md (how to add a lesson, the gate, each checker, the nine lanes, the
+four standing rules) and the benchmark labelling tool.
 
 Watch for the defect class that has appeared in every round: my own fixes
-introducing duplicates, most recently five option pairs created by lengthening a
-copy of the key instead of writing a distinct claim.
+introducing duplicates. In this round it was three quiz pairs and a second true
+option.
 
 Deferred: four word-count paragraphs (10.3, 10.6, 10.8, 10.9) restate a section the
 lesson already had. Not false, but redundant; removing them drops those lessons under
