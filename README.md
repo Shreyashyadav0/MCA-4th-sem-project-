@@ -207,6 +207,8 @@ Stated because a reviewer will find them anyway:
 | [docs/diagrams/](docs/diagrams) | eleven figures, each generated from the code |
 | [docs/learning/](docs/learning) | a seven-track curriculum for rebuilding this from memory |
 | [`site/`](site) | the learning site: **110 lessons across 13 parts**, parts 0-12. Open `site/index.html`, or `site/standalone.html` for one file that works from `file://` |
+| [docs/HANDOVER.md](docs/HANDOVER.md) | **the examiner's entry point** — what is real, what is simulated, what is deferred, in ten minutes |
+| [MAINTAINING.md](MAINTAINING.md) | the maintainer's entry point — how to add a lesson, run the gate, and the four standing rules |
 | [RESUME.md](RESUME.md) · [HANDOFF.md](HANDOFF.md) | recovery checklist and the honesty ledger |
 | [CHANGELOG.md](CHANGELOG.md) | phase-by-phase history with test counts |
 

@@ -19,7 +19,7 @@ window.LESSONS.push({
       "runnable": false,
       "run_tier": "terminal",
       "why_not": "the browser runner does not embed the provider modules; this command runs from a checkout instead.",
-      "expected_output": "harness files: ['__init__.py', 'collect_candidates.py', 'eval.py', 'label_helper.py', 'loader.py', 'matching.py', 'metrics.py', 'report.py', 'runner.py']\nevaluation samples: []"
+      "expected_output": "harness files: ['__init__.py', 'collect_candidates.py', 'eval.py', 'label_helper.py', 'labelling.py', 'loader.py', 'matching.py', 'metrics.py', 'report.py', 'runner.py']\nevaluation samples: []"
     }
   ],
   "quiz": [
