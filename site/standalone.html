@@ -40,6 +40,18 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;    /* 9.09:1 on the charcoal bar */
   --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
   --skip-bg: #047857;
 
   /* --- surfaces ---------------------------------------------------------- */
@@ -132,6 +144,18 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
   --skip-bg: #047857;   /* the skip link keeps the AA green in both themes */
 
   --bg: #282a35;
@@ -156,6 +180,14 @@
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
 
+  --brand-green: #6ee7b7;
+  --brand-suffix: #a9b3bf;
+  --side-bg: #16201b;
+  --side-border: #2b3d34;
+  --side-hover: #1d2a24;
+  --side-active: #12352a;
+  --side-label: #a7f3d0;
+  --side-count: #8fae9f;
   --mark: #4a4218;
   --ok: #34d399;
   --ok-soft: #14352a;
@@ -183,6 +215,18 @@
     --accent: #047857;
     --accent-strong: #047857;
     --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
     --ok-soft: #eefaf2;
     --bad-soft: #fdeff3;
     --code-bg: #f4f4f4;
@@ -521,8 +565,8 @@ figure {
   top: 0;
   height: 100vh;
   overscroll-behavior: contain;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  border-right: 1px solid var(--side-border);
+  background: var(--side-bg);
   /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
   padding: var(--space-3) 0 var(--space-6);
   /* The head stays put and the tree scrolls under it: at 16 lessons the list is
@@ -603,23 +647,28 @@ figure {
 }
 
 .side-toggle:hover {
-  background: var(--bg);
+  background: var(--side-hover);
+}
+
+.side-part-label {
+  color: var(--side-label);
+  font-weight: 600;
 }
 
 .side-toggle[aria-expanded="true"] .side-part-label::before {
   content: "▾ ";
-  color: var(--muted);
+  color: var(--side-count);
 }
 
 .side-toggle[aria-expanded="false"] .side-part-label::before {
   content: "▸ ";
-  color: var(--muted);
+  color: var(--side-count);
 }
 
 .side-part-count {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--muted);
+  color: var(--side-count);
   white-space: nowrap;
 }
 
@@ -643,19 +692,19 @@ figure {
 }
 
 .side-lesson:hover {
-  background: var(--bg);
+  background: var(--side-hover);
   text-decoration: underline;
 }
 
 .side-lesson.is-current {
   border-left-color: var(--accent);
-  background: var(--bg);
+  background: var(--side-active);
   font-weight: 600;
-  color: var(--text); /* the bar carries the green; the label must stay readable */
+  color: var(--text); /* the fill carries the green; the label must stay readable */
 }
 
 .side-tick {
-  color: var(--muted);
+  color: var(--side-count);
   font-weight: 700;
 }
 

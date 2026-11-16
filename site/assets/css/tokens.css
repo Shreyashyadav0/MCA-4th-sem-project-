@@ -17,6 +17,18 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;    /* 9.09:1 on the charcoal bar */
   --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
   --skip-bg: #047857;
 
   /* --- surfaces ---------------------------------------------------------- */
@@ -109,6 +121,18 @@
   --bar-text: #ffffff;
   --bar-muted: #c8cfda;
   --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
   --skip-bg: #047857;   /* the skip link keeps the AA green in both themes */
 
   --bg: #282a35;
@@ -133,6 +157,14 @@
   --sev-medium: #ffd166;
   --sev-low: #8fd3ff;
 
+  --brand-green: #6ee7b7;
+  --brand-suffix: #a9b3bf;
+  --side-bg: #16201b;
+  --side-border: #2b3d34;
+  --side-hover: #1d2a24;
+  --side-active: #12352a;
+  --side-label: #a7f3d0;
+  --side-count: #8fae9f;
   --mark: #4a4218;
   --ok: #34d399;
   --ok-soft: #14352a;
@@ -160,6 +192,18 @@
     --accent: #047857;
     --accent-strong: #047857;
     --accent-contrast: #ffffff;
+  /* The brand sits on the charcoal bar, where the brand green is only 4.74:1.
+   * A brighter green of the same hue reads as green and clears AA at 7.42:1. */
+  --brand-green: #34d399;
+  --brand-suffix: #9aa4b2;  /* 5.65:1 on the bar — dimmer than the brand, still AA */
+
+  /* --- the sidebar: a green ground rather than neutral grey --------------- */
+  --side-bg: #f2f9f5;
+  --side-border: #cbe3d7;
+  --side-hover: #e6f4ec;
+  --side-active: #d9eee1;
+  --side-label: #065f46;    /* 7.19:1 on --side-bg */
+  --side-count: #4b6b5d;    /* 5.52:1 on --side-bg */
     --ok-soft: #eefaf2;
     --bad-soft: #fdeff3;
     --code-bg: #f4f4f4;

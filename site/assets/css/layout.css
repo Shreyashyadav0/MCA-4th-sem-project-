@@ -318,8 +318,8 @@ figure {
   top: 0;
   height: 100vh;
   overscroll-behavior: contain;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  border-right: 1px solid var(--side-border);
+  background: var(--side-bg);
   /* Inline padding keeps the 3px focus ring + 6px halo inside the scroll box. */
   padding: var(--space-3) 0 var(--space-6);
   /* The head stays put and the tree scrolls under it: at 16 lessons the list is
@@ -400,23 +400,28 @@ figure {
 }
 
 .side-toggle:hover {
-  background: var(--bg);
+  background: var(--side-hover);
+}
+
+.side-part-label {
+  color: var(--side-label);
+  font-weight: 600;
 }
 
 .side-toggle[aria-expanded="true"] .side-part-label::before {
   content: "▾ ";
-  color: var(--muted);
+  color: var(--side-count);
 }
 
 .side-toggle[aria-expanded="false"] .side-part-label::before {
   content: "▸ ";
-  color: var(--muted);
+  color: var(--side-count);
 }
 
 .side-part-count {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--muted);
+  color: var(--side-count);
   white-space: nowrap;
 }
 
@@ -440,19 +445,19 @@ figure {
 }
 
 .side-lesson:hover {
-  background: var(--bg);
+  background: var(--side-hover);
   text-decoration: underline;
 }
 
 .side-lesson.is-current {
   border-left-color: var(--accent);
-  background: var(--bg);
+  background: var(--side-active);
   font-weight: 600;
-  color: var(--text); /* the bar carries the green; the label must stay readable */
+  color: var(--text); /* the fill carries the green; the label must stay readable */
 }
 
 .side-tick {
-  color: var(--muted);
+  color: var(--side-count);
   font-weight: 700;
 }
 
