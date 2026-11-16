@@ -33,6 +33,7 @@ would measure the server too.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from collections.abc import Sequence
@@ -70,6 +71,13 @@ EXIT_NO_RESULTS: int = 1
 
 EXIT_DATASET_ERROR: int = 2
 """The dataset could not be loaded."""
+
+EXIT_NO_LABELS: int = 3
+"""``--labels`` was asked for, but no sample carries a hand-written label.
+
+A distinct code so a caller can tell "nothing to score" from "the run failed".
+No figure is printed in this case: a number computed from an empty set would be a
+fabrication, not a measurement."""
 
 #: Column widths for the stdout table, in the order the columns are printed.
 _TABLE_HEADERS: tuple[str, ...] = (
@@ -125,6 +133,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_OUT,
         metavar="PATH",
         help=f"directory for metrics.csv, summary.json, summary.md and chart.png (default: {DEFAULT_OUT})",
+    )
+    parser.add_argument(
+        "--labels",
+        action="store_true",
+        help=(
+            "score against a hand-labelled set and print precision, recall and F1 "
+            "per mode. Refuses to print a figure when no sample carries a label."
+        ),
     )
     parser.add_argument(
         "--quiet",
@@ -202,6 +218,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     dataset = Path(args.dataset)
     out = Path(args.out)
 
+    if args.labels:
+        # A figure computed from an empty label set is not a figure. Check before
+        # anything is scored, so no 0.0 or 1.0 can reach a reader.
+        labelled = _labelled_samples(dataset)
+        if labelled == 0:
+            print(
+                f"{PROG}: no labels yet — {dataset} holds no hand-written "
+                "expected.json, so there is nothing to score against. "
+                "Label some samples first: python benchmarks/labelling.py",
+                file=sys.stderr,
+            )
+            return EXIT_NO_LABELS
+
     try:
         results = run_all(args.modes, dataset_root=dataset)
     except DatasetError as exc:
@@ -216,6 +245,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     json_path = write_summary_json(results, out)
     md_path = write_summary_md(results, out)
     chart_path = write_chart(results, out)
+
+    if args.labels and not args.quiet:
+        print(_label_table(results, labelled))
+        print()
 
     if not args.quiet:
         print(
@@ -234,6 +267,77 @@ def main(argv: Sequence[str] | None = None) -> int:
         print()
 
     return EXIT_OK
+
+
+def _labelled_samples(dataset: Path) -> int:
+    """Count samples under ``dataset`` that carry a hand-written label file.
+
+    Args:
+        dataset: Dataset root.
+
+    Returns:
+        The number of directories holding a non-empty ``expected.json``. A file
+        that does not parse counts as zero labels rather than as an error: the
+        point of the check is only "is there anything to score".
+    """
+    if not dataset.is_dir():
+        return 0
+    # Only samples the manifest lists for evaluation count. The example_* folders
+    # are format demonstrations and are excluded from every reported metric, so a
+    # run that counted them would score against illustrative labels.
+    manifest_path = dataset / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return 0
+    if not isinstance(manifest, dict):
+        return 0
+    listed = manifest.get("evaluation_samples") or []
+    if not isinstance(listed, list):
+        return 0
+
+    count = 0
+    for sample_id in listed:
+        if not isinstance(sample_id, str):
+            continue
+        label = dataset / sample_id / "expected.json"
+        if not label.is_file():
+            continue
+        try:
+            payload = json.loads(label.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(payload, dict) and isinstance(payload.get("findings"), list):
+            count += 1
+    return count
+
+
+def _label_table(results: dict[str, ModeResult], labelled: int) -> str:
+    """Render precision, recall, F1 and latency beside the sample count.
+
+    Args:
+        results: Per-mode results, in report order.
+        labelled: How many samples carry a hand-written label.
+
+    Returns:
+        The table, ready to print. Every figure sits beside the number of samples
+        it was computed from, because a precision over three samples and a
+        precision over three hundred are not the same claim.
+    """
+    lines = [
+        "hand-labelled set: %d sample(s)" % labelled,
+        "",
+        "%-10s %10s %10s %10s %10s %10s %8s" % (
+            "mode", "precision", "recall", "f1", "p50 ms", "p95 ms", "samples"),
+        "-" * 74,
+    ]
+    for name, result in results.items():
+        metrics = result.metrics
+        lines.append("%-10s %10.4f %10.4f %10.4f %10.3f %10.3f %8d" % (
+            name, metrics.precision, metrics.recall, metrics.f1,
+            metrics.latency_p50, metrics.latency_p95, result.samples,
+        ))
+    return "\n".join(lines)
 
 
 def _configure_logging() -> None:

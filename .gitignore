@@ -28,3 +28,6 @@ rebuild/**/__pycache__/
 # Runtime artefacts
 data/
 *.db
+
+# labelling tool scratch file, if a session is interrupted mid-sample
+.labelling.diff

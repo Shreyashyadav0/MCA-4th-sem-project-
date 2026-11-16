@@ -204,11 +204,46 @@ $ sha256sum ai-code-reviewer-site-*.zip | tee SHA256SUMS.txt
 
 ---
 
-## 9. What is not done, and is a person's work
+## 9. When real labels exist: the one documented step for lesson 10.10
 
-- **The benchmark.** The harness is real; the labelled set is not. There is no
-  precision, recall or F1 figure for this tool and the lessons say so. 10.10 explains
-  why an estimate would be worse than a gap.
+10.10 currently says, correctly, that no precision, recall or F1 figure exists. **Do
+not change that lesson until labels exist.** When they do, this is the only sequence
+that may change it:
+
+1. **Label.** `python benchmarks/labelling.py` — see `LABELLING.md`. At least 20
+   samples, and the session must include findings you added that the tool missed.
+
+2. **Score.**
+   ```console
+   $ python -m benchmarks.eval --labels
+   ```
+   It prints precision, recall and F1 per mode with the sample count beside each
+   figure. Copy the figures **from that output only**.
+
+3. **Edit 10.10 in `site/content/part-10/lesson-10.10.js`** — this is the one lesson a
+   labelling pass may change. Replace the paragraph beginning "There is no precision,
+   recall or F1 figure for this tool" with the measured values, and **keep the sample
+   count in the same sentence** as each figure. Keep the closing section about why an
+   estimate would have been worse; it is still the reason the number took a year.
+
+4. **Update the lesson's quiz.** Its first question keys "None, because no labels
+   exist". Re-key it to the measured result and rewrite the `why`.
+
+5. **Run the gate**, all seven commands in section 2. The `check_quiz.py` per-part rule
+   and `check_ranges.py` both apply.
+
+6. **Regenerate** `build_standalone.py`, then commit as
+   `10.10 — measured figures from N labelled samples`.
+
+If a figure cannot be traced to a line of `benchmarks.eval --labels` output, it does not
+go in the lesson. That rule has already caught two fabricated captures in this project.
+
+## 10. What is not done, and is a person's work
+
+- **The benchmark's labels.** The harness, the matcher and the labelling tool are all
+  real; the hand-written labels are not, so there is still no precision, recall or F1
+  figure. `LABELLING.md` is the procedure; section 9 above is the step that turns the
+  first real labels into 10.10's figures.
 - **A real model.** Variant B has never had one behind it here, and variant C never had
   a real key. `DEMO.md` and `HANDOFF.md` are the ledger for that, and they win any
   disagreement.
