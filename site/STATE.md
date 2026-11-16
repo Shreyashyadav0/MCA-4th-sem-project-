@@ -21,6 +21,7 @@ is the bug.
 | 5 | 2026-11-15 | `66006dd` | 17 added, 4 changed | 16 (`6.1`–`6.8`, `7.1`–`7.8`) | `OK lessons=66 parts_covered=8 manifest_entries=66 ids=0.1,…,7.8` |
 | 6a | 2026-11-15 | `423fd33` | 11 added, 4 changed | 10 (`8.1`–`8.10`) | `OK lessons=76 parts_covered=9 manifest_entries=76 ids=0.1,…,8.10` |
 | 6b | 2026-11-15 | `89080b0` | 9 added, 4 changed | 8 (`9.1`–`9.8`) | `OK lessons=84 parts_covered=10 manifest_entries=84 ids=0.1,…,9.8` |
+| 7b-1 | 2026-11-16 | `0104fde` | 7 added, 4 changed | 6 (`11.1`–`11.6`) | `OK lessons=100 parts_covered=12 manifest_entries=100` |
 | 7a | 2026-11-16 | `d5bf954` | 11 added, 4 changed | 10 (`10.1`–`10.10`) | `OK lessons=94 parts_covered=11 manifest_entries=94 ids=0.1,…,10.10` |
 
 A file cannot record the hash of the commit that contains it, so the column above

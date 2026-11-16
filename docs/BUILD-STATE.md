@@ -4,7 +4,7 @@ Read this first. It names the next stage and its first concrete action.
 
 ## Last commit
 
-Wave 7a is now AUDITED: `b6b23b9`. Site at 94 lessons, 11 of 13 parts.
+Part 11 audited: `f5b6acf`. Site at 100 lessons, 12 of 13 parts.
 
 ## Validator
 
@@ -48,19 +48,23 @@ Part 0.
 
 ## Next stage
 
-**Wave 7b — Parts 11 and 12, sixteen lessons (11.1-11.6, 12.1-12.10), site to 110.**
+**Part 12 — ten lessons, 12.1-12.10, site to 110.** The last content wave.
 
-Wave 7a's nine lanes have all run (five, then three re-auditors), every CRITICAL and
-HIGH is fixed, and the re-audit is committed.
+First concrete action: read `reviewer.py`, `app/cli.py`, `app/main.py` and
+`app/github_client.py`, then write the ten lessons with the generator discipline:
+quiz options drafted at equal length AND distinct from each other, executed captures,
+construct-aligned ranges, `part_title` exactly "Surfaces: CLI, API, webhook, GitHub".
 
-First concrete action: read `app/engine.py` and ADRs 0002 and 0004 for Part 11, and
-`reviewer.py`, `app/cli.py`, `app/main.py`, `app/github_client.py` for Part 12, then
-write the sixteen lessons with the generator discipline: equal-length quiz options,
-executed captures, construct-aligned ranges.
+12.9 carries the viva material — three demo variants from DEMO.md, and Sarvam is
+unexercised, never claimed to work. 12.5 is ADR 0005, the 422 demotion. 12.6 is the
+idempotency marker and its exact HTML comment form.
 
-Deferred from this run: four word-count paragraphs (10.3, 10.6, 10.8, 10.9) restate a
-section the lesson already had. Not false, but redundant; removing them drops those
-lessons under the 200-word floor, so it needs a rewrite rather than a deletion.
+Part 11 was audited by three of nine lanes (18 findings, all fixed); six lanes
+remain and should run with Part 12's round.
+
+Deferred: four word-count paragraphs (10.3, 10.6, 10.8, 10.9) restate a section the
+lesson already had. Not false, but redundant; removing them drops those lessons under
+the 200-word floor, so it needs a rewrite rather than a deletion.
 
 Still owed, recorded rather than dropped:
 - the three-auditor re-audit of these fixes
